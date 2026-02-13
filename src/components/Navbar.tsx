@@ -1,6 +1,5 @@
 "use client"
 
-import React from "react"
 import Image from "next/image"
 import { FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
@@ -9,7 +8,7 @@ import { usePathname } from "next/navigation";
 const Navbar = () => {
   const pathname = usePathname();
   return (
-    <div className="w-screen bg-black px-5 p-3 text-white grid grid-cols-3 items-center">
+    <div className="w-full bg-black px-5 p-3 text-white grid grid-cols-3 items-center">
       <div className="flex gap-4 items-center">
         <Link href="/">
           <Image src="/images/logo.svg" alt="BLF Logo" width={80} height={80} />
