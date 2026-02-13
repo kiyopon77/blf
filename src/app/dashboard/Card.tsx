@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-const Card = ({ heading, icon, value }) => {
+const Card = ({ heading, icon, value }: {heading: string, icon: string, value: number}) => {
   return (
     <div className="bg-white shadow-gray-300 shadow-sm p-5 rounded-2xl h-35 flex flex-col justify-between">
       <div className="flex items-center justify-between w-full">

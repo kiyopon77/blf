@@ -16,7 +16,7 @@ export const metadata = {
   description: "BLF Inventory Management",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: {children: React.ReactNode}) {
   return (
     <html lang="en">
       <body
