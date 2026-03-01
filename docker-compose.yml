@@ -19,6 +19,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: real_estate_frontend
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost/api
+    depends_on:
+      - backend
+    networks:
+      - app_network
 
   pgadmin:
     image: dpage/pgadmin4
