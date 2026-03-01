@@ -27,6 +27,8 @@ services:
     restart: always
     environment:
       NEXT_PUBLIC_API_URL: http://localhost/api
+    ports:
+      - "3000:3000"
     depends_on:
       - backend
     networks:
