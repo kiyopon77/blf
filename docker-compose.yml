@@ -63,6 +63,8 @@ services:
       - app_network
     volumes:
       - ./backend:/app
+    ports:
+      - "8000:8000"
 
   nginx:
     build:
