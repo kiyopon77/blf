@@ -168,3 +168,16 @@ CREATE INDEX idx_floors_status ON floors(status);
 CREATE INDEX idx_sales_broker ON sales(broker_id);
 CREATE INDEX idx_sales_status ON sales(status);
 CREATE INDEX idx_payments_sale ON payments(sale_id);
+
+
+-- ==================================================
+-- DEFAULT ADMIN USER
+-- ==================================================
+INSERT INTO users (full_name, email, hashed_password, role, is_active)
+VALUES (
+    'Admin',
+    'admin@blf.com',
+    '$2b$12$ytRFOrhRkVH2t2Qye1g.m.jH1diVJTqFbq2OWGfzEzPrdcCz6doZC',
+    'admin',
+    true
+);
