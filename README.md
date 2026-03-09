@@ -72,6 +72,15 @@ docker compose up -d --build
 docker compose ps
 ```
 
+### Run DB + Backend Only
+
+```bash
+docker compose up -d --build db backend
+
+# test
+curl http://localhost:8000/docs
+```
+
 ### Stop the Project
 
 ```bash
