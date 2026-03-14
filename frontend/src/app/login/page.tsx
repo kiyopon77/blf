@@ -4,21 +4,44 @@ import LoginBox from "./LoginBox"
 
 const Login = () => {
   return (
-    <div className="min-h-screen flex flex-col gap-5 justify-center items-center text-center">
-      <div>
-        <Image src="/images/logo.svg" width={300} height={300} alt="BLF Logo" />
+    <div className="relative h-screen w-screen overflow-hidden flex items-center justify-center">
+
+      <div className="absolute inset-0">
+        <Image
+          src="/images/login-bg.jpg"
+          alt="Office Background"
+          fill
+          className="object-cover blur-sm scale-105"
+          priority
+        />
       </div>
-      <div className="mt-4">
-        <span className="text-4xl font-bold">
-          BLF Inventory Management
-        </span>
+
+      <div className="absolute inset-0 bg-black/60"></div>
+
+      <div className="relative z-10 flex flex-col items-center text-center gap-6">
+
+        <Image
+          src="/images/logo.svg"
+          width={220}
+          height={220}
+          alt="BLF Logo"
+        />
+
+        <div className="flex flex-col gap-2">
+          <h1 className="text-4xl font-bold text-white">
+            BLF Inventory Management
+          </h1>
+
+          <p className="text-gray-300 max-w-md">
+            The all-in-one Inventory Management System
+          </p>
+        </div>
+
+        <LoginBox />
+
       </div>
-    <div>
-   <LoginBox /> 
-    </div>
     </div>
   )
 }
 
 export default Login
-

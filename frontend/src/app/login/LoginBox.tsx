@@ -31,7 +31,7 @@ const LoginBox = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col bg-white p-9 items-start w-xl gap-3 shadow-gray-200 shadow-xl border-2 border-gray-200 rounded-2xl"
+      className="flex flex-col bg-white p-9 items-start w-xl gap-3 shadow-xl border-2 border-gray-200 rounded-2xl"
     >
       <span className="font-bold text-3xl">Log In</span>
 
