@@ -11,6 +11,7 @@
   "dependencies": {
     "@syncfusion/ej2-react-layouts": "^32.2.3",
     "antd": "^6.3.0",
+    "axios": "^1.13.6",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
