@@ -12,26 +12,29 @@ blf/
 │   └── app/
 │       ├── main.py
 │       ├── core/
-│       │   ├── config.py         ← Loads env vars
-│       │   ├── database.py       ← DB connection
-│       │   ├── security.py       ← JWT + password hashing
-│       │   └── dependencies.py   ← Route guards (auth checks)
+│       │   ├── config.py
+│       │   ├── database.py
+│       │   ├── security.py
+│       │   └── dependencies.py
 │       ├── models/
-│       │   └── user.py           ← SQLAlchemy User model
+│       │   ├── user.py, plot.py, floor.py, rm.py
+│       │   ├── broker.py, customer.py, sale.py, payment.py
 │       ├── schemas/
-│       │   └── user.py           ← Request/Response shapes
+│       │   ├── user.py, plot.py, floor.py, rm.py
+│       │   ├── broker.py, customer.py, sale.py, payment.py, dashboard.py
 │       ├── services/
-│       │   └── auth.py           ← Business logic
+│       │   └── auth.py
 │       └── routers/
-│           └── auth.py           ← Auth endpoints
+│           ├── auth.py, plots.py, floors.py, rms.py
+│           ├── brokers.py, customers.py, sales.py, payments.py, dashboard.py
 ├── dbms/db/
 │   ├── .env                  ← DB credentials (never commit)
-│   └── init.sql              ← All table definitions
+│   └── init.sql              ← All table definitions + default admin
 ├── frontend/                 ← Next.js TypeScript frontend
-│   └── Dockerfile            ← (to be set up)
+│   └── Dockerfile
 └── nginx/
     ├── Dockerfile
-    └── nginx.conf            ← Reverse proxy config
+    └── nginx.conf
 ```
 
 ---
@@ -49,20 +52,7 @@ blf/
 
 ---
 
-
-
-## Figma Page link: 
-https://www.figma.com/design/SQSjEaEBtizxbxIGrIA658/Untitled?node-id=0-1&t=EKxfVSmJ11u3VC4I-1
-
----
-
 ## Getting Started
-
-### Prerequisites
-- Docker Desktop installed and running
-- That's it — everything else runs in containers
-
-### Run the Project
 
 ```bash
 # from blf/ root
@@ -72,178 +62,416 @@ docker compose up -d --build
 docker compose ps
 ```
 
-### Run DB + Backend Only
+### Run DB + Backend Only (without frontend/nginx)
 
 ```bash
-docker compose up -d --build db backend
+docker compose up -d --build db backend pgadmin
 
 # test
 curl http://localhost:8000/docs
 ```
 
-### Stop the Project
-
-```bash
-docker compose down
-
-# to also delete database data (fresh start)
-docker compose down -v
-```
-
----
-
-## Environment Variables
-
-### `backend/.env`
-```env
-DATABASE_URL=postgresql://admin:admin123@db:5432/realestate
-SECRET_KEY=your-secret-key-here
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=15
-REFRESH_TOKEN_EXPIRE_DAYS=7
-```
-
-### `dbms/db/.env`
-```env
-POSTGRES_DB=realestate
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=admin123
-```
-
-> ⚠️ Never commit `.env` files to git. They are in `.gitignore`.
-
 ---
 
 ## URLs
 
-| Service         | URL                          |
-|-----------------|------------------------------|
-| Frontend        | http://localhost             |
-| API (via Nginx) | http://localhost/api         |
-| Swagger Docs    | http://localhost/api/docs    |
-| pgAdmin         | http://localhost:5050        |
-
-> Note: Direct backend access on port 8000 is disabled. All traffic goes through Nginx on port 80.
+| Service      | URL                       |
+|--------------|---------------------------|
+| Frontend     | http://localhost          |
+| API          | http://localhost/api      |
+| Swagger Docs | http://localhost/api/docs |
+| pgAdmin      | http://localhost:5050     |
 
 ---
 
-## Auth API — For Frontend Developer
+## Test Credentials
+
+| Role  | Email         | Password |
+|-------|---------------|----------|
+| Admin | admin@blf.com | admin123 |
+
+---
+
+## API Reference
 
 ### Base URL
 ```
 http://localhost/api
 ```
 
+### Authentication Header (required on all endpoints except login)
+```
+Authorization: Bearer <access_token>
+```
+
 ---
 
-### 1. Login
-```
-POST /api/auth/login
-```
+## Auth
 
-**Request body:**
+### Login
+```
+POST /auth/login
+```
+```json
+// Request
+{ "email": "admin@blf.com", "password": "admin123" }
+
+// Response
+{ "access_token": "eyJ...", "token_type": "bearer", "role": "admin" }
+```
+- access_token expires in **15 minutes**
+- refresh_token set as **httpOnly cookie** automatically
+
+### Refresh Token
+```
+POST /auth/refresh
+```
+No body needed — reads cookie automatically. Returns new access_token.
+
+### Logout
+```
+POST /auth/logout
+```
+Clears refresh token cookie.
+
+### Get Current User
+```
+GET /auth/me
+```
 ```json
 {
-  "email": "admin@blf.com",
-  "password": "admin123"
+  "user_id": 1, "full_name": "Admin", "email": "admin@blf.com",
+  "role": "admin", "is_active": true, "created_at": "..."
 }
 ```
 
-**Response:**
+### Create User (Admin only)
+```
+POST /auth/users
+```
+```json
+{ "full_name": "John", "email": "john@blf.com", "password": "pass123", "role": "user" }
+```
+
+### List Users (Admin only)
+```
+GET /auth/users
+```
+
+---
+
+## Dashboard
+
+### Get Summary Counts
+```
+GET /dashboard
+```
 ```json
 {
-  "access_token": "eyJhbGci...",
-  "token_type": "bearer",
-  "role": "admin"
+  "total_plots": 5,
+  "total_floors": 20,
+  "available": 12,
+  "hold": 4,
+  "sold": 3,
+  "cancelled": 1
 }
 ```
-
-- `access_token` expires in **15 minutes**
-- `refresh_token` is set automatically as an **httpOnly cookie** (you don't handle it manually)
+> Powers the 5 dashboard cards
 
 ---
 
-### 2. Refresh Token (Silent Re-auth)
+## Plots
+
+### List All Plots
 ```
-POST /api/auth/refresh
+GET /plots
+```
+```json
+[{ "plot_id": 1, "plot_code": "C1", "length": 30.0, "breadth": 20.0, "created_at": "..." }]
 ```
 
-No request body needed — refresh token is read from the httpOnly cookie automatically.
+### Get Single Plot
+```
+GET /plots/{plot_id}
+```
 
-**Response:** Same as login (new access_token)
+### Get Floors of a Plot
+```
+GET /plots/{plot_id}/floors
+```
+```json
+[{ "floor_id": 1, "plot_id": 1, "floor_no": 1, "status": "AVAILABLE", "active_sale_id": null }]
+```
+> Use for floor status matrix. Status values: AVAILABLE, HOLD, SOLD, CANCELLED
 
-Call this automatically when you get a `401` response on any request.
+### Create Plot (Admin only)
+```
+POST /plots
+```
+```json
+{ "plot_code": "C1", "length": 30.0, "breadth": 20.0 }
+```
+
+### Update Plot (Admin only)
+```
+PUT /plots/{plot_id}
+```
+```json
+{ "length": 35.0, "breadth": 25.0 }
+```
+
+### Delete Plot (Admin only)
+```
+DELETE /plots/{plot_id}
+```
 
 ---
 
-### 3. Logout
+## Floors
+
+### List All Floors
 ```
-POST /api/auth/logout
+GET /floors
 ```
 
-Clears the refresh token cookie. No request body needed.
+### Get Single Floor
+```
+GET /floors/{floor_id}
+```
+
+### Create Floor (Admin only)
+```
+POST /floors
+```
+```json
+{ "plot_id": 1, "floor_no": 1 }
+```
+
+### Update Floor Status (Admin only)
+```
+PUT /floors/{floor_id}/status
+```
+```json
+{ "status": "AVAILABLE" }
+```
 
 ---
 
-### 4. Get Current User
+## Relationship Managers
+
+### List All RMs
 ```
-GET /api/auth/me
-Headers: Authorization: Bearer <access_token>
+GET /rms
 ```
 
-**Response:**
+### Get Single RM
+```
+GET /rms/{rm_id}
+```
+
+### Create RM (Admin only)
+```
+POST /rms
+```
+```json
+{ "name": "Rajesh Kumar", "email": "rajesh@blf.com", "phone": "9999999999" }
+```
+
+### Update RM (Admin only)
+```
+PUT /rms/{rm_id}
+```
+```json
+{ "name": "Rajesh", "phone": "8888888888" }
+```
+
+### Delete RM (Admin only)
+```
+DELETE /rms/{rm_id}
+```
+
+---
+
+## Brokers
+
+### List All Brokers
+```
+GET /brokers
+```
+```json
+[{
+  "broker_id": 1, "broker_name": "John Doe", "company": "Doe Realty",
+  "phone": "8888888888", "email": "john@doe.com", "rm_id": 1, "created_at": "..."
+}]
+```
+
+### Get Single Broker
+```
+GET /brokers/{broker_id}
+```
+
+### Create Broker (Admin only)
+```
+POST /brokers
+```
+```json
+{ "broker_name": "John Doe", "company": "Doe Realty", "phone": "8888888888", "email": "john@doe.com", "rm_id": 1 }
+```
+
+### Update Broker (Admin only)
+```
+PUT /brokers/{broker_id}
+```
+```json
+{ "broker_name": "John", "company": "Updated Realty", "phone": "7777777777" }
+```
+
+### Delete Broker (Admin only)
+```
+DELETE /brokers/{broker_id}
+```
+
+---
+
+## Customers
+
+### List All Customers
+```
+GET /customers
+```
+```json
+[{
+  "customer_id": 1, "full_name": "Amit Shah", "pan": "ABCDE1234F",
+  "phone": "7777777777", "email": "amit@gmail.com", "address": "Delhi",
+  "kyc_status": "PENDING", "created_at": "..."
+}]
+```
+
+### Get Single Customer
+```
+GET /customers/{customer_id}
+```
+
+### Create Customer
+```
+POST /customers
+```
+```json
+{ "full_name": "Amit Shah", "pan": "ABCDE1234F", "phone": "7777777777", "email": "amit@gmail.com", "address": "Delhi" }
+```
+
+### Update Customer / KYC Status
+```
+PUT /customers/{customer_id}
+```
+```json
+{ "kyc_status": "COMPLETED", "phone": "6666666666", "address": "Mumbai" }
+```
+
+---
+
+## Sales
+
+### List All Sales
+```
+GET /sales
+```
+```json
+[{
+  "sale_id": 1, "floor_id": 3, "broker_id": 1, "customer_id": 1,
+  "total_value": 245000.0, "commission_percent": 2.5,
+  "status": "HOLD", "initiated_at": "..."
+}]
+```
+
+### Get Sale Detail (enriched)
+```
+GET /sales/{sale_id}
+```
 ```json
 {
-  "user_id": 1,
-  "full_name": "Admin",
-  "email": "admin@blf.com",
-  "role": "admin",
-  "is_active": true,
-  "created_at": "2026-02-28T..."
+  "sale_id": 1,
+  "total_value": 245000.0,
+  "commission_percent": 2.5,
+  "status": "HOLD",
+  "initiated_at": "2026-03-14T...",
+  "broker_name": "John Doe",
+  "customer_name": "Amit Shah",
+  "customer_kyc_status": "PENDING",
+  "floor_no": 2,
+  "plot_code": "C1"
 }
 ```
+> Use this for the plot detail page — has all info for ValueCard, BrokerInfoCard, CustomerCard
 
----
-
-### 5. Create User (Admin only)
+### Create Sale
 ```
-POST /api/auth/users
-Headers: Authorization: Bearer <access_token>
+POST /sales
 ```
-
-**Request body:**
 ```json
-{
-  "full_name": "John Doe",
-  "email": "john@blf.com",
-  "password": "password123",
-  "role": "user"
-}
+{ "floor_id": 3, "broker_id": 1, "customer_id": 1, "total_value": 245000.00, "commission_percent": 2.5 }
 ```
+> Automatically sets floor status to HOLD and creates 6 milestone payment records
 
-Roles: `"admin"` or `"user"`
+### Update Sale Status (Admin only)
+```
+PUT /sales/{sale_id}/status
+```
+```json
+{ "status": "SOLD" }   // SOLD or CANCELLED
+```
+> SOLD → floor becomes SOLD | CANCELLED → floor becomes CANCELLED
+
+### Get Sale Milestones
+```
+GET /sales/{sale_id}/payments
+```
+```json
+[
+  { "payment_id": 1, "sale_id": 1, "milestone": "TOKEN", "amount": 45000.0, "status": "DONE", "paid_at": "..." },
+  { "payment_id": 2, "sale_id": 1, "milestone": "ATS", "amount": null, "status": "PENDING", "paid_at": null },
+  { "payment_id": 3, "sale_id": 1, "milestone": "SUPERSTRUCTURE", "amount": null, "status": "PENDING", "paid_at": null },
+  { "payment_id": 4, "sale_id": 1, "milestone": "PROPERTY_ID", "amount": null, "status": "PENDING", "paid_at": null },
+  { "payment_id": 5, "sale_id": 1, "milestone": "REGISTRY", "amount": null, "status": "PENDING", "paid_at": null },
+  { "payment_id": 6, "sale_id": 1, "milestone": "POSSESSION", "amount": null, "status": "PENDING", "paid_at": null }
+]
+```
+> Use this for MilestoneCard and PaymentInfoCard
 
 ---
 
-### 6. List All Users (Admin only)
+## Payments
+
+### Update Milestone
 ```
-GET /api/auth/users
-Headers: Authorization: Bearer <access_token>
+PUT /payments/{payment_id}
+```
+```json
+{ "status": "DONE", "amount": 45000.00 }
+```
+> paid_at is set automatically when status is DONE
+
+---
+
+## Page → API Mapping
+
+| Page         | API Calls                                                                 |
+|--------------|---------------------------------------------------------------------------|
+| `/login`     | `POST /auth/login`                                                        |
+| `/dashboard` | `GET /dashboard`, `GET /plots`, `GET /plots/{id}/floors`                  |
+| `/plot/{id}` | `GET /floors/{id}` → get active_sale_id, `GET /sales/{id}`, `GET /sales/{id}/payments` |
+| `/settings`  | `GET /auth/users`, `POST /auth/users` (admin only)                        |
+
+### Plot Detail Page Data Flow
+```
+1. GET /floors/{floor_id}          → get active_sale_id
+2. GET /sales/{active_sale_id}     → ValueCard, BrokerInfoCard, CustomerCard data
+3. GET /sales/{sale_id}/payments   → MilestoneCard, PaymentInfoCard data
 ```
 
 ---
 
-## Frontend Implementation Guide
-
-### Token Storage
-```
-✅ Store access_token in React state or Context (memory)
-✅ Refresh token is handled automatically via httpOnly cookie
-❌ Never store access_token in localStorage (XSS risk)
-❌ Never store access_token in sessionStorage
-```
-
-### Axios Setup (recommended)
+## Axios Setup
 
 ```typescript
 // lib/axios.ts
@@ -251,15 +479,13 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: 'http://localhost/api',
-  withCredentials: true,  // IMPORTANT: sends cookies with every request
+  withCredentials: true,  // IMPORTANT: sends cookies (refresh token)
 })
 
 // Attach token to every request
 api.interceptors.request.use((config) => {
-  const token = getAccessToken() // from your auth context/state
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
+  const token = getAccessToken() // from your auth context
+  if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
@@ -270,15 +496,13 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         const { data } = await axios.post(
-          'http://localhost/api/auth/refresh',
-          {},
+          'http://localhost/api/auth/refresh', {},
           { withCredentials: true }
         )
-        setAccessToken(data.access_token) // update your auth context
+        setAccessToken(data.access_token)
         error.config.headers.Authorization = `Bearer ${data.access_token}`
         return axios(error.config)
       } catch {
-        // refresh failed — redirect to login
         redirectToLogin()
       }
     }
@@ -289,173 +513,29 @@ api.interceptors.response.use(
 export default api
 ```
 
-### Auth Context (recommended)
-
-```typescript
-// context/AuthContext.tsx
-import { createContext, useContext, useState } from 'react'
-
-interface AuthContextType {
-  accessToken: string | null
-  role: string | null
-  login: (email: string, password: string) => Promise<void>
-  logout: () => void
-}
-
-export const AuthContext = createContext<AuthContextType>(null!)
-
-export function AuthProvider({ children }) {
-  const [accessToken, setAccessToken] = useState<string | null>(null)
-  const [role, setRole] = useState<string | null>(null)
-
-  const login = async (email: string, password: string) => {
-    const { data } = await api.post('/auth/login', { email, password })
-    setAccessToken(data.access_token)
-    setRole(data.role)
-  }
-
-  const logout = async () => {
-    await api.post('/auth/logout')
-    setAccessToken(null)
-    setRole(null)
-  }
-
-  return (
-    <AuthContext.Provider value={{ accessToken, role, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
-
-export const useAuth = () => useContext(AuthContext)
-```
-
-### Protected Route (recommended)
-
-```typescript
-// components/ProtectedRoute.tsx
-import { useAuth } from '@/context/AuthContext'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-
-export function ProtectedRoute({ children, requireAdmin = false }) {
-  const { accessToken, role } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (!accessToken) {
-      router.push('/login')
-      return
-    }
-    if (requireAdmin && role !== 'admin') {
-      router.push('/unauthorized')
-    }
-  }, [accessToken, role])
-
-  return <>{children}</>
-}
-```
-
 ---
 
-## Docker Setup for Frontend
-
-Add a `frontend/Dockerfile`:
-
-```dockerfile
-FROM node:18-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-
-EXPOSE 3000
-
-CMD ["npm", "run", "dev"]
+## Token Rules
 ```
-
-Then add to `docker-compose.yml` under services:
-
-```yaml
-frontend:
-  build:
-    context: ./frontend
-    dockerfile: Dockerfile
-  container_name: real_estate_frontend
-  restart: always
-  ports:
-    - "3000:3000"
-  networks:
-    - app_network
-  volumes:
-    - ./frontend:/app
-    - /app/node_modules
+✅ Store access_token in React state / Context (memory only)
+✅ withCredentials: true on axios — handles refresh cookie automatically
+❌ Never store access_token in localStorage
+❌ Never store access_token in sessionStorage
 ```
-
-And update `nginx/nginx.conf` to replace the placeholder location block:
-
-```nginx
-location / {
-    proxy_pass http://frontend:3000;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-}
-```
-
----
-
-## Database
-
-### View Database
-Go to http://localhost:5050
-- Email: `admin@admin.com`
-- Password: `admin123`
-- Server connection: host=`db`, port=`5432`, user=`admin`, password=`admin123`
-
-### Tables
-| Table                  | Description                    |
-|------------------------|--------------------------------|
-| users                  | Admin and user accounts        |
-| plots                  | Land plots with dimensions     |
-| floors                 | Floor units per plot           |
-| customers              | Customer KYC data              |
-| sales                  | Transaction records            |
-| payments               | Milestone payment tracking     |
-| brokers                | Broker profiles                |
-| relationship_managers  | RM profiles                    |
-
----
-
-## Test Credentials
-
-| Role  | Email           | Password   |
-|-------|-----------------|------------|
-| Admin | admin@blf.com   | admin123   |
-| User  | user1@blf.com   | user123    |
 
 ---
 
 ## Common Commands
 
 ```bash
-# View logs
+# Logs
 docker compose logs backend
 docker compose logs nginx
-docker compose logs db
+docker compose logs frontend
 
 # Rebuild single service
 docker compose up -d --build backend
 docker compose up -d --build frontend
-docker compose up -d --build nginx
-
-# Restart single service
-docker compose restart backend
 
 # Fresh start (deletes all data)
 docker compose down -v
