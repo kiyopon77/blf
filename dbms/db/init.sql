@@ -228,4 +228,4 @@ VALUES (
     'admin',
     true
 );
-
+);
