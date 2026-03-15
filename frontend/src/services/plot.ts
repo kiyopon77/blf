@@ -9,21 +9,100 @@ export const getPlotDetail = async (plotCode: string, floorNo: number) => {
   const floor = floors.find((f: any) => f.floor_no === floorNo)
 
   let sale = null
-  let payments = []
+  let broker = null
+  let customer = null
+  let payments: any[] = []
 
   if (floor.active_sale_id) {
 
-    const { data } = await api.get(`/sales/${floor.active_sale_id}`)
-    sale = data
+    // SaleDetailResponse (has names, floor_no, plot_code but no IDs)
+    const { data: saleDetail } = await api.get(`/sales/${floor.active_sale_id}`)
 
-    const res = await api.get(`/sales/${floor.active_sale_id}/payments`)
-    payments = res.data
+    // SaleResponse from list has broker_id + customer_id
+    // BUT — floor.active_sale_id gives us sale_id, and GET /sales returns SaleResponse[]
+    // which has broker_id and customer_id directly
+    const { data: allSales } = await api.get("/sales")
+    const saleBase = allSales.find((s: any) => s.sale_id === floor.active_sale_id)
+
+    const brokerId = saleBase?.broker_id ?? null
+    const customerId = saleBase?.customer_id ?? null
+
+    const [brokerRes, customerRes, paymentsRes] = await Promise.all([
+      brokerId ? api.get(`/brokers/${brokerId}`) : Promise.resolve({ data: null }),
+      customerId ? api.get(`/customers/${customerId}`) : Promise.resolve({ data: null }),
+      api.get(`/sales/${floor.active_sale_id}/payments`)
+    ])
+
+    broker = brokerRes.data
+    customer = customerRes.data
+    payments = paymentsRes.data
+
+    sale = {
+      ...saleDetail,
+      broker_id: brokerId,
+      customer_id: customerId,
+    }
+
   }
 
-  return {
-    plot,
-    floor,
-    sale,
-    payments
+  return { plot, floor, sale, broker, customer, payments }
+
+}
+
+export const updatePlot = async (
+  plotId: number,
+  payload: { length?: number; breadth?: number }
+) => {
+  const { data } = await api.put(`/plots/${plotId}`, payload)
+  return data
+}
+
+export const updateFloorStatus = async (
+  floorId: number,
+  status: "AVAILABLE" | "HOLD" | "SOLD" | "CANCELLED"
+) => {
+  const { data } = await api.put(`/floors/${floorId}/status`, { status })
+  return data
+}
+
+export const updateBroker = async (
+  brokerId: number,
+  payload: { broker_name?: string; company?: string; phone?: string }
+) => {
+  const { data } = await api.put(`/brokers/${brokerId}`, payload)
+  return data
+}
+
+export const updateCustomer = async (
+  customerId: number,
+  payload: {
+    full_name?: string
+    phone?: string
+    email?: string
+    address?: string
+    kyc_status?: string
   }
+) => {
+  const { data } = await api.put(`/customers/${customerId}`, payload)
+  return data
+}
+
+export const updatePayment = async (
+  paymentId: number,
+  payload: {
+    status: "DONE" | "PENDING"
+    amount?: number | null
+    paid_at?: string | null
+  }
+) => {
+  const { data } = await api.put(`/payments/${paymentId}`, payload)
+  return data
+}
+
+export const updateSaleStatus = async (
+  saleId: number,
+  status: "HOLD" | "SOLD" | "CANCELLED"
+) => {
+  const { data } = await api.put(`/sales/${saleId}/status`, { status })
+  return data
 }
