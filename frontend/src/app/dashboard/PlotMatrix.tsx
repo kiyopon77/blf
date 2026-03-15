@@ -99,7 +99,7 @@ export default function PlotMatrix() {
                         onClick={() =>
                           goToPlot(plot.plot, floor)
                         }
-                        className={`w-full py-4 rounded-lg ${statusColor[floorData.status]}`}
+                        className={`w-full py-4 rounded-lg hover:scale-105 hover:cursor-pointer transition-all ${statusColor[floorData.status]}`}
                       >
                         {plot.plot}-{floor}
                       </button>
