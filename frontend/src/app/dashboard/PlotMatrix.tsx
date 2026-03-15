@@ -1,64 +1,16 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { getPlotMatrix } from "@/services/plotMatrix"
 
 type Plot = {
   plot: string
   floors: {
-    floor: string
+    floor: number
     status: "available" | "sold" | "hold" | "cancelled"
   }[]
 }
-
-const floors = ["1st", "2nd", "3rd", "4th"]
-
-const plots: Plot[] = [
-  {
-    plot: "C1",
-    floors: [
-      { floor: "1", status: "available" },
-      { floor: "2", status: "sold" },
-      { floor: "3", status: "hold" },
-      { floor: "4", status: "available" },
-    ],
-  },
-  {
-    plot: "C2",
-    floors: [
-      { floor: "1", status: "sold" },
-      { floor: "2", status: "available" },
-      { floor: "3", status: "hold" },
-      { floor: "4", status: "sold" },
-    ],
-  },
-  {
-    plot: "C3",
-    floors: [
-      { floor: "1", status: "available" },
-      { floor: "2", status: "available" },
-      { floor: "3", status: "sold" },
-      { floor: "4", status: "hold" },
-    ],
-  },
-  {
-    plot: "C4",
-    floors: [
-      { floor: "1", status: "hold" },
-      { floor: "2", status: "sold" },
-      { floor: "3", status: "available" },
-      { floor: "4", status: "cancelled" },
-    ],
-  },
-  {
-    plot: "C5",
-    floors: [
-      { floor: "1", status: "hold" },
-      { floor: "2", status: "sold" },
-      { floor: "3", status: "available" },
-      { floor: "4", status: "available" },
-    ],
-  },
-]
 
 const statusColor = {
   available: "bg-green-200 text-green-900",
@@ -67,109 +19,105 @@ const statusColor = {
   cancelled: "bg-gray-300 text-gray-800",
 }
 
-const PlotMatrix = () => {
-  const router = useRouter()
+export default function PlotMatrix() {
 
-  const goToPlot = (plot: string, floor: string) => {
+  const router = useRouter()
+  const [plots, setPlots] = useState<Plot[]>([])
+  const [floors, setFloors] = useState<number[]>([])
+
+  useEffect(() => {
+
+    const load = async () => {
+
+      const data = await getPlotMatrix()
+      setPlots(data)
+
+      const maxFloor = Math.max(
+        ...data.flatMap((p: Plot) => p.floors.map((f) => f.floor))
+      )
+
+      const floorList = Array.from({ length: maxFloor }, (_, i) => i + 1)
+
+      setFloors(floorList)
+    }
+
+    load()
+
+  }, [])
+
+  const goToPlot = (plot: string, floor: number) => {
     router.push(`/plot/${plot}-${floor}`)
   }
+
+  if (!plots.length) return <div>Loading matrix...</div>
 
   return (
     <div className="px-10 pb-10">
 
       <div className="bg-white rounded-xl shadow p-8">
 
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <h2 className="text-xl font-semibold mb-8">
+          Plot Status Matrix
+        </h2>
 
-          <h2 className="text-xl font-semibold">
-            Plot Status Matrix
-          </h2>
+        <table className="w-full">
 
-          <div className="flex gap-6 text-sm">
+          <thead>
+            <tr className="text-gray-500 text-sm">
 
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-green-400"></span>
-              Available
-            </div>
+              <th className="w-16 text-left pb-4"></th>
+              {floors.map((floor) => (
+                <th key={floor} className="text-center pb-4">
+                  {floor}
+                </th>
+              ))}
 
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-400"></span>
-              Sold
-            </div>
+            </tr>
+          </thead>
 
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-yellow-400"></span>
-              On Hold
-            </div>
+          <tbody>
 
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-gray-400"></span>
-              Cancelled
-            </div>
+            {plots.map((plot) => (
 
-          </div>
-        </div>
+              <tr key={plot.plot}>
 
-        {/* Matrix */}
-        <div className="overflow-x-auto">
+                <td className="w-16 font-semibold text-gray-700 pr-2">
+                  {plot.plot}
+                </td>
+                {floors.map((floor) => {
 
-          <table className="w-full">
+                  const floorData = plot.floors.find(
+                    (f) => f.floor === floor
+                  )
 
-            <thead>
-              <tr className="text-gray-500 text-sm">
-                <th className="w-20 text-left pb-4"></th>
+                  if (!floorData) return <td key={floor}></td>
 
-                {floors.map((floor) => (
-                  <th
-                    key={floor}
-                    className="text-center pb-4 font-medium"
-                  >
-                    {floor}
-                  </th>
-                ))}
-
-              </tr>
-            </thead>
-
-            <tbody>
-
-              {plots.map((plot) => (
-                <tr key={plot.plot}>
-
-                  {/* Plot Label */}
-                  <td className="font-semibold text-gray-700 pr-4">
-                    {plot.plot}
-                  </td>
-
-                  {plot.floors.map((floor) => (
-                    <td key={floor.floor} className="p-2">
+                  return (
+                    <td key={floor} className="p-2">
 
                       <button
                         onClick={() =>
-                          goToPlot(plot.plot, floor.floor)
+                          goToPlot(plot.plot, floor)
                         }
-                        className={`w-full py-4 rounded-lg font-medium transition hover:scale-105 ${statusColor[floor.status]}`}
+                        className={`w-full py-4 rounded-lg ${statusColor[floorData.status]}`}
                       >
-                        {plot.plot}-{floor.floor}
+                        {plot.plot}-{floor}
                       </button>
 
                     </td>
-                  ))}
+                  )
+                })}
 
-                </tr>
-              ))}
+              </tr>
 
-            </tbody>
+            ))}
 
-          </table>
+          </tbody>
 
-        </div>
+        </table>
 
       </div>
 
     </div>
   )
 }
-
-export default PlotMatrix
