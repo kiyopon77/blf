@@ -1,23 +1,20 @@
 import api from "@/lib/api"
 
 export const getPlotMatrix = async () => {
-  const { data: plots } = await api.get("/plots")
+  const { data } = await api.get("/plots/matrix")
 
-  const matrix = await Promise.all(
-    plots.map(async (plot: any) => {
-      const { data: floors } = await api.get(`/plots/${plot.plot_id}/floors`)
-      return {
-        plot: plot.plot_code,
-        floors: floors.map((f: any) => ({
-          floor: f.floor_no,
-          status: f.status.toLowerCase()
-        }))
-      }
-    })
-  )
+  const matrix = data.map((plot: any) => ({
+    plot: plot.plot_code,
+    plot_id: plot.plot_id,
+    floors: plot.floors.map((f: any) => ({
+      floor: f.floor_no,
+      floor_id: f.floor_id,
+      status: f.status.toLowerCase() as "available" | "sold" | "hold" | "cancelled",
+      active_sale_id: f.active_sale_id ?? null,
+    })),
+  }))
 
-  // Fix the alphabetical sort bug
-  return matrix.sort((a, b) => {
+  return matrix.sort((a: any, b: any) => {
     const n = (s: string) => parseInt(s.replace(/\D/g, ""))
     return n(a.plot) - n(b.plot)
   })
