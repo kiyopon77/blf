@@ -8,7 +8,7 @@ type Props = {
 
 const SectionCard = ({ title, children }: Props) => {
   return (
-    <div className="bg-white border border-gray-300 rounded-xl p-6">
+    <div className="bg-white border border-gray-400 rounded-xl p-6">
       <div className="flex flex-col gap-6">
         <span className="text-gray-700 font-bold tracking-wide">
           {title}

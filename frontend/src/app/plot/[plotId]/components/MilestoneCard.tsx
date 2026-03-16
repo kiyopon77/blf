@@ -16,9 +16,12 @@ const milestoneTimeline = [
 ]
 
 const formatMilestone = (m: string) =>
-  m.replaceAll("_", " ")
+  m
+    .replaceAll("_", " ")
     .toLowerCase()
     .replace(/\b\w/g, l => l.toUpperCase())
+    .replace(/\bAts\b/g, "ATS")
+    .replace(/\bId\b/g, "ID")
 
 const MilestoneCard = ({ payments = [] }: { payments?: Payment[] }) => {
 

@@ -43,3 +43,8 @@ class SaleDetailResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class SaleUpdate(BaseModel):
+    total_value: Optional[float] = None
+    initiated_at: Optional[datetime] = None
+    commission_percent: Optional[float] = None
