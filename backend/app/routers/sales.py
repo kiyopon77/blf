@@ -7,7 +7,7 @@ from app.models.floor import Floor, InventoryStatus
 from app.models.payment import Payment, MilestoneType, MilestoneStatus
 from app.models.broker import Broker
 from app.models.customer import Customer
-from app.schemas.sale import SaleCreate, SaleStatusUpdate, SaleResponse, SaleDetailResponse
+from app.schemas.sale import SaleCreate, SaleStatusUpdate, SaleResponse, SaleDetailResponse, SaleUpdate
 from app.schemas.payment import PaymentResponse
 from typing import List
 
@@ -97,3 +97,16 @@ def get_sale_payments(sale_id: int, db: Session = Depends(get_db), user=Depends(
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
     return sale.payments
+
+
+
+@router.put("/{sale_id}", response_model=SaleResponse)
+def update_sale(sale_id: int, data: SaleUpdate, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    for key, value in data.model_dump(exclude_none=True).items():
+        setattr(sale, key, value)
+    db.commit()
+    db.refresh(sale)
+    return sale

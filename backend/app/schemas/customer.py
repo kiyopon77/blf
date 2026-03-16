@@ -26,3 +26,6 @@ class CustomerResponse(CustomerBase):
 
     class Config:
         from_attributes = True
+
+class CustomerPanUpdate(BaseModel):
+    pan: str
