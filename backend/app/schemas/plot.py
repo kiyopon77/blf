@@ -20,3 +20,20 @@ class PlotResponse(PlotBase):
 
     class Config:
         from_attributes = True
+
+class FloorMatrixItem(BaseModel):
+    floor_no: int
+    status: str
+    floor_id: int
+    active_sale_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class PlotMatrixResponse(BaseModel):
+    plot_id: int
+    plot_code: str
+    floors: list[FloorMatrixItem]
+
+    class Config:
+        from_attributes = True
