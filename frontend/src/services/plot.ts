@@ -106,3 +106,23 @@ export const updateSaleStatus = async (
   const { data } = await api.put(`/sales/${saleId}/status`, { status })
   return data
 }
+
+export const updateSale = async (
+  saleId: number,
+  payload: {
+    total_value?: number | null
+    initiated_at?: string | null
+    commission_percent?: number | null
+  }
+) => {
+  const { data } = await api.put(`/sales/${saleId}`, payload)
+  return data
+}
+
+export const updateCustomerPan = async (
+  customerId: number,
+  pan: string
+) => {
+  const { data } = await api.patch(`/customers/${customerId}/pan`, { pan })
+  return data
+}
