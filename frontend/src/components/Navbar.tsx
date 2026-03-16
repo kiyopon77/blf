@@ -13,7 +13,6 @@ const Navbar = () => {
         <Link href="/">
           <Image src="/images/logo.svg" alt="BLF Logo" width={80} height={80} />
         </Link>
-        <span className="text-xl font-bold">BLF Inventory Management</span>
       </div>
 
       <div className="flex justify-center gap-6">
