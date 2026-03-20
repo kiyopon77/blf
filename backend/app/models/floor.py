@@ -8,7 +8,7 @@ class InventoryStatus(str, enum.Enum):
     HOLD = "HOLD"
     SOLD = "SOLD"
     CANCELLED = "CANCELLED"
-    INVESTOR_UNIT = "INVESTOR UNIT"  # ← add this
+    INVESTOR_UNIT = "INVESTOR_UNIT"  # ← add this
 
 class Floor(Base):
     __tablename__ = "floors"
