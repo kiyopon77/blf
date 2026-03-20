@@ -7,7 +7,7 @@ class Broker(Base):
     __tablename__ = "brokers"
 
     broker_id = Column(Integer, primary_key=True, index=True)
-    broker_name = Column(String(100), nullable=False)
+    broker_name = Column(String(100), nullable=True)  # was nullable=False
     company = Column(String(100))
     phone = Column(String(20))
     email = Column(String(100), unique=True)

@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 class BrokerBase(BaseModel):
-    broker_name: str
+    broker_name: Optional[str] = None
     company: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[EmailStr] = None

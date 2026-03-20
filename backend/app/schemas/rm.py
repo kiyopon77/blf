@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Optional
 
 class RMBase(BaseModel):
-    name: str
-    email: EmailStr
+    name: Optional[str] = None      # was str
+    email: Optional[EmailStr] = None 
     phone: Optional[str] = None
 
 class RMCreate(RMBase):

@@ -8,13 +8,14 @@ class InventoryStatus(str, enum.Enum):
     HOLD = "HOLD"
     SOLD = "SOLD"
     CANCELLED = "CANCELLED"
+    INVESTOR_UNIT = "INVESTOR UNIT"  # ← add this
 
 class Floor(Base):
     __tablename__ = "floors"
 
     floor_id = Column(Integer, primary_key=True, index=True)
     plot_id = Column(Integer, ForeignKey("plots.plot_id", ondelete="CASCADE"), nullable=False)
-    floor_no = Column(Integer, nullable=False)
+    floor_no = Column(Integer, nullable=True)  # was nullable=False
     status = Column(Enum(InventoryStatus, name="inventory_status"), default=InventoryStatus.AVAILABLE)
     active_sale_id = Column(Integer, ForeignKey("sales.sale_id"), nullable=True)
 
