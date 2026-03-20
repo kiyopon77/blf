@@ -93,6 +93,7 @@ CREATE TABLE floors (
     floor_id SERIAL PRIMARY KEY,
     plot_id INT NOT NULL REFERENCES plots(plot_id) ON DELETE CASCADE,
     floor_no INT,
+    bhk INT,
     status inventory_status DEFAULT 'AVAILABLE',
     active_sale_id INT,
     UNIQUE(plot_id, floor_no)
