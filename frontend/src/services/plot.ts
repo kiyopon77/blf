@@ -1,10 +1,8 @@
 import api from "@/lib/api"
 
 export const getPlotDetail = async (plotCode: string, floorNo: number) => {
-
   const { data: plots } = await api.get("/plots")
   const plot = plots.find((p: any) => p.plot_code === plotCode)
-
   const { data: floors } = await api.get(`/plots/${plot.plot_id}/floors`)
   const floor = floors.find((f: any) => f.floor_no === floorNo)
 
@@ -14,44 +12,37 @@ export const getPlotDetail = async (plotCode: string, floorNo: number) => {
   let payments: any[] = []
 
   if (floor.active_sale_id) {
-
     // SaleDetailResponse (has names, floor_no, plot_code but no IDs)
     const { data: saleDetail } = await api.get(`/sales/${floor.active_sale_id}`)
 
     // SaleResponse from list has broker_id + customer_id
-    // BUT — floor.active_sale_id gives us sale_id, and GET /sales returns SaleResponse[]
-    // which has broker_id and customer_id directly
     const { data: allSales } = await api.get("/sales")
     const saleBase = allSales.find((s: any) => s.sale_id === floor.active_sale_id)
-
     const brokerId = saleBase?.broker_id ?? null
     const customerId = saleBase?.customer_id ?? null
 
     const [brokerRes, customerRes, paymentsRes] = await Promise.all([
       brokerId ? api.get(`/brokers/${brokerId}`) : Promise.resolve({ data: null }),
       customerId ? api.get(`/customers/${customerId}`) : Promise.resolve({ data: null }),
-      api.get(`/sales/${floor.active_sale_id}/payments`)
+      api.get(`/sales/${floor.active_sale_id}/payments`),
     ])
 
     broker = brokerRes.data
     customer = customerRes.data
     payments = paymentsRes.data
-
     sale = {
       ...saleDetail,
       broker_id: brokerId,
       customer_id: customerId,
     }
-
   }
 
   return { plot, floor, sale, broker, customer, payments }
-
 }
 
 export const updatePlot = async (
   plotId: number,
-  payload: { length?: number; breadth?: number }
+  payload: { area_sqyd?: number | null; area_sqft?: number | null }
 ) => {
   const { data } = await api.put(`/plots/${plotId}`, payload)
   return data
@@ -59,7 +50,7 @@ export const updatePlot = async (
 
 export const updateFloorStatus = async (
   floorId: number,
-  status: "AVAILABLE" | "HOLD" | "SOLD" | "CANCELLED"
+  status: "AVAILABLE" | "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR UNIT"
 ) => {
   const { data } = await api.put(`/floors/${floorId}/status`, { status })
   return data
@@ -101,7 +92,7 @@ export const updatePayment = async (
 
 export const updateSaleStatus = async (
   saleId: number,
-  status: "HOLD" | "SOLD" | "CANCELLED"
+  status: "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR UNIT"
 ) => {
   const { data } = await api.put(`/sales/${saleId}/status`, { status })
   return data
@@ -119,10 +110,7 @@ export const updateSale = async (
   return data
 }
 
-export const updateCustomerPan = async (
-  customerId: number,
-  pan: string
-) => {
+export const updateCustomerPan = async (customerId: number, pan: string) => {
   const { data } = await api.patch(`/customers/${customerId}/pan`, { pan })
   return data
 }
