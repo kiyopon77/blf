@@ -8,8 +8,8 @@ class Plot(Base):
 
     plot_id = Column(Integer, primary_key=True, index=True)
     plot_code = Column(String(20), unique=True, nullable=False)
-    length = Column(Numeric(10, 2), nullable=False)
-    breadth = Column(Numeric(10, 2), nullable=False)
+    area_sqyd = Column(Numeric(10, 2), nullable=True)
+    area_sqft = Column(Numeric(10, 2), nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     floors = relationship("Floor", back_populates="plot", cascade="all, delete")
