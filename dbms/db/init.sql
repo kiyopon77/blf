@@ -149,6 +149,23 @@ CREATE TABLE payments (
 );
 
 -- ==================================================
+-- DOCUMENTS (File Upload)
+-- ==================================================
+
+CREATE TABLE documents (
+    document_id SERIAL PRIMARY KEY,
+    label VARCHAR(100) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    file_type VARCHAR(50) NOT NULL,
+    entity_type VARCHAR(20) NOT NULL,  -- 'customer' or 'sale'
+    entity_id INT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_documents_entity ON documents(entity_type, entity_id);
+
+-- ==================================================
 -- BROKER PERFORMANCE VIEW (From Meeting 2)
 -- ==================================================
 
@@ -209,6 +226,4 @@ VALUES (
     'admin',
     true
 );
-
-
 
