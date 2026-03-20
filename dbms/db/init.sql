@@ -53,8 +53,8 @@ CREATE TABLE users (
 
 CREATE TABLE relationship_managers (
     rm_id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
     phone VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -65,7 +65,7 @@ CREATE TABLE relationship_managers (
 
 CREATE TABLE brokers (
     broker_id SERIAL PRIMARY KEY,
-    broker_name VARCHAR(100) NOT NULL,
+    broker_name VARCHAR(100),
     company VARCHAR(100),
     phone VARCHAR(20),
     email VARCHAR(100) UNIQUE,
@@ -80,8 +80,8 @@ CREATE TABLE brokers (
 CREATE TABLE plots (
     plot_id SERIAL PRIMARY KEY,
     plot_code VARCHAR(20) UNIQUE NOT NULL,  -- C1, C2, C3
-    length NUMERIC(10,2) NOT NULL,
-    breadth NUMERIC(10,2) NOT NULL,
+    area_sqyd NUMERIC(10,2),
+    area_sqft NUMERIC(10,2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -92,7 +92,7 @@ CREATE TABLE plots (
 CREATE TABLE floors (
     floor_id SERIAL PRIMARY KEY,
     plot_id INT NOT NULL REFERENCES plots(plot_id) ON DELETE CASCADE,
-    floor_no INT NOT NULL,
+    floor_no INT,
     status inventory_status DEFAULT 'AVAILABLE',
     active_sale_id INT,
     UNIQUE(plot_id, floor_no)
@@ -104,8 +104,8 @@ CREATE TABLE floors (
 
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
-    full_name VARCHAR(100) NOT NULL,
-    pan VARCHAR(20) UNIQUE NOT NULL,
+    full_name VARCHAR(100),
+    pan VARCHAR(20) UNIQUE,
     phone VARCHAR(20),
     email VARCHAR(100),
     address TEXT,
