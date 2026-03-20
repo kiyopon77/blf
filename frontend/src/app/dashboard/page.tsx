@@ -1,5 +1,4 @@
 "use client"
-
 import Card from "./Card"
 import PlotMatrix from "./PlotMatrix"
 import { getDashboard } from "@/services/dashboard"
@@ -13,7 +12,6 @@ const Dashboard = () => {
       const data = await getDashboard()
       setDashboard(data)
     }
-
     loadDashboard()
   }, [])
 
@@ -21,7 +19,7 @@ const Dashboard = () => {
 
   const cards = [
     {
-      heading: "total plots",
+      heading: "total floors",
       value: dashboard.total_plots,
       icon: "icons/totalPlots.svg",
     },
@@ -45,11 +43,16 @@ const Dashboard = () => {
       value: dashboard.cancelled,
       icon: "icons/cancelled.svg",
     },
+    {
+      heading: "investor unit",
+      value: dashboard.investor_unit,
+      icon: "icons/investorUnit.svg",
+    },
   ]
 
   return (
     <div>
-      <div className="grid grid-cols-5 p-10 gap-8">
+      <div className="grid grid-cols-6 p-10 gap-8">
         {cards.map((card, index) => (
           <Card
             key={index}

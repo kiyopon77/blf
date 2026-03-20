@@ -17,10 +17,10 @@ const Navbar = () => {
 
       <div className="flex justify-center gap-6">
         <Link href="/dashboard" className={`hover:text-[#f4d98b] ${pathname === "/dashboard" ? "text-[#f4d98b]" : ""}`}>
-          Dashboard
+          Plot Dashboard
         </Link>
-        <Link href="/settings" className={`hover:text-[#f4d98b] ${pathname === "/settings" ? "text-[#f4d98b]" : ""}`}>
-          Settings
+        <Link href="/admin" className={`hover:text-[#f4d98b] ${pathname === "/admin" ? "text-[#f4d98b]" : ""}`}>
+          Admin Dashbaord
         </Link>
 
       </div>
