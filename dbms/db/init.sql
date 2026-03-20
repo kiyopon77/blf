@@ -163,6 +163,32 @@ LEFT JOIN sales s ON b.broker_id = s.broker_id
 GROUP BY b.broker_id, b.broker_name;
 
 -- ==================================================
+-- FULL DATABASE VIEW
+-- ==================================================
+
+CREATE VIEW global_inventory_master AS
+SELECT 
+    p.plot_code,
+    f.floor_no,
+    f.status AS inventory_status,
+    p.area_sqft,
+    s.sale_id,
+    s.total_value,
+    s.status AS sale_status,
+    c.full_name AS customer_name,
+    c.phone AS customer_phone,
+    b.broker_name,
+    b.company AS broker_company,
+    rm.name AS relationship_manager,
+    (SELECT COUNT(*) FROM payments pay WHERE pay.sale_id = s.sale_id AND pay.status = 'DONE') AS milestones_completed
+FROM plots p
+JOIN floors f ON p.plot_id = f.plot_id
+LEFT JOIN sales s ON f.floor_id = s.floor_id
+LEFT JOIN customers c ON s.customer_id = c.customer_id
+LEFT JOIN brokers b ON s.broker_id = b.broker_id
+LEFT JOIN relationship_managers rm ON b.rm_id = rm.rm_id;
+
+-- ==================================================
 -- INDEXES
 -- ==================================================
 
