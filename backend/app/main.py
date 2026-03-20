@@ -10,6 +10,7 @@ from app.routers import customers
 from app.routers import sales
 from app.routers import payments
 from app.routers import dashboard
+from app.routers import documents 
 
 # import all models so SQLAlchemy knows about them
 import app.models
@@ -39,6 +40,7 @@ app.include_router(customers.router)
 app.include_router(sales.router)
 app.include_router(payments.router)
 app.include_router(dashboard.router)
+app.include_router(documents.router)
 
 @app.get("/")
 def root():

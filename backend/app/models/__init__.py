@@ -6,3 +6,4 @@ from app.models.broker import Broker
 from app.models.customer import Customer
 from app.models.sale import Sale
 from app.models.payment import Payment
+from app.models.document import Document

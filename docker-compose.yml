@@ -63,6 +63,7 @@ services:
       - app_network
     volumes:
       - ./backend:/app
+      -  uploads_data:/app/uploads 
     ports:
       - "8000:8000"
 
@@ -85,3 +86,4 @@ networks:
 
 volumes:
   pgdata:
+  uploads_data: 
