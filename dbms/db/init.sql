@@ -7,14 +7,14 @@ CREATE TYPE inventory_status AS ENUM (
     'HOLD',
     'SOLD',
     'CANCELLED',
-    'INVESTOR UNIT'
+    'INVESTOR_UNIT'
 );
 
 CREATE TYPE sale_status AS ENUM (
     'HOLD',
     'SOLD',
     'CANCELLED',
-    'INVESTOR UNIT'
+    'INVESTOR_UNIT'
 );
 
 CREATE TYPE milestone_type AS ENUM (
