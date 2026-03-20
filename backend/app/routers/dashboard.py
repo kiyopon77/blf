@@ -17,6 +17,7 @@ def get_dashboard(db: Session = Depends(get_db), user=Depends(get_current_user))
     hold = db.query(Floor).filter(Floor.status == InventoryStatus.HOLD).count()
     sold = db.query(Floor).filter(Floor.status == InventoryStatus.SOLD).count()
     cancelled = db.query(Floor).filter(Floor.status == InventoryStatus.CANCELLED).count()
+    investor_unit = db.query(Floor).filter(Floor.status == InventoryStatus.INVESTOR_UNIT).count()
 
     return DashboardResponse(
         total_plots=total_plots,
@@ -24,5 +25,6 @@ def get_dashboard(db: Session = Depends(get_db), user=Depends(get_current_user))
         available=available,
         hold=hold,
         sold=sold,
-        cancelled=cancelled
+        cancelled=cancelled,
+        investor_unit=investor_unit
     )

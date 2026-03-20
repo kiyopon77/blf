@@ -7,3 +7,4 @@ class DashboardResponse(BaseModel):
     hold: int
     sold: int
     cancelled: int
+    investor_unit: int
