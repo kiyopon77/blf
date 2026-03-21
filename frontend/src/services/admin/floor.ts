@@ -1,0 +1,23 @@
+// lib/api/floor.ts
+import api from "@/lib/api"
+
+// lib/api/floor.ts
+export const getFloors = async () => {
+  const res = await api.get("/floors")
+  return res.data
+}
+
+export const createFloor = async (data: any) => {
+  const res = await api.post("/floors", data)
+  return res.data
+}
+
+export const updateFloorStatus = async (id: number, status: string) => {
+  const res = await api.put(`/floors/${id}/status`, { status })
+  return res.data
+}
+
+export const getPlotFloors = async (plotId: number) => {
+  const res = await api.get(`/plots/${plotId}/floors`)
+  return res.data
+}
