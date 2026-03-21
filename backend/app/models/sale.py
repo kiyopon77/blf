@@ -8,7 +8,7 @@ class SaleStatus(str, enum.Enum):
     HOLD = "HOLD"
     SOLD = "SOLD"
     CANCELLED = "CANCELLED"
-    INVESTOR_UNIT = "INVESTOR_UNIT"  # ← add this
+    INVESTOR_UNIT = "INVESTOR_UNIT"   # fixed — no space
 
 class Sale(Base):
     __tablename__ = "sales"
