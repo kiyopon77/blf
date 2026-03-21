@@ -7,7 +7,7 @@ class BrokerBase(BaseModel):
     company: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
-    rm_id: int
+    user_id: int                    # changed from rm_id
 
 class BrokerCreate(BrokerBase):
     pass
@@ -16,6 +16,8 @@ class BrokerUpdate(BaseModel):
     broker_name: Optional[str] = None
     company: Optional[str] = None
     phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    user_id: Optional[int] = None
 
 class BrokerResponse(BrokerBase):
     broker_id: int
