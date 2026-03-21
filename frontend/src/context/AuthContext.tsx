@@ -1,11 +1,12 @@
 "use client"
 
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import api, { setAccessToken } from "@/lib/api"
 
 interface AuthContextType {
   accessToken: string | null
   role: string | null
+  loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
 }
@@ -15,6 +16,28 @@ const AuthContext = createContext<AuthContextType | null>(null)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessTokenState, setAccessTokenState] = useState<string | null>(null)
   const [role, setRole] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+  const initAuth = async () => {
+    try {
+      const { data: refreshData } = await api.post("/auth/refresh")
+
+      setAccessToken(refreshData.access_token)
+      setAccessTokenState(refreshData.access_token)
+      setRole(refreshData.role)
+
+    } catch {
+      setAccessToken(null)
+      setAccessTokenState(null)
+      setRole(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  initAuth()
+}, [])
 
   const login = async (email: string, password: string) => {
     const { data } = await api.post("/auth/login", { email, password })
@@ -26,14 +49,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     await api.post("/auth/logout")
+
     setAccessToken(null)
     setAccessTokenState(null)
     setRole(null)
+
+    window.location.href = "/login"
   }
 
   return (
     <AuthContext.Provider
-      value={{ accessToken: accessTokenState, role, login, logout }}
+      value={{ accessToken: accessTokenState, role, login, logout, loading }}
     >
       {children}
     </AuthContext.Provider>
@@ -41,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error("useAuth must be used inside AuthProvider")
-  return context
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider")
+  return ctx
 }
