@@ -2,7 +2,7 @@
 import { RM } from "@/types/rm"
 import RMActions from "./RMActions"
 
-const RMRow = ({ rm, setRms }: any) => {
+const RMRow = ({ rm, setRms, onEdit}: any) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
       day: "2-digit",
@@ -19,7 +19,7 @@ const RMRow = ({ rm, setRms }: any) => {
       <td className="p-4">{rm.phone}</td>
       <td className="p-4 text-gray-500">{formatDate(rm.created_at)}</td>
       <td className="p-4">
-        <RMActions rm={rm} setRms={setRms} />
+        <RMActions rm={rm} setRms={setRms} onEdit={onEdit}/>
       </td>
     </tr>
   )

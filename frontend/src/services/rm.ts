@@ -18,3 +18,14 @@ export const createRM = async (data: {
   const res = await api.post("/rms", data)
   return res.data
 }
+
+export const updateRM = async (
+  rm_id: number,
+  data: {
+    name: string
+    phone: string
+  }
+) => {
+  const res = await api.put(`/rms/${rm_id}`, data)
+  return res.data
+}

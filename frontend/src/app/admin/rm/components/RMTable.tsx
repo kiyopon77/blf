@@ -2,7 +2,7 @@
 import { RM } from "@/types/rm"
 import RMRow from "./RMRow"
 
-const RMTable = ({ rms, setRms }: any) => {
+const RMTable = ({ rms, setRms, onEdit }: any) => {
   return (
     <div className="border rounded-xl overflow-hidden">
       <table className="w-full">
@@ -19,7 +19,7 @@ const RMTable = ({ rms, setRms }: any) => {
 
         <tbody>
           {rms.map((rm: RM) => (
-            <RMRow key={rm.rm_id} rm={rm} setRms={setRms} />
+            <RMRow key={rm.rm_id} rm={rm} setRms={setRms} onEdit={onEdit} />
           ))}
         </tbody>
       </table>
