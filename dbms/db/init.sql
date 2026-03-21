@@ -54,9 +54,7 @@ CREATE TABLE users (
 CREATE TABLE brokers (
     broker_id SERIAL PRIMARY KEY,
     broker_name VARCHAR(100),
-    company VARCHAR(100),
-    phone VARCHAR(20),
-    email VARCHAR(100) UNIQUE,
+    phone VARCHAR(20) UNIQUE,
     user_id INT NOT NULL REFERENCES users(user_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -199,7 +197,6 @@ SELECT
     c.full_name AS customer_name,
     c.phone AS customer_phone,
     b.broker_name,
-    b.company AS broker_company,
     (SELECT COUNT(*) FROM payments pay WHERE pay.sale_id = s.sale_id AND pay.status = 'DONE') AS milestones_completed
 FROM plots p
 JOIN floors f ON p.plot_id = f.plot_id
