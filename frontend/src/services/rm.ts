@@ -9,3 +9,12 @@ export const getRMs = async () => {
 export const deleteRM = async (id: string) => {
   await api.delete(`/rms/${id}`)
 }
+
+export const createRM = async (data: {
+  name: string
+  email: string
+  phone: string
+}) => {
+  const res = await api.post("/rms", data)
+  return res.data
+}
