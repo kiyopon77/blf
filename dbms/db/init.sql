@@ -70,6 +70,7 @@ CREATE TABLE plots (
     plot_code VARCHAR(20) UNIQUE NOT NULL,  -- C1, C2, C3
     area_sqyd NUMERIC(10,2),
     area_sqft NUMERIC(10,2),
+    type CHAR(1),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
