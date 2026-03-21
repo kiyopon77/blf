@@ -1,11 +1,12 @@
 from sqlalchemy import Column, Integer, String, Boolean, Enum, TIMESTAMP
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
 import enum
 
 class UserRole(str, enum.Enum):
     admin = "admin"
-    rm = "rm"          # changed from 'user' to 'rm'
+    rm = "rm"
 
 class User(Base):
     __tablename__ = "users"
