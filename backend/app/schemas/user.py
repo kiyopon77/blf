@@ -5,27 +5,23 @@ from typing import Optional
 
 class UserRole(str, Enum):
     admin = "admin"
-    user = "user"
+    rm = "rm"              # changed from 'user'
 
-# Login request
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
-# Token response
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: UserRole
 
-# User creation (admin creates users)
 class UserCreate(BaseModel):
     full_name: str
     email: EmailStr
     password: str
-    role: UserRole = UserRole.user
+    role: UserRole = UserRole.rm    # default is now rm
 
-# User response (never expose password)
 class UserResponse(BaseModel):
     user_id: int
     full_name: str
