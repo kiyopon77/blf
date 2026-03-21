@@ -1,7 +1,9 @@
 import AdminSidebar from "@/components/AdminSidebar"
 import Navbar from "@/components/Navbar"
+import { ProtectedRoute } from "@/components/ProtectedRoute"
 export default function AdminPage({ children } : {children: React.ReactNode}) {
   return (
+    <ProtectedRoute requireAdmin>
     <div className="h-screen flex flex-col">
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
@@ -12,5 +14,6 @@ export default function AdminPage({ children } : {children: React.ReactNode}) {
 
       </div>
     </div>
+    </ProtectedRoute>
   )
 }
