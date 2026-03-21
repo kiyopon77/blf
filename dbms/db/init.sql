@@ -88,6 +88,21 @@ CREATE TABLE floors (
 );
 
 -- ==================================================
+-- FLOOR STATUS AUDIT LOG
+-- ==================================================
+
+CREATE TABLE floor_status_logs (
+    log_id SERIAL PRIMARY KEY,
+    floor_id INT NOT NULL REFERENCES floors(floor_id) ON DELETE CASCADE,
+    changed_by INT NOT NULL REFERENCES users(user_id),
+    old_status VARCHAR(20),
+    new_status VARCHAR(20),
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_floor_logs_floor ON floor_status_logs(floor_id);
+
+-- ==================================================
 -- CUSTOMERS (KYC)
 -- ==================================================
 
