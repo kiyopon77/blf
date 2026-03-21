@@ -4,42 +4,84 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_admin
 from app.models.plot import Plot
 from app.models.floor import Floor
+from app.models.sale import Sale
+from app.models.broker import Broker
+from app.models.user import User
+from app.models.floor_log import FloorStatusLog
 from app.schemas.plot import PlotCreate, PlotUpdate, PlotResponse, PlotMatrixResponse, FloorMatrixItem
 from app.schemas.floor import FloorResponse
 from typing import List
+from datetime import datetime
 
-router = APIRouter(prefix="/plots", tags=["Plots"])
+router = APIRouter(prefix="/plots", tags=["Plots"])  # ← this must be before any @router.get
 
 
-# ── Matrix (must be before /{plot_id}) ─────────────────
 @router.get("/matrix", response_model=list[PlotMatrixResponse])
 def get_plots_matrix(db: Session = Depends(get_db), user=Depends(get_current_user)):
     plots = db.query(Plot).all()
     result = []
+
     for plot in plots:
-        floors = db.query(Floor).filter(Floor.plot_id == plot.plot_id).order_by(Floor.floor_no).all()
+        floors = db.query(Floor).filter(
+            Floor.plot_id == plot.plot_id
+        ).order_by(Floor.floor_no).all()
+
+        floor_items = []
+        for floor in floors:
+            sale_status = None
+            broker_name = None
+            broker_company = None
+            last_changed_by = None
+            last_changed_at = None
+
+            if floor.active_sale_id:
+                sale = db.query(Sale).filter(Sale.sale_id == floor.active_sale_id).first()
+                if sale:
+                    sale_status = sale.status
+                    broker = db.query(Broker).filter(Broker.broker_id == sale.broker_id).first()
+                    if broker:
+                        broker_name = broker.broker_name
+                        broker_company = broker.company
+
+            last_log = db.query(FloorStatusLog).filter(
+                FloorStatusLog.floor_id == floor.floor_id
+            ).order_by(FloorStatusLog.changed_at.desc()).first()
+
+            if last_log:
+                last_changed_at = last_log.changed_at
+                user_obj = db.query(User).filter(User.user_id == last_log.changed_by).first()
+                if user_obj:
+                    last_changed_by = user_obj.full_name
+
+            floor_items.append(FloorMatrixItem(
+                floor_id=floor.floor_id,
+                floor_no=floor.floor_no,
+                status=floor.status,
+                active_sale_id=floor.active_sale_id,
+                sale_status=sale_status,
+                broker_name=broker_name,
+                broker_company=broker_company,
+                last_changed_by=last_changed_by,
+                last_changed_at=last_changed_at
+            ))
+
         result.append(PlotMatrixResponse(
             plot_id=plot.plot_id,
             plot_code=plot.plot_code,
-            floors=[
-                FloorMatrixItem(
-                    floor_no=floor.floor_no,
-                    floor_id=floor.floor_id,
-                    status=floor.status,
-                    active_sale_id=floor.active_sale_id
-                ) for floor in floors
-            ]
+            area_sqyd=float(plot.area_sqyd) if plot.area_sqyd else None,
+            area_sqft=float(plot.area_sqft) if plot.area_sqft else None,
+            type=plot.type,
+            floors=floor_items
         ))
+
     return result
 
 
-# ── List all plots ──────────────────────────────────────
 @router.get("", response_model=List[PlotResponse])
 def get_plots(db: Session = Depends(get_db), user=Depends(get_current_user)):
     return db.query(Plot).all()
 
 
-# ── Single plot ─────────────────────────────────────────
 @router.get("/{plot_id}", response_model=PlotResponse)
 def get_plot(plot_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     plot = db.query(Plot).filter(Plot.plot_id == plot_id).first()
@@ -48,7 +90,6 @@ def get_plot(plot_id: int, db: Session = Depends(get_db), user=Depends(get_curre
     return plot
 
 
-# ── Floors of a plot ────────────────────────────────────
 @router.get("/{plot_id}/floors", response_model=List[FloorResponse])
 def get_plot_floors(plot_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
     plot = db.query(Plot).filter(Plot.plot_id == plot_id).first()
@@ -57,7 +98,6 @@ def get_plot_floors(plot_id: int, db: Session = Depends(get_db), user=Depends(ge
     return db.query(Floor).filter(Floor.plot_id == plot_id).all()
 
 
-# ── Create ──────────────────────────────────────────────
 @router.post("", response_model=PlotResponse, status_code=status.HTTP_201_CREATED)
 def create_plot(data: PlotCreate, db: Session = Depends(get_db), admin=Depends(require_admin)):
     existing = db.query(Plot).filter(Plot.plot_code == data.plot_code).first()
@@ -70,7 +110,6 @@ def create_plot(data: PlotCreate, db: Session = Depends(get_db), admin=Depends(r
     return plot
 
 
-# ── Update ──────────────────────────────────────────────
 @router.put("/{plot_id}", response_model=PlotResponse)
 def update_plot(plot_id: int, data: PlotUpdate, db: Session = Depends(get_db), admin=Depends(require_admin)):
     plot = db.query(Plot).filter(Plot.plot_id == plot_id).first()
@@ -83,7 +122,6 @@ def update_plot(plot_id: int, data: PlotUpdate, db: Session = Depends(get_db), a
     return plot
 
 
-# ── Delete ──────────────────────────────────────────────
 @router.delete("/{plot_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_plot(plot_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
     plot = db.query(Plot).filter(Plot.plot_id == plot_id).first()

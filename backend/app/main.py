@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth
 from app.routers import plots
 from app.routers import floors
-from app.routers import rms
 from app.routers import brokers
 from app.routers import customers
 from app.routers import sales
@@ -34,7 +33,6 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(plots.router)
 app.include_router(floors.router)
-app.include_router(rms.router)
 app.include_router(brokers.router)
 app.include_router(customers.router)
 app.include_router(sales.router)

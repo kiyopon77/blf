@@ -31,7 +31,7 @@ CREATE TYPE milestone_status AS ENUM (
     'DONE'
 );
 
-CREATE TYPE user_role AS ENUM ('admin', 'user');
+CREATE TYPE user_role AS ENUM ('admin', 'rm');
 
 -- ==================================================
 -- admin and user tables
@@ -42,20 +42,8 @@ CREATE TABLE users (
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     hashed_password VARCHAR(255) NOT NULL,
-    role user_role DEFAULT 'user',
+    role user_role DEFAULT 'rm',
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ==================================================
--- RELATIONSHIP MANAGERS
--- ==================================================
-
-CREATE TABLE relationship_managers (
-    rm_id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    phone VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -69,7 +57,7 @@ CREATE TABLE brokers (
     company VARCHAR(100),
     phone VARCHAR(20),
     email VARCHAR(100) UNIQUE,
-    rm_id INT NOT NULL REFERENCES relationship_managers(rm_id),
+    user_id INT NOT NULL REFERENCES users(user_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -82,6 +70,7 @@ CREATE TABLE plots (
     plot_code VARCHAR(20) UNIQUE NOT NULL,  -- C1, C2, C3
     area_sqyd NUMERIC(10,2),
     area_sqft NUMERIC(10,2),
+    type CHAR(1),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -97,6 +86,21 @@ CREATE TABLE floors (
     active_sale_id INT,
     UNIQUE(plot_id, floor_no)
 );
+
+-- ==================================================
+-- FLOOR STATUS AUDIT LOG
+-- ==================================================
+
+CREATE TABLE floor_status_logs (
+    log_id SERIAL PRIMARY KEY,
+    floor_id INT NOT NULL REFERENCES floors(floor_id) ON DELETE CASCADE,
+    changed_by INT NOT NULL REFERENCES users(user_id),
+    old_status VARCHAR(20),
+    new_status VARCHAR(20),
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_floor_logs_floor ON floor_status_logs(floor_id);
 
 -- ==================================================
 -- CUSTOMERS (KYC)
@@ -196,14 +200,12 @@ SELECT
     c.phone AS customer_phone,
     b.broker_name,
     b.company AS broker_company,
-    rm.name AS relationship_manager,
     (SELECT COUNT(*) FROM payments pay WHERE pay.sale_id = s.sale_id AND pay.status = 'DONE') AS milestones_completed
 FROM plots p
 JOIN floors f ON p.plot_id = f.plot_id
 LEFT JOIN sales s ON f.floor_id = s.floor_id
 LEFT JOIN customers c ON s.customer_id = c.customer_id
-LEFT JOIN brokers b ON s.broker_id = b.broker_id
-LEFT JOIN relationship_managers rm ON b.rm_id = rm.rm_id;
+LEFT JOIN brokers b ON s.broker_id = b.broker_id;
 
 -- ==================================================
 -- INDEXES
@@ -226,4 +228,3 @@ VALUES (
     'admin',
     true
 );
-
