@@ -8,7 +8,7 @@ export const setAccessToken = (token: string | null) => {
 
 const api = axios.create({
   baseURL: "http://localhost:8000/api",
-  withCredentials: true, // required for refresh cookie
+  withCredentials: true,
 })
 
 api.interceptors.request.use((config) => {
@@ -19,20 +19,20 @@ api.interceptors.request.use((config) => {
 })
 
 api.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   async (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !error.config._retry) {
+      error.config._retry = true
       try {
         const { data } = await axios.post(
           "http://localhost:8000/api/auth/refresh",
           {},
           { withCredentials: true }
         )
-
         setAccessToken(data.access_token)
         error.config.headers.Authorization = `Bearer ${data.access_token}`
-        return axios(error.config)
-      } catch (refreshError) {
+        return api(error.config)
+      } catch {
         window.location.href = "/login"
       }
     }

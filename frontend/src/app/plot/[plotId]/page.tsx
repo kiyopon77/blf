@@ -8,6 +8,7 @@ import MilestoneCard from "./components/MilestoneCard"
 import PaymentInfoCard from "./components/PaymentInfoCard"
 import ValueCard from "./components/ValueCard"
 import { getPlotDetail } from "@/services/plot"
+import { ThreeDot } from "react-loading-indicators"
 
 export default function Plot() {
   const params = useParams()
@@ -24,7 +25,9 @@ export default function Plot() {
     load()
   }, [plotId])
 
-  if (!data) return <div>Loading...</div>
+  if (!data) return <div className="h-screen w-screen flex items-center justify-center">
+      <ThreeDot color="#D4A22A" size="medium" text="" textColor="" />
+    </div>
 
   const { sale, plot, broker, customer } = data
 
