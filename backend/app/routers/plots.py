@@ -30,7 +30,7 @@ def get_plots_matrix(db: Session = Depends(get_db), user=Depends(get_current_use
         for floor in floors:
             sale_status = None
             broker_name = None
-            broker_company = None
+            
             last_changed_by = None
             last_changed_at = None
 
@@ -41,7 +41,7 @@ def get_plots_matrix(db: Session = Depends(get_db), user=Depends(get_current_use
                     broker = db.query(Broker).filter(Broker.broker_id == sale.broker_id).first()
                     if broker:
                         broker_name = broker.broker_name
-                        broker_company = broker.company
+                        
 
             last_log = db.query(FloorStatusLog).filter(
                 FloorStatusLog.floor_id == floor.floor_id

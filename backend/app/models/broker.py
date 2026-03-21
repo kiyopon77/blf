@@ -8,10 +8,8 @@ class Broker(Base):
 
     broker_id = Column(Integer, primary_key=True, index=True)
     broker_name = Column(String(100), nullable=True)
-    company = Column(String(100))
-    phone = Column(String(20))
-    email = Column(String(100), unique=True)
-    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)  # changed from rm_id
+    phone = Column(String(20), unique=True)        # now unique, email+company removed
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user = relationship("User", back_populates="brokers")

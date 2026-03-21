@@ -1,22 +1,18 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
 class BrokerBase(BaseModel):
     broker_name: Optional[str] = None
-    company: Optional[str] = None
     phone: Optional[str] = None
-    email: Optional[EmailStr] = None
-    user_id: int                    # changed from rm_id
+    user_id: int
 
 class BrokerCreate(BrokerBase):
     pass
 
 class BrokerUpdate(BaseModel):
     broker_name: Optional[str] = None
-    company: Optional[str] = None
     phone: Optional[str] = None
-    email: Optional[EmailStr] = None
     user_id: Optional[int] = None
 
 class BrokerResponse(BrokerBase):

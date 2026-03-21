@@ -58,8 +58,7 @@ class FloorMatrixItem(BaseModel):
     status: str
     active_sale_id: Optional[int] = None
     sale_status: Optional[str] = None
-    broker_name: Optional[str] = None
-    broker_company: Optional[str] = None
+    broker_name: Optional[str] = None        # kept
     last_changed_by: Optional[str] = None
     last_changed_at: Optional[datetime] = None
 
