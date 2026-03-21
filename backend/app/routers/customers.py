@@ -6,6 +6,7 @@ from app.models.customer import Customer
 from app.schemas.customer import CustomerCreate, CustomerUpdate, CustomerResponse, CustomerPanUpdate
 from typing import List
 
+
 router = APIRouter(prefix="/customers", tags=["Customers"])
 
 
@@ -67,3 +68,11 @@ def update_customer_pan(
     db.commit()
     db.refresh(customer)
     return customer
+
+@router.delete("/{customer_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_customer(customer_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    customer = db.query(Customer).filter(Customer.customer_id == customer_id).first()
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    db.delete(customer)
+    db.commit()

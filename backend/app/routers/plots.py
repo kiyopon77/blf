@@ -60,7 +60,6 @@ def get_plots_matrix(db: Session = Depends(get_db), user=Depends(get_current_use
                 active_sale_id=floor.active_sale_id,
                 sale_status=sale_status,
                 broker_name=broker_name,
-                broker_company=broker_company,
                 last_changed_by=last_changed_by,
                 last_changed_at=last_changed_at
             ))
