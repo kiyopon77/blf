@@ -3,6 +3,7 @@ import Card from "./Card"
 import PlotMatrix from "./PlotMatrix"
 import { getDashboard } from "@/services/dashboard"
 import { useState, useEffect } from "react"
+import { ThreeDot } from "react-loading-indicators"
 
 const Dashboard = () => {
   const [dashboard, setDashboard] = useState<any>(null)
@@ -15,7 +16,9 @@ const Dashboard = () => {
     loadDashboard()
   }, [])
 
-  if (!dashboard) return <div>Loading...</div>
+  if (!dashboard) return <div className="h-screen w-screen flex items-center justify-center">
+      <ThreeDot color="#D4A22A" size="medium" text="" textColor="" />
+    </div>
 
   const cards = [
     {

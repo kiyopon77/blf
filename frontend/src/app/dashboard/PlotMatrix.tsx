@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { getPlotMatrix } from "@/services/plotMatrix"
+import { ThreeDot } from "react-loading-indicators"
 
 type FloorItem = {
   floor: number
@@ -74,7 +75,10 @@ export default function PlotMatrix() {
     router.push(`/plot/${plotCode}-${floor.floor}`)
   }
 
-  if (!plots.length) return <div>Loading matrix...</div>
+  if (!plots.length) return <div className="h-screen w-screen flex items-center justify-center">
+      <ThreeDot color="#D4A22A" size="medium" text="" textColor="" />
+    </div>
+
 
   const sortedPlots = sortPlots(plots)
 

@@ -11,19 +11,25 @@ export function ProtectedRoute({
   children: React.ReactNode
   requireAdmin?: boolean
 }) {
-  const { accessToken, role } = useAuth()
+  const { accessToken, role, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
+    if (loading) return
+
     if (!accessToken) {
-      router.push("/login")
+      router.replace("/login")
       return
     }
 
     if (requireAdmin && role !== "admin") {
-      router.push("/unauthorized")
+      router.replace("/unauthorized")
     }
-  }, [accessToken, role])
+  }, [accessToken, role, loading])
+
+  if (loading) return null
+  if (!accessToken) return null
+  if (requireAdmin && role !== "admin") return null
 
   return <>{children}</>
 }
