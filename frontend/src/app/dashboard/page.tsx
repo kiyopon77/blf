@@ -25,31 +25,37 @@ const Dashboard = () => {
       heading: "total floors",
       value: dashboard.total_plots,
       icon: "icons/totalPlots.svg",
+      bgColor: "bg-white"
     },
     {
       heading: "available",
       value: dashboard.available,
       icon: "icons/available.svg",
+      bgColor: "bg-white"
     },
     {
       heading: "sold",
       value: dashboard.sold,
       icon: "icons/sold.svg",
+      bgColor: "bg-green-200"
     },
     {
       heading: "on hold",
       value: dashboard.hold,
       icon: "icons/onHold.svg",
+      bgColor: "bg-yellow-200"
     },
     {
       heading: "cancelled",
       value: dashboard.cancelled,
       icon: "icons/cancelled.svg",
+      bgColor: "bg-gray-300"
     },
     {
       heading: "investor unit",
       value: dashboard.investor_unit,
       icon: "icons/investorUnit.svg",
+      bgColor: "bg-blue-200"
     },
   ]
 
@@ -62,6 +68,7 @@ const Dashboard = () => {
             heading={card.heading}
             value={card.value}
             icon={card.icon}
+            bgColor={card.bgColor}
           />
         ))}
       </div>
