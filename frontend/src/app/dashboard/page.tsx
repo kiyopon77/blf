@@ -1,5 +1,5 @@
 "use client"
-import Card from "./Card"
+import Card from "./components/Card"
 import PlotMatrix from "./PlotMatrix"
 import { getDashboard } from "@/services/dashboard"
 import { useState, useEffect } from "react"
@@ -7,6 +7,7 @@ import { ThreeDot } from "react-loading-indicators"
 
 const Dashboard = () => {
   const [dashboard, setDashboard] = useState<any>(null)
+  const [activeFilter, setActiveFilter] = useState<string | null>(null)
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -17,8 +18,8 @@ const Dashboard = () => {
   }, [])
 
   if (!dashboard) return <div className="h-screen w-screen flex items-center justify-center">
-      <ThreeDot color="#D4A22A" size="medium" text="" textColor="" />
-    </div>
+    <ThreeDot color="#D4A22A" size="medium" text="" textColor="" />
+  </div>
 
   const cards = [
     {
@@ -62,17 +63,33 @@ const Dashboard = () => {
   return (
     <div>
       <div className="grid grid-cols-6 p-10 gap-8">
-        {cards.map((card, index) => (
-          <Card
-            key={index}
-            heading={card.heading}
-            value={card.value}
-            icon={card.icon}
-            bgColor={card.bgColor}
-          />
-        ))}
+        {cards.map((card, index) => {
+          const isActive = activeFilter === card.heading
+
+          return (
+            <div
+              key={index}
+              onClick={() =>
+                setActiveFilter(prev =>
+                  prev === card.heading ? null : card.heading
+                )
+              }
+              className={`
+          cursor-pointer transition-transform duration-200 
+          ${isActive ? "scale-105 border-2 border-black rounded-2xl" : "hover:scale-105"}
+        `}
+            >
+              <Card
+                heading={card.heading}
+                value={card.value}
+                icon={card.icon}
+                bgColor={card.bgColor}
+              />
+            </div>
+          )
+        })}
       </div>
-      <PlotMatrix />
+      <PlotMatrix filter={activeFilter} />
     </div>
   )
 }

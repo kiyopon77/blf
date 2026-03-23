@@ -9,7 +9,8 @@ const Card = ({ heading, icon, value, bgColor }: {heading: string, icon: string,
       </div>
 
       <span className="text-5xl font-extrabold">{value}</span>
-    </div>)
+    </div>
+  )
 }
 
 export default Card
