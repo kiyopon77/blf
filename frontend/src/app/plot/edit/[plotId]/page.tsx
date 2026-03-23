@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useForm, Controller, useWatch } from "react-hook-form"
-import { message } from "antd"
+import { App } from "antd"
 
 import MilestoneSection from "./components/MilestoneStatus"
 import SectionCard from "./components/SectionCard"
@@ -22,17 +22,11 @@ import {
 } from "@/services/plot"
 
 export default function EditPlot() {
-
   const { plotId } = useParams()
   const router = useRouter()
+  const { message } = App.useApp()
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm({
+  const { register, control, handleSubmit, reset } = useForm({
     defaultValues: {
       plot_id: null,
       floor_id: null,
@@ -42,23 +36,20 @@ export default function EditPlot() {
       plot_value: "",
       selling_date: "",
       broker_name: "",
-      broker_company: "",
       broker_phone: "",
-      broker_email: "",
       customer_name: "",
       customer_pan: "",
       customer_phone: "",
       customer_email: "",
       customer_address: "",
       customer_kyc_status: "PENDING",
-      length: "",
-      breadth: "",
-      floor_status: "AVAILABLE" as "AVAILABLE" | "HOLD" | "SOLD" | "CANCELLED",
+      area_sqyd: "",
+      area_sqft: "",
+      floor_status: "AVAILABLE" as "AVAILABLE" | "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR_UNIT",
       payments: [] as any[]
     }
   })
 
-  // Watch payments + plot_value reactively for live sum validation
   const watchedPayments = useWatch({ control, name: "payments" })
   const watchedPlotValue = useWatch({ control, name: "plot_value" })
 
@@ -87,17 +78,15 @@ export default function EditPlot() {
           plot_value: sale?.total_value || "",
           selling_date: sale?.initiated_at?.split("T")[0] || "",
           broker_name: broker?.broker_name || "",
-          broker_company: broker?.company || "",
           broker_phone: broker?.phone || "",
-          broker_email: broker?.email || "",
           customer_name: customer?.full_name || "",
           customer_pan: customer?.pan || "",
           customer_phone: customer?.phone || "",
           customer_email: customer?.email || "",
           customer_address: customer?.address || "",
           customer_kyc_status: customer?.kyc_status || "PENDING",
-          length: plot?.length || "",
-          breadth: plot?.breadth || "",
+          area_sqyd: plot?.area_sqyd || "",
+          area_sqft: plot?.area_sqft || "",
           floor_status: floor?.status ?? "AVAILABLE",
           payments: MILESTONE_ORDER.map(milestone => {
             const existing = (payments || []).find((p: any) => p.milestone === milestone)
@@ -125,8 +114,8 @@ export default function EditPlot() {
 
       if (data.plot_id) {
         requests.push(updatePlot(data.plot_id, {
-          length: Number(data.length),
-          breadth: Number(data.breadth)
+          area_sqyd: data.area_sqyd ? Number(data.area_sqyd) : null,
+          area_sqft: data.area_sqft ? Number(data.area_sqft) : null,
         }))
       }
 
@@ -137,8 +126,7 @@ export default function EditPlot() {
       if (data.broker_id) {
         requests.push(updateBroker(data.broker_id, {
           broker_name: data.broker_name,
-          company: data.broker_company,
-          phone: data.broker_phone
+          phone: data.broker_phone,
         }))
       }
 
@@ -148,31 +136,27 @@ export default function EditPlot() {
           phone: data.customer_phone,
           email: data.customer_email,
           address: data.customer_address,
-          kyc_status: data.customer_kyc_status
+          kyc_status: data.customer_kyc_status,
         }))
 
-        // update sale value + selling date
-        if (data.sale_id) {
-          requests.push(
-            updateSale(data.sale_id, {
-              total_value: data.plot_value ? Number(data.plot_value) : null,
-              initiated_at: data.selling_date ? new Date(data.selling_date).toISOString() : null,
-            })
-          )
-        }
-
-        // update customer PAN separately via PATCH
-        if (data.customer_id && data.customer_pan) {
+        if (data.customer_pan) {
           requests.push(updateCustomerPan(data.customer_id, data.customer_pan))
         }
+      }
+
+      if (data.sale_id) {
+        requests.push(updateSale(data.sale_id, {
+          total_value: data.plot_value ? Number(data.plot_value) : null,
+          initiated_at: data.selling_date ? new Date(data.selling_date).toISOString() : null,
+        }))
       }
 
       for (const payment of data.payments) {
         if (!payment.payment_id) continue
         requests.push(updatePayment(payment.payment_id, {
           status: payment.status,
-          amount: payment.amount || null,
-          paid_at: payment.paid_at || null
+          amount: payment.amount ? Number(payment.amount) : null,
+          paid_at: payment.paid_at ? new Date(payment.paid_at).toISOString() : null,
         }))
       }
 
@@ -184,19 +168,13 @@ export default function EditPlot() {
     }
   }
 
-  const err = (field: any) =>
-    field ? <p className="text-red-500 text-xs mt-1">{field.message}</p> : null
-
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-8 p-10 bg-gray-50 min-h-screen w-3/4 mx-auto"
     >
-      {/* HEADER */}
       <div className="flex justify-between items-center">
-        <div className="flex flex-col">
-          <span className="text-3xl font-bold">Edit Floor: {plotId}</span>
-        </div>
+        <span className="text-3xl font-bold">Edit Floor: {plotId}</span>
         <button
           type="submit"
           className="px-6 py-2 bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
@@ -206,7 +184,6 @@ export default function EditPlot() {
         </button>
       </div>
 
-      {/* PLOT STATUS */}
       <SectionCard title="FLOOR STATUS">
         <div className="flex flex-col gap-2 w-64">
           <span className="text-xs text-gray-500 font-semibold">AVAILABILITY STATUS</span>
@@ -218,105 +195,37 @@ export default function EditPlot() {
             <option value="HOLD">Hold</option>
             <option value="SOLD">Sold</option>
             <option value="CANCELLED">Cancelled</option>
+            <option value="INVESTOR_UNIT">Investor Unit</option>
           </select>
         </div>
       </SectionCard>
 
-      {/* PLOT VALUE */}
       <SectionCard title="FLOOR & VALUE">
         <div className="grid grid-cols-2 gap-6">
-          <div>
-            <Field
-              label="FLOOR VALUE"
-              {...register("plot_value", {
-                required: "Floor value is required",
-                validate: v => !isNaN(parseFloat(v)) && parseFloat(v) > 0 || "Must be a positive number"
-              })}
-            />
-            {err(errors.plot_value)}
-          </div>
-          <div>
-            <Field
-              label="SELLING DATE"
-              type="date"
-              {...register("selling_date")}
-            />
-          </div>
+          <Field label="FLOOR VALUE" {...register("plot_value")} />
+          <Field label="SELLING DATE" type="date" {...register("selling_date")} />
         </div>
       </SectionCard>
 
-      {/* BROKER */}
       <SectionCard title="BROKER INFORMATION">
         <div className="grid grid-cols-2 gap-6">
-          <div>
-            <Field label="BROKER NAME" {...register("broker_name", { required: "Broker name is required" })} />
-            {err(errors.broker_name)}
-          </div>
-          <div>
-            <Field label="BROKER COMPANY" {...register("broker_company")} />
-          </div>
-          <div>
-            <Field
-              label="BROKER PHONE"
-              {...register("broker_phone", {
-                pattern: { value: /^[0-9]{10}$/, message: "Phone number must be exactly 10 digits" }
-              })}
-            />
-            {err(errors.broker_phone)}
-          </div>
-          <div>
-            <Field
-              label="BROKER EMAIL"
-              {...register("broker_email", {
-                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email address" }
-              })}
-            />
-            {err(errors.broker_email)}
-          </div>
+          <Field label="BROKER NAME" {...register("broker_name")} />
+          <Field label="BROKER PHONE" {...register("broker_phone")} />
         </div>
       </SectionCard>
 
-      {/* CUSTOMER */}
       <SectionCard title="CUSTOMER INFORMATION">
         <div className="grid grid-cols-2 gap-6">
-          <div>
-            <Field label="CUSTOMER NAME" {...register("customer_name", { required: "Customer name is required" })} />
-            {err(errors.customer_name)}
-          </div>
-          <div>
-            <Field
-              label="PAN"
-              {...register("customer_pan", {
-                pattern: { value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, message: "Invalid PAN format (e.g. ABCDE1234F)" }
-              })}
-            />
-            {err(errors.customer_pan)}
-          </div>
-          <div>
-            <Field
-              label="PHONE"
-              {...register("customer_phone", {
-                pattern: { value: /^[0-9]{10}$/, message: "Phone number must be exactly 10 digits" }
-              })}
-            />
-            {err(errors.customer_phone)}
-          </div>
-          <div>
-            <Field
-              label="EMAIL"
-              {...register("customer_email", {
-                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email address" }
-              })}
-            />
-            {err(errors.customer_email)}
-          </div>
+          <Field label="CUSTOMER NAME" {...register("customer_name")} />
+          <Field label="PAN" {...register("customer_pan")} />
+          <Field label="PHONE" {...register("customer_phone")} />
+          <Field label="EMAIL" {...register("customer_email")} />
           <div className="col-span-2">
             <Field label="ADDRESS" {...register("customer_address")} />
           </div>
         </div>
       </SectionCard>
 
-      {/* CUSTOMER KYC */}
       <SectionCard title="CUSTOMER COMPLIANCE">
         <Controller
           name="customer_kyc_status"
@@ -331,39 +240,17 @@ export default function EditPlot() {
         />
       </SectionCard>
 
-      {/* PLOT DETAILS */}
       <SectionCard title="FLOOR DETAILS">
         <div className="grid grid-cols-2 gap-6">
-          <div>
-            <Field
-              label="LENGTH"
-              {...register("length", {
-                required: "Length is required",
-                validate: v => !isNaN(parseFloat(v)) && parseFloat(v) > 0 || "Must be a positive number"
-              })}
-            />
-            {err(errors.length)}
-          </div>
-          <div>
-            <Field
-              label="BREADTH"
-              {...register("breadth", {
-                required: "Breadth is required",
-                validate: v => !isNaN(parseFloat(v)) && parseFloat(v) > 0 || "Must be a positive number"
-              })}
-            />
-            {err(errors.breadth)}
-          </div>
+          <Field label="AREA (SQ YD)" {...register("area_sqyd")} />
+          <Field label="AREA (SQ FT)" {...register("area_sqft")} />
         </div>
       </SectionCard>
 
-      {/* PAYMENT MILESTONES */}
       <SectionCard title="PAYMENT MILESTONES">
-        {/* Live sum indicator */}
-        <div className={`flex items-center justify-between mb-4 px-4 py-3 rounded-lg border ${sumExceedsPlotValue
-          ? "bg-red-50 border-red-300"
-          : "bg-gray-50 border-gray-200"
-          }`}>
+        <div className={`flex items-center justify-between mb-4 px-4 py-3 rounded-lg border ${
+          sumExceedsPlotValue ? "bg-red-50 border-red-300" : "bg-gray-50 border-gray-200"
+        }`}>
           <span className="text-sm text-gray-600">
             Total entered:{" "}
             <span className={`font-bold ${sumExceedsPlotValue ? "text-red-600" : "text-gray-800"}`}>
@@ -378,15 +265,12 @@ export default function EditPlot() {
           </span>
           {sumExceedsPlotValue && (
             <span className="text-xs text-red-600 font-semibold">
-              ⚠ Exceeds plot value by ₹{" "}
-              {(paymentsSum - plotValueNum).toLocaleString("en-IN")}
+              ⚠ Exceeds plot value by ₹ {(paymentsSum - plotValueNum).toLocaleString("en-IN")}
             </span>
           )}
         </div>
-
         <MilestoneSection control={control} register={register} />
       </SectionCard>
-
     </form>
   )
 }
