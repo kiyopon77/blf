@@ -31,6 +31,11 @@ CREATE TYPE milestone_status AS ENUM (
     'DONE'
 );
 
+CREATE TYPE entity_type AS ENUM (
+    'CUSTOMER',
+    'SALE'
+);
+
 CREATE TYPE user_role AS ENUM ('admin', 'rm');
 
 -- ==================================================
@@ -160,12 +165,12 @@ CREATE TABLE documents (
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,
     file_type VARCHAR(50) NOT NULL,
-    entity_type VARCHAR(20) NOT NULL,  -- 'customer' or 'sale'
-    entity_id INT NOT NULL,
+    entity entity_type DEFAULT 'CUSTOMER',
+    sale_id INT NOT NULL REFERENCES sales(sale_id),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_documents_entity ON documents(entity_type, entity_id);
+CREATE INDEX idx_documents_entity ON documents(entity_type, sale_id);
 
 -- ==================================================
 -- BROKER PERFORMANCE VIEW (From Meeting 2)
