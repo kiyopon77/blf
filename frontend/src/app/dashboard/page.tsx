@@ -23,7 +23,7 @@ const Dashboard = () => {
   const cards = [
     {
       heading: "total floors",
-      value: dashboard.total_plots,
+      value: dashboard.total_floors,
       icon: "icons/totalPlots.svg",
       bgColor: "bg-white"
     },
