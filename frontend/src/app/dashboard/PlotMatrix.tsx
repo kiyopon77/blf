@@ -31,7 +31,7 @@ const statusConfig: Record<
   sold:         { bg: "bg-green-200",      text: "text-green-900",    dot: "bg-green-500",    label: "Sold" },
   hold:         { bg: "bg-yellow-200",   text: "text-yellow-900", dot: "bg-yellow-400", label: "Hold" },
   cancelled:    { bg: "bg-gray-300",     text: "text-gray-800",   dot: "bg-gray-500",   label: "Cancelled" },
-  investor_unit:{ bg: "bg-blue-200",     text: "text-blue-900",   dot: "bg-blue-500",   label: "Investor Unit" },
+  investor_unit:{ bg: "bg-blue-200",     text: "text-blue-900",   dot: "bg-[#213B8D]",   label: "Investor Unit" },
 }
 
 const parsePlotLabel = (label: string) => {
