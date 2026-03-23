@@ -53,8 +53,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(null)
     setAccessTokenState(null)
     setRole(null)
-
-    window.location.href = "/login"
   }
 
   return (
