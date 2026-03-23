@@ -1,6 +1,6 @@
 "use client"
-
 import { createContext, useContext, useEffect, useState } from "react"
+import axios from "axios"
 import api, { setAccessToken } from "@/lib/api"
 
 interface AuthContextType {
@@ -19,29 +19,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-  const initAuth = async () => {
-    try {
-      const { data: refreshData } = await api.post("/auth/refresh")
-
-      setAccessToken(refreshData.access_token)
-      setAccessTokenState(refreshData.access_token)
-      setRole(refreshData.role)
-
-    } catch {
-      setAccessToken(null)
-      setAccessTokenState(null)
-      setRole(null)
-    } finally {
-      setLoading(false)
+    const initAuth = async () => {
+      try {
+        const { data } = await axios.post(
+          "http://localhost:8000/api/auth/refresh",
+          {},
+          { withCredentials: true }
+        )
+        setAccessToken(data.access_token)
+        setAccessTokenState(data.access_token)
+        setRole(data.role)
+      } catch {
+        setAccessToken(null)
+        setAccessTokenState(null)
+        setRole(null)
+      } finally {
+        setLoading(false)
+      }
     }
-  }
-
-  initAuth()
-}, [])
+    initAuth()
+  }, [])
 
   const login = async (email: string, password: string) => {
     const { data } = await api.post("/auth/login", { email, password })
-
     setAccessToken(data.access_token)
     setAccessTokenState(data.access_token)
     setRole(data.role)
@@ -49,18 +49,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     await api.post("/auth/logout")
-
     setAccessToken(null)
     setAccessTokenState(null)
     setRole(null)
-
-    window.location.href = "/login"
   }
 
   return (
-    <AuthContext.Provider
-      value={{ accessToken: accessTokenState, role, login, logout, loading }}
-    >
+    <AuthContext.Provider value={{ accessToken: accessTokenState, role, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

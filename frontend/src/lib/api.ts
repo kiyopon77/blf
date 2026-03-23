@@ -21,7 +21,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
-    if (error.response?.status === 401 && !error.config._retry) {
+    const isRefreshCall = error.config?.url?.includes("/auth/refresh")
+    if (error.response?.status === 401 && !error.config._retry && !isRefreshCall) {
       error.config._retry = true
       try {
         const { data } = await axios.post(
@@ -33,10 +34,11 @@ api.interceptors.response.use(
         error.config.headers.Authorization = `Bearer ${data.access_token}`
         return api(error.config)
       } catch {
-        window.location.href = "/login"
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login"
+        }
       }
     }
-
     return Promise.reject(error)
   }
 )

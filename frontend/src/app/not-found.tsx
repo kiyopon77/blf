@@ -1,4 +1,4 @@
-import Link from "next/link"
+import GoToHome from "@/components/GoToHome"
 
 const NotFound = () => {
   return (
@@ -12,11 +12,7 @@ const NotFound = () => {
         or requires additional permissions.
       </div>
 
-      <div className="buttons">
-        <Link href="/">
-          <span className="borderAmber border-2 p-4 font-bold backgroundAmberHover hover:text-white transition">Go to Home</span>
-        </Link>
-      </div>
+     <GoToHome /> 
     </div>
   )
 }
