@@ -1,7 +1,7 @@
 import { Eye, Pencil, Trash } from "lucide-react"
 import { updateSaleStatus } from "@/services/admin/sales"
 
-const SalesActions = ({ s, setSales, onEdit }: any) => {
+const SalesActions = ({ s, setSales, onEdit, onView }: any) => {
   const handleCancel = async () => {
     try {
       await updateSaleStatus(s.sale_id, "CANCELLED")
@@ -18,7 +18,7 @@ const SalesActions = ({ s, setSales, onEdit }: any) => {
 
   return (
     <div className="flex justify-center gap-3">
-      <Eye className="text-yellow-500 cursor-pointer" size={18} />
+      <Eye className="text-yellow-500 cursor-pointer" size={18} onClick= {() => onView(s)} />
 
       <Pencil
         className="text-gray-600 cursor-pointer"

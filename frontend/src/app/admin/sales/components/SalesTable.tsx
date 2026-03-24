@@ -1,6 +1,6 @@
 import SalesRow from "./SalesRow"
 
-const SalesTable = ({ sales, setSales, onEdit }: any) => {
+const SalesTable = ({ sales, setSales, onEdit, onView }: any) => {
   return (
     <div className="border rounded-xl overflow-hidden bg-white text-gray-800">
       <table className="w-full">
@@ -24,6 +24,7 @@ const SalesTable = ({ sales, setSales, onEdit }: any) => {
               s={s}
               setSales={setSales}
               onEdit={onEdit}
+              onView={onView}
             />
           ))}
         </tbody>

@@ -6,10 +6,12 @@ import { Sale } from "@/types/sales"
 import SalesHeader from "./components/SalesHeader"
 import SalesTable from "./components/SalesTable"
 import SaleEditModal from "./components/modals/SaleEditModal"
+import { useRouter } from "next/navigation"
 
 export default function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([])
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   const [editingSale, setEditingSale] = useState<Sale | null>(null)
 
@@ -37,6 +39,10 @@ export default function SalesPage() {
     setEditingSale(sale)
   }
 
+  const handleView = (sale: Sale) => {
+    router.push(`/admin/sales/${sale.sale_id}`)
+  }
+
   if (loading) return <div className="p-6">Loading...</div>
 
   return (
@@ -46,7 +52,8 @@ export default function SalesPage() {
       <SalesTable
         sales={sales}
         setSales={setSales}
-        onEdit={handleEdit}   // ✅ PASS IT HERE
+        onEdit={handleEdit}
+        onView={handleView}
       />
 
       {editingSale && (

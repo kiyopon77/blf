@@ -8,7 +8,7 @@ const formatDate = (date: string) => {
   })
 }
 
-const SalesRow = ({ s, setSales, onEdit }: any) => {
+const SalesRow = ({ s, setSales, onEdit, onView }: any) => {
   return (
     <tr className="border-t hover:bg-gray-50">
       <td className="p-4 font-medium text-center">
@@ -46,7 +46,7 @@ const SalesRow = ({ s, setSales, onEdit }: any) => {
       </td>
 
       <td className="p-4 text-center">
-        <SalesActions s={s} setSales={setSales} onEdit={onEdit} />
+        <SalesActions s={s} setSales={setSales} onEdit={onEdit} onView={onView} />
       </td>
     </tr>
   )
