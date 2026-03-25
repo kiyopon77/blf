@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_admin
 from app.services.auth import authenticate_user, create_user, generate_tokens, get_user_by_id
-from app.schemas.user import LoginRequest, TokenResponse, UserCreate, UserResponse
+from app.schemas.user import LoginRequest, TokenResponse, UserCreate, UserResponse, UserUpdate
 from app.core.security import decode_token
 from typing import Optional
 
@@ -119,3 +119,40 @@ def list_users(
 ):
     from app.models.user import User
     return db.query(User).all()
+
+from app.schemas.user import LoginRequest, TokenResponse, UserCreate, UserResponse, UserUpdate
+
+# ── Update User (Admin only) ────────────────────────────
+@router.put("/users/{user_id}", response_model=UserResponse)
+def update_user(
+    user_id: int,
+    data: UserUpdate,
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin)
+):
+    from app.models.user import User
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    # check email not taken by someone else
+    if data.email:
+        existing = db.query(User).filter(
+            User.email == data.email,
+            User.user_id != user_id
+        ).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already in use"
+            )
+
+    for key, value in data.model_dump(exclude_none=True).items():
+        setattr(user, key, value)
+
+    db.commit()
+    db.refresh(user)
+    return user

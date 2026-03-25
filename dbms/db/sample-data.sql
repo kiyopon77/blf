@@ -328,4 +328,13 @@ VALUES
     (52, 1, 'AVAILABLE', 'SOLD'),  
     (54, 1, 'AVAILABLE', 'HOLD');
 
--- EOF!!!
+-- run this in pgAdmin query tool
+SELECT setval('brokers_broker_id_seq', (SELECT MAX(broker_id) FROM brokers));
+SELECT setval('users_user_id_seq', (SELECT MAX(user_id) FROM users));
+SELECT setval('society_society_id_seq', (SELECT MAX(society_id) FROM society));
+SELECT setval('plots_plot_id_seq', (SELECT MAX(plot_id) FROM plots));
+SELECT setval('customers_customer_id_seq', (SELECT MAX(customer_id) FROM customers));
+SELECT setval('sales_sale_id_seq', (SELECT MAX(sale_id) FROM sales));
+SELECT setval('payments_payment_id_seq', (SELECT MAX(payment_id) FROM payments));
+SELECT setval('floor_status_logs_log_id_seq', (SELECT MAX(log_id) FROM floor_status_logs));
+

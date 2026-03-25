@@ -9,9 +9,9 @@ from app.routers import customers
 from app.routers import sales
 from app.routers import payments
 from app.routers import dashboard
-from app.routers import documents 
+from app.routers import documents
+from app.routers import society
 
-# import all models so SQLAlchemy knows about them
 import app.models
 
 app = FastAPI(
@@ -20,7 +20,6 @@ app = FastAPI(
     root_path="/api"
 )
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost", "http://localhost:3000"],
@@ -29,8 +28,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routers
 app.include_router(auth.router)
+app.include_router(society.router)
 app.include_router(plots.router)
 app.include_router(floors.router)
 app.include_router(brokers.router)
