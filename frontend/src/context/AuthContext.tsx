@@ -6,6 +6,7 @@ import api, { setAccessToken } from "@/lib/api"
 interface AuthContextType {
   accessToken: string | null
   role: string | null
+  user: any | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -17,6 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessTokenState, setAccessTokenState] = useState<string | null>(null)
   const [role, setRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
     const initAuth = async () => {
@@ -26,13 +28,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           {},
           { withCredentials: true }
         )
+
         setAccessToken(data.access_token)
         setAccessTokenState(data.access_token)
         setRole(data.role)
+
+        // fetch user
+        const me = await api.get("/auth/me")
+        setUser(me.data)
+
       } catch {
         setAccessToken(null)
         setAccessTokenState(null)
         setRole(null)
+        setUser(null)
       } finally {
         setLoading(false)
       }
@@ -45,6 +54,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(data.access_token)
     setAccessTokenState(data.access_token)
     setRole(data.role)
+
+    const me = await api.get("/auth/me")
+    setUser(me.data)
   }
 
   const logout = async () => {
@@ -52,10 +64,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(null)
     setAccessTokenState(null)
     setRole(null)
+    setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ accessToken: accessTokenState, role, login, logout, loading }}>
+    <AuthContext.Provider value={{ accessToken: accessTokenState, role, user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { createBroker } from "@/services/admin/broker"
+import { useAuth } from "@/context/AuthContext"
 
 const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
   const [form, setForm] = useState({
@@ -9,6 +10,8 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
     phone: "",
     user_id: "",
   })
+
+  const {user} = useAuth()
 
   const [loading, setLoading] = useState(false)
 
@@ -24,7 +27,7 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
 
       const newBroker = await createBroker({
         ...form,
-        user_id: ,
+        user_id: user.user_id,
       })
 
       setBrokers((prev: any) => [newBroker, ...prev])
