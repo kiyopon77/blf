@@ -14,11 +14,11 @@ VALUES (2, 'BLF Subedar Floors', 'Sector 67, Sohna, Haryana');
 
 INSERT INTO brokers (broker_id, society_id, broker_name, phone, user_id)
 VALUES
-    (1, 1, 'Goldy',          '9811100001', 2),
-    (2, 1, 'Rajesh Verma',   '9811100002', 2),
-    (3, 1, 'Sunita Brokers', '9811100003', 3),
-    (4, 1, 'Deepak Arora',   '9811100004', 4),
-    (5, 1, 'Meena Estates',  '9811100005', 5);
+    (1, 1, 'Goldy',          '9811100001', 1),
+    (2, 1, 'Rajesh Verma',   '9811100002', 1),
+    (3, 1, 'Sunita Brokers', '9811100003', 1),
+    (4, 1, 'Deepak Arora',   '9811100004', 1),
+    (5, 1, 'Meena Estates',  '9811100005', 1);
 
 
 -- ==================================================
@@ -322,10 +322,10 @@ VALUES
 
 INSERT INTO floor_status_logs (floor_id, changed_by, old_status, new_status)
 VALUES
-    (23, 2, 'AVAILABLE', 'SOLD'),
-    (43, 3, 'AVAILABLE', 'SOLD'),
-    (51, 2, 'AVAILABLE', 'SOLD'),
-    (52, 2, 'AVAILABLE', 'SOLD'),  
-    (54, 2, 'AVAILABLE', 'HOLD');
+    (23, 1, 'AVAILABLE', 'SOLD'),
+    (43, 1, 'AVAILABLE', 'SOLD'),
+    (51, 1, 'AVAILABLE', 'SOLD'),
+    (52, 1, 'AVAILABLE', 'SOLD'),  
+    (54, 1, 'AVAILABLE', 'HOLD');
 
 -- EOF!!!
