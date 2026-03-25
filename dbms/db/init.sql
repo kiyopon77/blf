@@ -44,6 +44,17 @@ CREATE TYPE entity_type AS ENUM (
 CREATE TYPE user_role AS ENUM ('admin', 'rm');
 
 -- ==================================================
+-- SOCIETY (Managed by ADMIN)
+-- ==================================================
+
+CREATE TABLE society (
+    society_id SERIAL PRIMARY KEY,
+    society_name VARCHAR(100),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ==================================================
 -- admin and user tables
 -- ==================================================
 
@@ -55,17 +66,6 @@ CREATE TABLE users (
     hashed_password VARCHAR(255) NOT NULL,
     role user_role DEFAULT 'rm',
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ==================================================
--- SOCIETY (Managed by ADMIN)
--- ==================================================
-
-CREATE TABLE society (
-    society_id SERIAL PRIMARY KEY,
-    society_name VARCHAR(100),
-    address TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
