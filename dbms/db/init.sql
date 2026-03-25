@@ -190,7 +190,7 @@ CREATE TABLE documents (
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_documents_entity ON documents(entity_type, sale_id);
+CREATE INDEX idx_documents_entity ON documents(entity, sale_id);
 
 -- ==================================================
 -- BROKER PERFORMANCE VIEW (From Meeting 2)
