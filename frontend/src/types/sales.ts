@@ -5,6 +5,20 @@ export type Sale = {
   customer_id: number
   total_value: number
   commission_percent?: number
-  status: "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR_UNIT"
+  status: SaleStatus
   initiated_at: string
 }
+
+export type SaleDetail = Sale & {
+  broker_name: string
+  customer_name: string
+  customer_kyc_status: "PENDING" | "DONE"
+  floor_no: number
+  plot_code: string
+}
+
+type SaleStatus =
+  | "HOLD"
+  | "SOLD"
+  | "CANCELLED"
+  | "INVESTOR_UNIT"
