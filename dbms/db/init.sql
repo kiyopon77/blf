@@ -31,6 +31,11 @@ CREATE TYPE milestone_status AS ENUM (
     'DONE'
 );
 
+CREATE TYPE kyc_status AS ENUM (
+    'PENDING',
+    'DONE'
+);
+
 CREATE TYPE entity_type AS ENUM (
     'CUSTOMER',
     'SALE'
@@ -131,7 +136,7 @@ CREATE TABLE customers (
     phone VARCHAR(20),
     email VARCHAR(100),
     address TEXT,
-    kyc_status VARCHAR(20) DEFAULT 'PENDING',
+    kyc_status kyc_status DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
