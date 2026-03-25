@@ -31,6 +31,11 @@ CREATE TYPE milestone_status AS ENUM (
     'DONE'
 );
 
+CREATE TYPE entity_type AS ENUM (
+    'CUSTOMER',
+    'SALE'
+);
+
 CREATE TYPE user_role AS ENUM ('admin', 'rm');
 
 -- ==================================================
@@ -39,6 +44,7 @@ CREATE TYPE user_role AS ENUM ('admin', 'rm');
 
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
+    society_id INT REFERENCES society(society_id),
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     hashed_password VARCHAR(255) NOT NULL,
@@ -48,11 +54,23 @@ CREATE TABLE users (
 );
 
 -- ==================================================
+-- SOCIETY (Managed by ADMIN)
+-- ==================================================
+
+CREATE TABLE society (
+    society_id SERIAL PRIMARY KEY,
+    society_name VARCHAR(100),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ==================================================
 -- BROKERS (Managed by RM)
 -- ==================================================
 
 CREATE TABLE brokers (
     broker_id SERIAL PRIMARY KEY,
+    society_id INT NOT NULL REFERENCES society(society_id),
     broker_name VARCHAR(100),
     phone VARCHAR(20) UNIQUE,
     user_id INT NOT NULL REFERENCES users(user_id),
@@ -65,6 +83,7 @@ CREATE TABLE brokers (
 
 CREATE TABLE plots (
     plot_id SERIAL PRIMARY KEY,
+    society_id INT NOT NULL REFERENCES society(society_id),
     plot_code VARCHAR(20) UNIQUE NOT NULL,  -- C1, C2, C3
     area_sqyd NUMERIC(10,2),
     area_sqft NUMERIC(10,2),
@@ -106,6 +125,7 @@ CREATE INDEX idx_floor_logs_floor ON floor_status_logs(floor_id);
 
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
+    society_id INT NOT NULL REFERENCES society(society_id),
     full_name VARCHAR(100),
     pan VARCHAR(20) UNIQUE,
     phone VARCHAR(20),
@@ -160,12 +180,12 @@ CREATE TABLE documents (
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,
     file_type VARCHAR(50) NOT NULL,
-    entity_type VARCHAR(20) NOT NULL,  -- 'customer' or 'sale'
-    entity_id INT NOT NULL,
+    entity entity_type DEFAULT 'CUSTOMER',
+    sale_id INT NOT NULL REFERENCES sales(sale_id),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_documents_entity ON documents(entity_type, entity_id);
+CREATE INDEX idx_documents_entity ON documents(entity_type, sale_id);
 
 -- ==================================================
 -- BROKER PERFORMANCE VIEW (From Meeting 2)
@@ -187,6 +207,7 @@ GROUP BY b.broker_id, b.broker_name;
 
 CREATE VIEW global_inventory_master AS
 SELECT 
+    p.society_id,
     p.plot_code,
     f.floor_no,
     f.status AS inventory_status,
