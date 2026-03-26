@@ -1,3 +1,4 @@
+// services/admin/broker.ts
 import api from "@/lib/api"
 
 export const getBrokers = async () => {
@@ -9,6 +10,7 @@ export const createBroker = async (data: {
   broker_name?: string
   phone?: string
   user_id: number
+  society_id: number
 }) => {
   const res = await api.post("/brokers", data)
   return res.data
@@ -20,6 +22,7 @@ export const updateBroker = async (
     broker_name?: string
     phone?: string
     user_id?: number
+    society_id?: number
   }
 ) => {
   const res = await api.put(`/brokers/${id}`, data)

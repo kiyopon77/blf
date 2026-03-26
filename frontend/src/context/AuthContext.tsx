@@ -7,6 +7,7 @@ interface AuthContextType {
   accessToken: string | null
   role: string | null
   user: any | null
+  society: any | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -19,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const [society, setSociety] = useState<number | null>(null)
 
   useEffect(() => {
     const initAuth = async () => {
@@ -36,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // fetch user
         const me = await api.get("/auth/me")
         setUser(me.data)
+        setSociety(me.data.society_id)
 
       } catch {
         setAccessToken(null)
@@ -68,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ accessToken: accessTokenState, role, user, login, logout, loading }}>
+    <AuthContext.Provider value={{ accessToken: accessTokenState, role, user, society, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )
