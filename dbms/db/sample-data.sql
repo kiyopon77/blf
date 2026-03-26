@@ -336,4 +336,5 @@ SELECT setval('customers_customer_id_seq', (SELECT MAX(customer_id) FROM custome
 SELECT setval('sales_sale_id_seq', (SELECT MAX(sale_id) FROM sales));
 SELECT setval('payments_payment_id_seq', (SELECT MAX(payment_id) FROM payments));
 SELECT setval('floor_status_logs_log_id_seq', (SELECT MAX(log_id) FROM floor_status_logs));
+SELECT setval('floors_floor_id_seq', (SELECT MAX(floor_id) FROM floors));
 
