@@ -34,7 +34,7 @@ const Navbar = () => {
     <div className="w-full bg-black px-5 p-3 text-white grid grid-cols-3 items-center">
       <div className="flex gap-4 items-center">
         <Link href="/">
-          <Image src="/images/logo.svg" alt="BLF Logo" width={80} height={80} loading="eager" />
+          <Image src="/images/logo.svg" alt="BLF Logo" width={120} height={40} loading="eager" className="w-auto h-15"/>
         </Link>
       </div>
       <div className="flex justify-center gap-6">
