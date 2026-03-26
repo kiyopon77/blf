@@ -3,6 +3,7 @@
 
 import { useState } from "react"
 import { createCustomer } from "@/services/admin/customer"
+import { useAuth } from "@/context/AuthContext"
 
 const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
   const [form, setForm] = useState({
@@ -12,6 +13,8 @@ const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
     email: "",
     address: "",
   })
+
+  const {user} = useAuth()
 
   const [loading, setLoading] = useState(false)
 
@@ -25,7 +28,7 @@ const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
     try {
       setLoading(true)
 
-      const newCustomer = await createCustomer(form)
+      const newCustomer = await createCustomer({society_id: user.society_id, ...form})
 
       setCustomers((prev: any) => [newCustomer, ...prev])
 

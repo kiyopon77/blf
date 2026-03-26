@@ -7,6 +7,7 @@ import CustomerHeader from "./components/CustomerHeader"
 import CustomerTable from "./components/CustomerTable"
 import CustomerCreateModal from "./components/modals/CustomerCreateModal"
 import CustomerEditModal from "./components/modals/CustomerEditModal"
+import { sortByCustomerId } from "@/app/utils/sort"
 
 const CustomersPage = () => {
   const [customers, setCustomers] = useState([])
@@ -18,7 +19,7 @@ const CustomersPage = () => {
     const fetchData = async () => {
       try {
         const data = await getCustomers()
-        setCustomers(data)
+        setCustomers(sortByCustomerId(data))
       } catch (err) {
         console.error(err)
       } finally {

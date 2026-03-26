@@ -11,6 +11,7 @@ export const deleteCustomer = async (id: number) => {
 }
 
 export const createCustomer = async (data: {
+  society_id: number
   full_name: string
   pan: string
   phone?: string

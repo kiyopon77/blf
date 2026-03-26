@@ -1,17 +1,23 @@
-// components/CustomerHeader.tsx
-const CustomerHeader = ({onCreate}:any) => {
+import AdminButton from "@/components/ui/AdminButton"
+import { Plus } from "lucide-react"
+
+const CustomerHeader = ({ onCreate }: any) => {
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
       <div>
-        <h1 className="text-3xl font-bold">Customers</h1>
-        <p className="text-gray-500">
+        <h1 className="text-[28px] font-bold text-black leading-tight">
+          Customers
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
           Manage all customer records and KYC details
         </p>
       </div>
 
-      <button className="border border-yellow-500 text-yellow-500 px-4 py-2 rounded-md" onClick={onCreate}>
-        + Create Customer
-      </button>
+      <div className="mt-4 sm:mt-0">
+        <AdminButton onClick={onCreate} icon={<Plus size={16} />} >
+        Add Customer
+        </AdminButton>
+      </div>
     </div>
   )
 }

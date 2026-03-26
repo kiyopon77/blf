@@ -15,7 +15,6 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
 
   const [loading, setLoading] = useState(false)
 
-  // ✅ PREFILL
   useEffect(() => {
     if (customer) {
       setForm({
@@ -37,6 +36,13 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
   const handleSubmit = async () => {
     try {
       setLoading(true)
+      const cleanForm = {
+        full_name: form.full_name || null,
+        phone: form.phone || null,
+        email: form.email || null,
+        address: form.address || null,
+        kyc_status: form.kyc_status || null,
+      }
 
       const updated = await updateCustomer(
         customer.customer_id,
@@ -76,8 +82,7 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
             className="border p-2 rounded-md"
           >
             <option value="PENDING">PENDING</option>
-            <option value="VERIFIED">VERIFIED</option>
-            <option value="REJECTED">REJECTED</option>
+            <option value="DONE">DONE</option>
           </select>
         </div>
 
