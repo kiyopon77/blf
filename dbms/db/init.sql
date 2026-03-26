@@ -243,8 +243,9 @@ CREATE INDEX idx_payments_sale ON payments(sale_id);
 -- ==================================================
 -- DEFAULT ADMIN USER
 -- ==================================================
-INSERT INTO users (full_name, email, hashed_password, role, is_active)
+INSERT INTO users (society_id, full_name, email, hashed_password, role, is_active)
 VALUES (
+          1,
     'Admin',
     'admin@blf.com',
     '$2b$12$ytRFOrhRkVH2t2Qye1g.m.jH1diVJTqFbq2OWGfzEzPrdcCz6doZC',
