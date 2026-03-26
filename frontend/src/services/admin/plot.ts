@@ -1,20 +1,30 @@
-// lib/api/plot.ts
 import api from "@/lib/api"
-export const getPlots = async () => {
+import {
+  Plot,
+  CreatePlotPayload,
+  UpdatePlotPayload,
+} from "@/types/plot"
+
+export const getPlots = async (): Promise<Plot[]> => {
   const res = await api.get("/plots")
   return res.data
 }
 
-export const createPlot = async (data: any) => {
+export const createPlot = async (
+  data: CreatePlotPayload
+): Promise<Plot> => {
   const res = await api.post("/plots", data)
   return res.data
 }
 
-export const updatePlot = async (id: number, data: any) => {
+export const updatePlot = async (
+  id: number,
+  data: UpdatePlotPayload
+): Promise<Plot> => {
   const res = await api.put(`/plots/${id}`, data)
   return res.data
 }
 
-export const deletePlot = async (id: number) => {
+export const deletePlot = async (id: number): Promise<void> => {
   await api.delete(`/plots/${id}`)
 }

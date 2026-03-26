@@ -1,12 +1,29 @@
-// components/FloorTable.tsx
 import { useState } from "react"
 import { updateFloorStatus } from "@/services/admin/floor"
+import { Check, Eye, Plus } from "lucide-react"
+import { useRouter } from "next/navigation"
+import AdminButton from "@/components/ui/AdminButton"
+import AddButton from "@/components/ui/AddButton"
+
+const getStatusStyle = (status: string) => {
+  switch (status) {
+    case "AVAILABLE":
+      return "bg-green-50 text-green-700 border-green-200"
+    case "SOLD":
+      return "bg-red-50 text-red-700 border-red-200"
+    case "HOLD":
+      return "bg-amber-50 text-amber-700 border-amber-200"
+    case "INVESTOR_UNIT":
+      return "bg-blue-100 text-blue-700 border-blue-200"
+    default:
+      return "bg-gray-100 text-gray-700 border-gray-200"
+  }
+}
 
 const FloorTable = ({ floors, setFloors }: any) => {
-  const [changes, setChanges] = useState<any>({}) 
-  // { floor_id: "NEW_STATUS" }
+  const [changes, setChanges] = useState<any>({})
+  const router = useRouter()
 
-  // 📝 track changes locally
   const handleChange = (id: number, status: string) => {
     setChanges((prev: any) => ({
       ...prev,
@@ -14,7 +31,6 @@ const FloorTable = ({ floors, setFloors }: any) => {
     }))
   }
 
-  // 🚀 submit all changes
   const handleSubmit = async () => {
     try {
       const updatedFloors = [...floors]
@@ -35,58 +51,83 @@ const FloorTable = ({ floors, setFloors }: any) => {
       }
 
       setFloors(updatedFloors)
-      setChanges({}) // reset
+      setChanges({})
     } catch (err) {
       console.error(err)
     }
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-gray-100 text-left">
-          <tr>
-            <th className="p-3">Floor ID</th>
-            <th className="p-3">Floor No</th>
-            <th className="p-3">Status</th>
+    <div className="px-6 pb-6">
+      <table className="w-full border-collapse text-left">
+        <thead>
+          <tr className="bg-[#FAFAFA] border-y border-[#E5E5E5]">
+            <th className="py-3 px-4 text-sm font-semibold text-gray-600">
+              Floor ID
+            </th>
+            <th className="py-3 px-4 text-sm font-semibold text-gray-600">
+              Floor No
+            </th>
+            <th className="py-3 px-4 text-sm font-semibold text-gray-600">
+              Status
+            </th>
+            <th className="py-3 px-4 text-sm font-semibold text-gray-600">
+              Actions
+            </th>
           </tr>
         </thead>
 
         <tbody>
-          {floors.map((f: any) => (
-            <tr key={f.floor_id} className="border-t hover:bg-gray-50">
-              <td className="p-3">{f.floor_id}</td>
-              <td className="p-3">{f.floor_no}</td>
+          {floors.map((f: any) => {
+            const currentStatus = changes[f.floor_id] ?? f.status
 
-              <td className="p-3">
-                <select
-                  value={changes[f.floor_id] ?? f.status}
-                  onChange={(e) =>
-                    handleChange(f.floor_id, e.target.value)
-                  }
-                  className="border rounded-md px-2 py-1"
-                >
-                  <option>AVAILABLE</option>
-                  <option>HOLD</option>
-                  <option>SOLD</option>
-                  <option>CANCELLED</option>
-                  <option>INVESTOR_UNIT</option>
-                </select>
-              </td>
-            </tr>
-          ))}
+            return (
+              <tr
+                key={f.floor_id}
+                className="h-13 border-b border-[#E5E5E5] hover:bg-gray-50 transition-colors group"
+              >
+                <td className="px-4 text-sm text-gray-800 font-medium">
+                  {f.floor_id}
+                </td>
+
+                <td className="px-4 text-sm text-gray-600">
+                  {f.floor_no}
+                </td>
+
+                <td className="px-4">
+                  <select
+                    value={currentStatus}
+                    onChange={(e) =>
+                      handleChange(f.floor_id, e.target.value)
+                    }
+                    className={`text-sm font-medium py-1.5 pl-3 pr-8 rounded-md border focus:outline-none focus:ring-1 focus:ring-[#D4A22A] focus:border-[#D4A22A] transition-colors cursor-pointer w-40 ${getStatusStyle(
+                      currentStatus
+                    )}`}
+                  >
+                    <option value="AVAILABLE">Available</option>
+                    <option value="SOLD">Sold</option>
+                    <option value="HOLD">Hold</option>
+                    <option value="INVESTOR_UNIT">Investor Unit</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                </td>
+                <td>
+                <AdminButton onClick={() => router.push(`/admin/plot/floors/${f.floor_id}/logs`)} icon={<Eye size={16} />} >
+                  View Logs
+                </AdminButton>
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
 
-      {/* 🔥 Submit button */}
+      {/* Save button */}
       {Object.keys(changes).length > 0 && (
-        <div className="p-4 flex justify-end">
-          <button
-            onClick={handleSubmit}
-            className="bg-yellow-500 text-white px-4 py-2 rounded-md"
-          >
+        <div className="flex justify-end pt-4">
+          <AddButton onClick={handleSubmit} icon={<Check size={16} />} >
             Save Changes
-          </button>
+          </AddButton>
         </div>
       )}
     </div>

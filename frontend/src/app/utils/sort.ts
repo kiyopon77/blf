@@ -5,3 +5,7 @@ export const sortByUserId = (arr: any[]) => {
 export const sortByBrokerId = (arr: any[]) => {
   return [...arr].sort((a, b) => a.broker_id - b.broker_id)
 }
+
+export const sortByFloorNo = (arr: any[]) => {
+  return [...arr].sort((a, b) => a.floor_no - b.floor_no)
+}

@@ -1,7 +1,7 @@
 // lib/api/floor.ts
 import api from "@/lib/api"
+import { FloorLog } from "@/types/floor"
 
-// lib/api/floor.ts
 export const getFloors = async () => {
   const res = await api.get("/floors")
   return res.data
@@ -22,5 +22,12 @@ export const updateFloorStatus = async (id: number, status: string) => {
 
 export const getPlotFloors = async (plotId: number) => {
   const res = await api.get(`/plots/${plotId}/floors`)
+  return res.data
+}
+
+export const getFloorLogs = async (
+  floorId: number
+): Promise<FloorLog[]> => {
+  const res = await api.get(`/floors/${floorId}/logs`)
   return res.data
 }
