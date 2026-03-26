@@ -8,10 +8,9 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
   const [form, setForm] = useState({
     broker_name: "",
     phone: "",
-    user_id: "",
   })
 
-  const {user} = useAuth()
+  const { user } = useAuth()
 
   const [loading, setLoading] = useState(false)
 
@@ -24,10 +23,13 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
   const handleSubmit = async () => {
     try {
       setLoading(true)
+      console.log(user)
 
       const newBroker = await createBroker({
-        ...form,
+        broker_name: form.broker_name ,
+        phone: form.phone ,
         user_id: user.user_id,
+        society_id: user.society_id
       })
 
       setBrokers((prev: any) => [newBroker, ...prev])
@@ -47,7 +49,6 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
         <div className="flex flex-col gap-3">
           <input name="broker_name" placeholder="Name" onChange={handleChange} className="border p-2 rounded-md" />
           <input name="phone" placeholder="Phone" onChange={handleChange} className="border p-2 rounded-md" />
-          <input name="user_id" placeholder="User ID" onChange={handleChange} className="border p-2 rounded-md" />
         </div>
 
         <div className="flex justify-end gap-3 mt-5">

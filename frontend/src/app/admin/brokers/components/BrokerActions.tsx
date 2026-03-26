@@ -15,7 +15,7 @@ const BrokerActions = ({ b, setBrokers, onEdit }: any) => {
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex justify-end gap-3 w-full">
       <Pencil
         className="text-gray-600 cursor-pointer"
         size={18}

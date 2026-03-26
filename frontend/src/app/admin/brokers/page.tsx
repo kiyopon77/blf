@@ -6,9 +6,10 @@ import BrokerHeader from "./components/BrokerHeader"
 import BrokerTable from "./components/BrokerTable"
 import BrokerCreateModal from "./components/modals/BrokerCreateModal"
 import BrokerEditModal from "./components/modals/BrokerEditModal"
+import { sortByBrokerId } from "@/app/utils/sort"
 
 const BrokersPage = () => {
-  const [brokers, setBrokers] = useState([])
+  const [brokers, setBrokers] = useState<any>([])
   const [loading, setLoading] = useState(true)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -18,7 +19,8 @@ const BrokersPage = () => {
     const fetchData = async () => {
       try {
         const data = await getBrokers()
-        setBrokers(data)
+        setBrokers(sortByBrokerId(data))
+        console.log(sortByBrokerId(data))
       } catch (err) {
         console.error(err)
       } finally {

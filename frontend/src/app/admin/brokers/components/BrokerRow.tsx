@@ -10,15 +10,34 @@ const formatDate = (date: string) => {
 
 const BrokerRow = ({ b, setBrokers, onEdit }: any) => {
   return (
-    <tr className="border-t hover:bg-gray-50">
-      <td className="p-4">{b.broker_id}</td>
-      <td className="p-4 font-medium">{b.broker_name || "-"}</td>
-      <td className="p-4">{b.phone || "-"}</td>
-      <td className="p-4 text-gray-500">
+    <tr className="hover:bg-gray-50 transition-colors duration-150">
+
+      <td className="px-6 py-3 font-semibold text-gray-900">
+        #{b.broker_id}
+      </td>
+
+      <td className="px-6 py-3 font-semibold text-gray-900">
+        #{b.society_id}
+      </td>
+
+      <td className="px-6 py-3 font-medium text-gray-800">
+        {b.broker_name || "-"}
+      </td>
+
+      <td className="px-6 py-3 text-gray-600">
+        {b.phone || "-"}
+      </td>
+
+      <td className="px-6 py-3 text-gray-500">
         {formatDate(b.created_at)}
       </td>
-      <td className="p-4">
-        <BrokerActions b={b} setBrokers={setBrokers} onEdit={onEdit} />
+
+      <td className="px-6 py-3 text-right">
+        <BrokerActions
+          b={b}
+          setBrokers={setBrokers}
+          onEdit={onEdit}
+        />
       </td>
     </tr>
   )

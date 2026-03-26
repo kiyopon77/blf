@@ -2,29 +2,34 @@ import BrokerRow from "./BrokerRow"
 
 const BrokerTable = ({ brokers, setBrokers, onEdit }: any) => {
   return (
-    <div className="border rounded-xl overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-gray-100 text-left">
-          <tr>
-            <th className="p-4">ID</th>
-            <th className="p-4">Name</th>
-            <th className="p-4">Phone</th>
-            <th className="p-4">Created</th>
-            <th className="p-4">Actions</th>
-          </tr>
-        </thead>
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left">User ID</th>
+              <th className="px-6 py-4 text-left">Society ID</th>
+              <th className="px-6 py-4 text-left">Name</th>
+              <th className="px-6 py-4 text-left">Phone</th>
+              <th className="px-6 py-4 text-left">Created</th>
+              <th className="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {brokers.map((b: any) => (
-            <BrokerRow
-              key={b.broker_id}
-              b={b}
-              setBrokers={setBrokers}
-              onEdit={onEdit}
-            />
-          ))}
-        </tbody>
-      </table>
+          <tbody className="divide-y divide-gray-200">
+            {brokers.map((b: any) => (
+              <BrokerRow
+                key={b.broker_id}
+                b={b}
+                setBrokers={setBrokers}
+                onEdit={onEdit}
+              />
+            ))}
+          </tbody>
+
+        </table>
+      </div>
     </div>
   )
 }
