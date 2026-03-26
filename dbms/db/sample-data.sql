@@ -321,11 +321,11 @@ VALUES
 
 INSERT INTO floor_status_logs (floor_id, changed_by, old_status, new_status)
 VALUES
-    (7,  2, 'AVAILABLE', 'SOLD'),   -- C2  F3
-    (15, 3, 'AVAILABLE', 'SOLD'),   -- C15 F3
-    (17, 2, 'AVAILABLE', 'SOLD'),   -- C16 F1
-    (18, 2, 'AVAILABLE', 'SOLD'),   -- C16 F2: shifted from C15
-    (20, 2, 'AVAILABLE', 'HOLD');   -- C16 F4: token done
+    (7,  1, 'AVAILABLE', 'SOLD'),   -- C2  F3
+    (15, 1, 'AVAILABLE', 'SOLD'),   -- C15 F3
+    (17, 1, 'AVAILABLE', 'SOLD'),   -- C16 F1
+    (18, 1, 'AVAILABLE', 'SOLD'),   -- C16 F2: shifted from C15
+    (20, 1, 'AVAILABLE', 'HOLD');   -- C16 F4: token done
 
 -- run this in pgAdmin query tool
 SELECT setval('brokers_broker_id_seq', (SELECT MAX(broker_id) FROM brokers));
