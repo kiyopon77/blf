@@ -95,6 +95,16 @@ def logout(response: Response):
     return {"message": "Logged out successfully"}
 
 
+@router.get("/user/{user_id}", response_model=UserResponse)
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = get_user_by_id(db, user_id)
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user
+
+
 # ── Get Current User ────────────────────────────────────────────────────
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user=Depends(get_current_user)):
