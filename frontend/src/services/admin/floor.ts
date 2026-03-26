@@ -7,7 +7,10 @@ export const getFloors = async () => {
   return res.data
 }
 
-export const createFloor = async (data: any) => {
+export const createFloor = async (data: {
+  plot_id: number
+  floor_no: number
+}) => {
   const res = await api.post("/floors", data)
   return res.data
 }

@@ -4,10 +4,12 @@
 import { useEffect, useState } from "react"
 import { getPlotFloors } from "@/services/admin/floor"
 import FloorTable from "./FloorTable"
+import FloorCreateModal from "./modals/FloorCreateModal"
 
 const PlotSection = ({ plot }: any) => {
   const [floors, setFloors] = useState([])
   const [loading, setLoading] = useState(true)
+  const [createOpen, setCreateOpen] = useState(false)
 
   useEffect(() => {
     const fetchFloors = async () => {
@@ -49,7 +51,7 @@ const PlotSection = ({ plot }: any) => {
         </div>
 
         {/* Optional actions */}
-        <button className="text-yellow-500 border px-3 py-1 rounded-md">
+        <button className="text-yellow-500 border px-3 py-1 rounded-md" onClick={() => setCreateOpen(true)}>
           + Add Floor
         </button>
       </div>
@@ -60,6 +62,12 @@ const PlotSection = ({ plot }: any) => {
       ) : (
         <FloorTable floors={floors} setFloors={setFloors} />
       )}
+      <FloorCreateModal
+        open={createOpen}
+        setOpen={setCreateOpen}
+        plot={plot}
+        setFloors={setFloors}
+      />
     </div>
   )
 }
