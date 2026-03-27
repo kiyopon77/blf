@@ -1,22 +1,32 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_admin
 from app.models.sale import Sale, SaleStatus
 from app.models.floor import Floor, InventoryStatus
+from app.models.plot import Plot
 from app.models.payment import Payment, MilestoneType, MilestoneStatus
 from app.models.broker import Broker
 from app.models.customer import Customer
-from app.schemas.sale import SaleCreate, SaleStatusUpdate, SaleResponse, SaleDetailResponse, SaleUpdate
+from app.schemas.sale import SaleCreate, SaleStatusUpdate, SaleResponse, SaleDetailResponse, SaleUpdate, FloorInfoResponse
 from app.schemas.payment import PaymentResponse
-from typing import List
+from typing import List, Optional
 
 router = APIRouter(prefix="/sales", tags=["Sales"])
 
 
 @router.get("", response_model=List[SaleResponse])
-def get_sales(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(Sale).all()
+def get_sales(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    query = db.query(Sale)
+    if society_id is not None:
+        query = query.join(Floor, Sale.floor_id == Floor.floor_id).join(Plot, Floor.plot_id == Plot.plot_id).filter(
+            Plot.society_id == society_id
+        )
+    return query.all()
 
 
 @router.get("/{sale_id}", response_model=SaleDetailResponse)
@@ -34,7 +44,14 @@ def get_sale(sale_id: int, db: Session = Depends(get_db), user=Depends(get_curre
         customer_name=sale.customer.full_name,
         customer_kyc_status=sale.customer.kyc_status,
         floor_no=sale.floor.floor_no,
-        plot_code=sale.floor.plot.plot_code
+        plot_code=sale.floor.plot.plot_code,
+        floor=FloorInfoResponse(
+            floor_id=sale.floor.floor_id,
+            plot_id=sale.floor.plot_id,
+            floor_no=sale.floor.floor_no,
+            status=sale.floor.status.value,
+            active_sale_id=sale.floor.active_sale_id
+        )
     )
 
 

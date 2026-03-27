@@ -1,17 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_admin
 from app.models.broker import Broker
 from app.schemas.broker import BrokerCreate, BrokerUpdate, BrokerResponse
-from typing import List
+from typing import List, Optional
 
 router = APIRouter(prefix="/brokers", tags=["Brokers"])
 
 
 @router.get("", response_model=List[BrokerResponse])
-def get_brokers(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(Broker).all()
+def get_brokers(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    query = db.query(Broker)
+    if society_id is not None:
+        query = query.filter(Broker.society_id == society_id)
+    return query.all()
 
 
 @router.get("/{broker_id}", response_model=BrokerResponse)

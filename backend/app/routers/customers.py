@@ -1,18 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_admin
 from app.models.customer import Customer
 from app.schemas.customer import CustomerCreate, CustomerUpdate, CustomerResponse, CustomerPanUpdate
-from typing import List
+from typing import List, Optional
 
 
 router = APIRouter(prefix="/customers", tags=["Customers"])
 
 
 @router.get("", response_model=List[CustomerResponse])
-def get_customers(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(Customer).all()
+def get_customers(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    query = db.query(Customer)
+    if society_id is not None:
+        query = query.filter(Customer.society_id == society_id)
+    return query.all()
 
 
 @router.get("/{customer_id}", response_model=CustomerResponse)

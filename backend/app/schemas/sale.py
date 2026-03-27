@@ -27,6 +27,14 @@ class SaleResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
+class FloorInfoResponse(BaseModel):
+    floor_id: int
+    plot_id: int
+    floor_no: int
+    status: str
+    active_sale_id: Optional[int] = None
+
 class SaleDetailResponse(BaseModel):
     sale_id: int
     total_value: float
@@ -40,6 +48,7 @@ class SaleDetailResponse(BaseModel):
     customer_kyc_status: str
     floor_no: int
     plot_code: str
+    floor: FloorInfoResponse
 
     class Config:
         from_attributes = True

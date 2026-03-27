@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_admin
@@ -10,15 +10,23 @@ from app.models.user import User
 from app.models.floor_log import FloorStatusLog
 from app.schemas.plot import PlotCreate, PlotUpdate, PlotResponse, PlotMatrixResponse, FloorMatrixItem
 from app.schemas.floor import FloorResponse
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 router = APIRouter(prefix="/plots", tags=["Plots"])  # ← this must be before any @router.get
 
 
 @router.get("/matrix", response_model=list[PlotMatrixResponse])
-def get_plots_matrix(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    plots = db.query(Plot).all()
+def get_plots_matrix(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    plots_query = db.query(Plot)
+    if society_id is not None:
+        plots_query = plots_query.filter(Plot.society_id == society_id)
+
+    plots = plots_query.all()
     result = []
 
     for plot in plots:
@@ -77,8 +85,15 @@ def get_plots_matrix(db: Session = Depends(get_db), user=Depends(get_current_use
 
 
 @router.get("", response_model=List[PlotResponse])
-def get_plots(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(Plot).all()
+def get_plots(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    query = db.query(Plot)
+    if society_id is not None:
+        query = query.filter(Plot.society_id == society_id)
+    return query.all()
 
 
 @router.get("/{plot_id}", response_model=PlotResponse)
