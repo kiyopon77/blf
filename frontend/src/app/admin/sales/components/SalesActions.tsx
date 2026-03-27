@@ -17,7 +17,7 @@ const SalesActions = ({ s, setSales, onEdit, onView }: any) => {
   }
 
   return (
-    <div className="flex justify-center gap-3">
+    <div className="flex justify-end gap-3">
       <Eye className="text-yellow-500 cursor-pointer" size={18} onClick= {() => onView(s)} />
 
       <Pencil

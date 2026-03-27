@@ -50,7 +50,7 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-      <div className="bg-zinc-900 p-6 rounded-xl w-[600px]">
+      <div className="p-6 rounded-xl w-[600px]">
         <h2 className="text-lg font-bold mb-4">Create Sale</h2>
 
         <div className="grid grid-cols-2 gap-4">
