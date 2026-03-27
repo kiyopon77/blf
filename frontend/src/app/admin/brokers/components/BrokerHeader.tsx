@@ -13,7 +13,7 @@ const BrokerHeader = ({ onCreate }: any) => {
       </div>
 
       <AdminButton onClick={onCreate} icon={<Plus size={16} />} >
-        Add Floor
+        Add Broker
       </AdminButton>
 
     </div>
