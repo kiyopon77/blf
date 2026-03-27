@@ -12,7 +12,7 @@ const BrokerEditModal = ({ open, setOpen, broker, setBrokers }: any) => {
     society_id: ""
   })
 
-  const {user} = useAuth()
+  const {user,society} = useAuth()
 
   const [loading, setLoading] = useState(false)
 
@@ -41,7 +41,7 @@ const BrokerEditModal = ({ open, setOpen, broker, setBrokers }: any) => {
         broker_name: form.broker_name,
         phone: form.phone,
         user_id: user.user_id,
-        society_id: user.society_id
+        society_id: society
       }
 
       const updated = await updateBroker(broker.broker_id, payload)

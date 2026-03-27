@@ -7,7 +7,9 @@ interface AuthContextType {
   accessToken: string | null
   role: string | null
   user: any | null
-  society: any | null
+  society: number 
+  societies: any[]
+  setSociety: (id: number) => void
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -20,7 +22,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
-  const [society, setSociety] = useState<number | null>(null)
+
+  const [society, setSocietyState] = useState<number | null>(null)
+  const [societies, setSocieties] = useState<any[]>([])
 
   useEffect(() => {
     const initAuth = async () => {
@@ -35,10 +39,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setAccessTokenState(data.access_token)
         setRole(data.role)
 
-        // fetch user
         const me = await api.get("/auth/me")
         setUser(me.data)
-        setSociety(me.data.society_id)
+
+        // 🔥 fetch societies
+        const societiesRes = await api.get("/societies")
+        setSocieties(societiesRes.data)
+
+        // 🔥 default selected society (optional)
+        setSocietyState(me.data.society_id || null)
 
       } catch {
         setAccessToken(null)
@@ -49,8 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false)
       }
     }
+
     initAuth()
   }, [])
+
+  const setSociety = (id: number) => {
+    setSocietyState(id)
+    localStorage.setItem("society_id", String(id)) // optional persistence
+  }
 
   const login = async (email: string, password: string) => {
     const { data } = await api.post("/auth/login", { email, password })
@@ -60,6 +75,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const me = await api.get("/auth/me")
     setUser(me.data)
+
+    const societiesRes = await api.get("/societies")
+    setSocieties(societiesRes.data)
+
+    setSocietyState(me.data.society_id || null)
   }
 
   const logout = async () => {
@@ -68,10 +88,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessTokenState(null)
     setRole(null)
     setUser(null)
+    setSocietyState(null)
+    setSocieties([])
+    localStorage.removeItem("society_id")
   }
 
   return (
-    <AuthContext.Provider value={{ accessToken: accessTokenState, role, user, society, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        accessToken: accessTokenState,
+        role,
+        user,
+        society,
+        societies,
+        setSociety,
+        loading,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

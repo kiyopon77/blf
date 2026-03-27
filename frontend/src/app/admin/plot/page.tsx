@@ -13,7 +13,7 @@ const PlotsPage = () => {
   const [plots, setPlots] = useState<Plot[]>([])
   const [createOpen, setCreateOpen] = useState(false)
 
-  const {user} = useAuth()
+  const {society} = useAuth()
 
   useEffect(() => {
     const fetch = async () => {
@@ -79,7 +79,7 @@ const PlotsPage = () => {
         open={createOpen}
         setOpen={setCreateOpen}
         setPlots={setPlots}
-        societyId={user.societyId}
+        societyId={society}
       />
     </div>
   )

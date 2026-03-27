@@ -14,7 +14,7 @@ const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
     address: "",
   })
 
-  const {user} = useAuth()
+  const {user, society} = useAuth()
 
   const [loading, setLoading] = useState(false)
 
@@ -28,7 +28,7 @@ const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
     try {
       setLoading(true)
 
-      const newCustomer = await createCustomer({society_id: user.society_id, ...form})
+      const newCustomer = await createCustomer({society_id: society, ...form})
 
       setCustomers((prev: any) => [newCustomer, ...prev])
 

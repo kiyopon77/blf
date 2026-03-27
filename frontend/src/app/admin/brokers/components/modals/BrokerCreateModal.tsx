@@ -10,7 +10,7 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
     phone: "",
   })
 
-  const { user } = useAuth()
+  const { user, society } = useAuth()
 
   const [loading, setLoading] = useState(false)
 
@@ -29,7 +29,7 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
         broker_name: form.broker_name ,
         phone: form.phone ,
         user_id: user.user_id,
-        society_id: user.society_id
+        society_id: society
       })
 
       setBrokers((prev: any) => [newBroker, ...prev])
