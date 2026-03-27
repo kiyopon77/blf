@@ -12,7 +12,7 @@ export default function Home() {
     if (loading) return
 
     if (accessToken) {
-      router.replace("/dashboard")
+      router.replace("/society")
     } else {
       router.replace("/login")
     }
