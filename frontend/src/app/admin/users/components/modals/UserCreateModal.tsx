@@ -39,7 +39,7 @@ const UserCreateModal = ({ open, setOpen, setUsers }: any) => {
       <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Create User</h2>
-          <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+          <button onClick={() => setOpen(false)} className="text-gray-400 hover:cursor-pointer hover:text-gray-600 text-xl">✕</button>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -91,14 +91,14 @@ const UserCreateModal = ({ open, setOpen, setUsers }: any) => {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50"
+              className="hover:cursor-pointer px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm bg-yellow-500 text-white rounded-md hover:bg-yellow-600 disabled:opacity-50"
+              className="px-4 py-2 text-sm hover:cursor-pointer bg-yellow-500 text-white rounded-md hover:bg-yellow-600 disabled:opacity-50"
             >
               {loading ? "Creating..." : "Create"}
             </button>

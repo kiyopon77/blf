@@ -1,25 +1,29 @@
 import UserRow from "./UserRow"
 
-const UserTable = ({ users }: any) => {
+const UserTable = ({ users, onEdit }: any) => {
   return (
-    <div className="border rounded-xl overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-gray-100 text-left">
-          <tr>
-            <th className="p-4">ID</th>
-            <th className="p-4">Name</th>
-            <th className="p-4">Email</th>
-            <th className="p-4">Role</th>
-            <th className="p-4">Status</th>
-            <th className="p-4">Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u: any) => (
-            <UserRow key={u.user_id} u={u} />
-          ))}
-        </tbody>
-      </table>
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-4 text-left">ID</th>
+              <th className="px-6 py-4 text-left">Name</th>
+              <th className="px-6 py-4 text-left">Email</th>
+              <th className="px-6 py-4 text-left">Role</th>
+              <th className="px-6 py-4 text-left">Status</th>
+              <th className="px-6 py-4 text-left">Created</th>
+              <th className="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-gray-200">
+            {users.map((u: any) => (
+              <UserRow key={u.user_id} u={u} onEdit={onEdit} />
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
