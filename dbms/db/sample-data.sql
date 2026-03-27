@@ -327,6 +327,20 @@ VALUES
     (18, 1, 'AVAILABLE', 'SOLD'),   -- C16 F2: shifted from C15
     (20, 1, 'AVAILABLE', 'HOLD');   -- C16 F4: token done
 
+-- ==================================================
+-- DEFAULT ADMIN USER
+-- ==================================================
+
+INSERT INTO users (society_id, full_name, email, hashed_password, role, is_active)
+VALUES (
+          1,
+    'Admin',
+    'admin@blf.com',
+    '$2b$12$ytRFOrhRkVH2t2Qye1g.m.jH1diVJTqFbq2OWGfzEzPrdcCz6doZC',
+    'admin',
+    true
+);
+
 -- run this in pgAdmin query tool
 SELECT setval('brokers_broker_id_seq', (SELECT MAX(broker_id) FROM brokers));
 SELECT setval('users_user_id_seq', (SELECT MAX(user_id) FROM users));
