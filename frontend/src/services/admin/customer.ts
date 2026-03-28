@@ -1,8 +1,10 @@
 // lib/api/customer.ts
 import api from "@/lib/api"
 
-export const getCustomers = async () => {
-  const res = await api.get("/customers")
+export const getCustomers = async (society_id? : number) => {
+  const res = await api.get("/customers", {
+    params: { society_id },
+  })
   return res.data
 }
 
