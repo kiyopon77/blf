@@ -12,14 +12,15 @@ export const getDocuments = async (
 export const uploadDocument = async (
   label: string,
   entityType: string,
-  entityId: number,
+  saleId: number, 
   file: File
 ): Promise<DocumentResponse> => {
   const form = new FormData()
+
   form.append("label", label)
-  form.append("entity_type", entityType)
-  form.append("entity_id", String(entityId))
-  form.append("file", file, file.name)
+  form.append("entity", entityType.toUpperCase()) 
+  form.append("sale_id", String(saleId)) 
+  form.append("file", file)
 
   const { data } = await api.post("/documents/upload", form)
   return data

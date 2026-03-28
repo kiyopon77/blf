@@ -17,6 +17,7 @@ export default function Plot() {
   const [data, setData] = useState<any>(null)
   const [category, floor] = plotId.split("-")
 
+  console.log(data)
   useEffect(() => {
     const load = async () => {
       const res = await getPlotDetail(category, Number(floor))
@@ -88,7 +89,12 @@ export default function Plot() {
             address={customer?.address}
           />
           <MilestoneCard payments={data?.payments} />
-          <DocumentsCard />
+          {sale && (
+            <DocumentsCard
+              entityType="sale"
+              entityId={sale.sale_id}
+            />
+          )}
         </div>
       </div>
     </div>
