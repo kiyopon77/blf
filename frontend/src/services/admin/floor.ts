@@ -2,8 +2,10 @@
 import api from "@/lib/api"
 import { FloorLog } from "@/types/floor"
 
-export const getFloors = async () => {
-  const res = await api.get("/floors")
+export const getFloors = async (society_id?: number) => {
+  const res = await api.get("/floors", {
+    params: { society_id },
+  })
   return res.data
 }
 
