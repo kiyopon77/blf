@@ -5,8 +5,10 @@ import {
   UpdatePlotPayload,
 } from "@/types/plot"
 
-export const getPlots = async (): Promise<Plot[]> => {
-  const res = await api.get("/plots")
+export const getPlots = async (society_id?: number): Promise<Plot[]> => {
+  const res = await api.get("/plots", {
+    params: { society_id },
+  })
   return res.data
 }
 

@@ -1,9 +1,10 @@
 import { useState } from "react"
-import { updateFloorStatus } from "@/services/admin/floor"
-import { Check, Eye, Plus } from "lucide-react"
+import { updateFloorStatus, deleteFloor } from "@/services/admin/floor"
+import { Check, Eye, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 import AdminButton from "@/components/ui/AdminButton"
 import AddButton from "@/components/ui/AddButton"
+import DeleteButton from "@/components/ui/DeleteButton"
 
 const getStatusStyle = (status: string) => {
   switch (status) {
@@ -29,6 +30,19 @@ const FloorTable = ({ floors, setFloors }: any) => {
       ...prev,
       [id]: status,
     }))
+  }
+
+  const handleDelete = async (floorId: number) => {
+    try {
+      await deleteFloor(floorId)
+
+      // remove from UI
+      setFloors((prev: any[]) =>
+        prev.filter((f) => f.floor_id !== floorId)
+      )
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   const handleSubmit = async () => {
@@ -111,10 +125,16 @@ const FloorTable = ({ floors, setFloors }: any) => {
                     <option value="CANCELLED">Cancelled</option>
                   </select>
                 </td>
-                <td>
-                <AdminButton onClick={() => router.push(`/admin/plot/floors/${f.floor_id}/logs`)} icon={<Eye size={16} />} >
-                  View Logs
-                </AdminButton>
+                <td className="flex items-center gap-2 my-2">
+                  <AdminButton onClick={() => router.push(`/admin/plot/floors/${f.floor_id}/logs`)} icon={<Eye size={16} />} >
+                    View Logs
+                  </AdminButton>
+                  <DeleteButton
+                    onClick={() => handleDelete(f.floor_id)}
+                    icon={<Trash size={16} />}
+                  >
+                    Delete
+                  </DeleteButton>
                 </td>
               </tr>
             )

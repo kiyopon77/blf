@@ -15,6 +15,10 @@ export const createFloor = async (data: {
   return res.data
 }
 
+export const deleteFloor = async (id: number): Promise<void> => {
+  await api.delete(`/floors/${id}`)
+}
+
 export const updateFloorStatus = async (id: number, status: string) => {
   const res = await api.put(`/floors/${id}/status`, { status })
   return res.data

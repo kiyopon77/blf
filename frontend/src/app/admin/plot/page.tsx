@@ -18,7 +18,7 @@ const PlotsPage = () => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const data = await getPlots()
+        const data = await getPlots(society)
 
         const order = ["C", "A", "B"]
 
