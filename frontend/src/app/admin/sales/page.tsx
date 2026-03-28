@@ -8,6 +8,7 @@ import SalesTable from "./components/SalesTable"
 import SaleEditModal from "./components/modals/SaleEditModal"
 import SaleCreateModal from "./components/modals/SaleCreateModal"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/context/AuthContext"
 
 export default function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([])
@@ -17,10 +18,11 @@ export default function SalesPage() {
   const [openCreate, setOpenCreate] = useState(false)
 
   const router = useRouter()
+  const {society} = useAuth()
 
   const fetchSales = async () => {
     try {
-      const data = await getSales()
+      const data = await getSales(society)
 
       const sorted = data.sort(
         (a, b) => Number(a.sale_id) - Number(b.sale_id)
