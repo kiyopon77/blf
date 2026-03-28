@@ -1,8 +1,10 @@
 // services/admin/broker.ts
 import api from "@/lib/api"
 
-export const getBrokers = async () => {
-  const res = await api.get("/brokers")
+export const getBrokers = async (society_id?: number) => {
+  const res = await api.get("/brokers", {
+    params: { society_id },
+  })
   return res.data
 }
 
