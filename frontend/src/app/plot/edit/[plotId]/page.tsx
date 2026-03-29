@@ -26,7 +26,7 @@ export default function EditPlot() {
   const router = useRouter()
   const { message } = App.useApp()
 
-  const { register, control, handleSubmit, reset } = useForm({
+  const { register, control, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
       plot_id: null,
       floor_id: null,
@@ -58,6 +58,7 @@ export default function EditPlot() {
     return sum + (isNaN(amt) ? 0 : amt)
   }, 0)
   const plotValueNum = parseFloat(watchedPlotValue as string)
+  const floorValueNum = parseFloat(watchedPlotValue as string) || null
   const sumExceedsPlotValue = !isNaN(plotValueNum) && plotValueNum > 0 && paymentsSum > plotValueNum
 
   useEffect(() => {
@@ -248,9 +249,8 @@ export default function EditPlot() {
       </SectionCard>
 
       <SectionCard title="PAYMENT MILESTONES">
-        <div className={`flex items-center justify-between mb-4 px-4 py-3 rounded-lg border ${
-          sumExceedsPlotValue ? "bg-red-50 border-red-300" : "bg-gray-50 border-gray-200"
-        }`}>
+        <div className={`flex items-center justify-between mb-4 px-4 py-3 rounded-lg border ${sumExceedsPlotValue ? "bg-red-50 border-red-300" : "bg-gray-50 border-gray-200"
+          }`}>
           <span className="text-sm text-gray-600">
             Total entered:{" "}
             <span className={`font-bold ${sumExceedsPlotValue ? "text-red-600" : "text-gray-800"}`}>
@@ -269,7 +269,7 @@ export default function EditPlot() {
             </span>
           )}
         </div>
-        <MilestoneSection control={control} register={register} />
+        <MilestoneSection control={control} register={register} setValue={setValue} floorValue={floorValueNum} />
       </SectionCard>
     </form>
   )
