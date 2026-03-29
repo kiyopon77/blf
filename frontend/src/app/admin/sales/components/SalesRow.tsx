@@ -19,7 +19,7 @@ const SalesRow = ({ s, setSales, onEdit, onView }: any) => {
 
       {/* FLOOR */}
       <td className="px-6 py-3 text-gray-600">
-        Floor {s.floor_id}
+        {s.floor_code}
       </td>
 
       {/* BROKER */}

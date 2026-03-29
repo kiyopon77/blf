@@ -2,7 +2,7 @@ import api from "@/lib/api"
 import { Sale } from "@/types/sales"
 
 export const getSales = async (society_id? : number): Promise<Sale[]> => {
-  const res = await api.get("/sales", {
+  const res = await api.get("/sales/floor-code-info", {
     params: { society_id },
   })
   return res.data
