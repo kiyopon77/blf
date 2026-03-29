@@ -101,10 +101,10 @@ export default function DocumentsCard({ entityId }: { entityId: number }) {
                     <p className="text-xs text-gray-400 truncate">{doc.file_name}</p>
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleDownload(doc)} disabled={downloadingId === doc.document_id} className="p-2 text-gray-400 hover:text-[#D4A22A] disabled:opacity-50">
+                    <button onClick={() => handleDownload(doc)} disabled={downloadingId === doc.document_id} className="p-2 hover:cursor-pointer text-gray-400 hover:text-[#D4A22A] disabled:opacity-50">
                       {downloadingId === doc.document_id ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                     </button>
-                    <button onClick={() => handleDelete(doc)} disabled={deletingId === doc.document_id} className="p-2 text-gray-400 hover:text-red-500 disabled:opacity-50">
+                    <button onClick={() => handleDelete(doc)} disabled={deletingId === doc.document_id} className="p-2 text-gray-400 hover:cursor-pointer hover:text-red-500 disabled:opacity-50">
                       {deletingId === doc.document_id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                     </button>
                   </div>
