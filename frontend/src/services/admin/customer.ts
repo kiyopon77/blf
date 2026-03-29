@@ -37,3 +37,8 @@ export const updateCustomer = async (
   const res = await api.put(`/customers/${id}`, data)
   return res.data
 }
+
+export const updateCustomerPan = async (customerId: number, pan: string) => {
+  const { data } = await api.patch(`/customers/${customerId}/pan`, { pan })
+  return data
+}

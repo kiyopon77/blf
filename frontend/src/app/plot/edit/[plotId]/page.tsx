@@ -9,16 +9,15 @@ import MilestoneSection from "./components/MilestoneStatus"
 import SectionCard from "./components/SectionCard"
 import Field from "./components/Field"
 import StatusRadio from "./components/StatusRadio"
-
+import { updateCustomerPan } from "@/services/admin/customer"
+import { updateSale } from "@/services/admin/sales"
+import { updateCustomer } from "@/services/admin/customer"
+import { updateBroker } from "@/services/admin/broker"
+import { updateFloorStatus } from "@/services/admin/floor"
 import {
   getPlotDetail,
   updatePlot,
-  updateFloorStatus,
-  updateBroker,
-  updateCustomer,
   updatePayment,
-  updateSale,
-  updateCustomerPan
 } from "@/services/plot"
 
 export default function EditPlot() {
@@ -148,7 +147,6 @@ export default function EditPlot() {
       if (data.sale_id) {
         requests.push(updateSale(data.sale_id, {
           total_value: data.plot_value ? Number(data.plot_value) : null,
-          initiated_at: data.selling_date ? new Date(data.selling_date).toISOString() : null,
         }))
       }
 

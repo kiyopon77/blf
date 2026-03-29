@@ -45,36 +45,6 @@ export const updatePlot = async (
   return data
 }
 
-export const updateFloorStatus = async (
-  floorId: number,
-  status: "AVAILABLE" | "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR_UNIT"
-) => {
-  const { data } = await api.put(`/floors/${floorId}/status`, { status })
-  return data
-}
-
-export const updateBroker = async (
-  brokerId: number,
-  payload: { broker_name?: string; phone?: string }
-) => {
-  const { data } = await api.put(`/brokers/${brokerId}`, payload)
-  return data
-}
-
-export const updateCustomer = async (
-  customerId: number,
-  payload: {
-    full_name?: string
-    phone?: string
-    email?: string
-    address?: string
-    kyc_status?: string
-  }
-) => {
-  const { data } = await api.put(`/customers/${customerId}`, payload)
-  return data
-}
-
 export const updatePayment = async (
   paymentId: number,
   payload: {
@@ -92,22 +62,5 @@ export const updateSaleStatus = async (
   status: "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR_UNIT"
 ) => {
   const { data } = await api.put(`/sales/${saleId}/status`, { status })
-  return data
-}
-
-export const updateSale = async (
-  saleId: number,
-  payload: {
-    total_value?: number | null
-    initiated_at?: string | null
-    commission_percent?: number | null
-  }
-) => {
-  const { data } = await api.put(`/sales/${saleId}`, payload)
-  return data
-}
-
-export const updateCustomerPan = async (customerId: number, pan: string) => {
-  const { data } = await api.patch(`/customers/${customerId}/pan`, { pan })
   return data
 }
