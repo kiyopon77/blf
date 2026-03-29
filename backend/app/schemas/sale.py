@@ -52,6 +52,22 @@ class SaleDetailResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class FloorCodeSaleResponse(BaseModel):
+    sale_id: int
+    floor_id: int
+    plot_id: int
+    society_id: int
+    plot_code: str
+    floor_no: int
+    floor_code: str
+    broker_id: int
+    customer_id: int
+    total_value: float
+    commission_percent: Optional[float] = None
+    status: SaleStatus
+    initiated_at: datetime
         
 class SaleUpdate(BaseModel):
     total_value: Optional[float] = None

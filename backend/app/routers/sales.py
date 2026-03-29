@@ -8,7 +8,7 @@ from app.models.plot import Plot
 from app.models.payment import Payment, MilestoneType, MilestoneStatus
 from app.models.broker import Broker
 from app.models.customer import Customer
-from app.schemas.sale import SaleCreate, SaleStatusUpdate, SaleResponse, SaleDetailResponse, SaleUpdate, FloorInfoResponse
+from app.schemas.sale import SaleCreate, SaleStatusUpdate, SaleResponse, SaleDetailResponse, SaleUpdate, FloorInfoResponse, FloorCodeSaleResponse
 from app.schemas.payment import PaymentResponse
 from typing import List, Optional
 
@@ -27,6 +27,43 @@ def get_sales(
             Plot.society_id == society_id
         )
     return query.all()
+
+
+@router.get("/floor-code-info", response_model=List[FloorCodeSaleResponse])
+def get_floor_code_info_with_sales(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    query = db.query(Sale, Floor, Plot).join(
+        Floor, Sale.floor_id == Floor.floor_id
+    ).join(
+        Plot, Floor.plot_id == Plot.plot_id
+    )
+
+    if society_id is not None:
+        query = query.filter(Plot.society_id == society_id)
+
+    rows = query.order_by(Plot.plot_code.asc(), Floor.floor_no.asc()).all()
+
+    return [
+        FloorCodeSaleResponse(
+            sale_id=sale.sale_id,
+            floor_id=floor.floor_id,
+            plot_id=plot.plot_id,
+            society_id=plot.society_id,
+            plot_code=plot.plot_code,
+            floor_no=floor.floor_no,
+            floor_code=f"{plot.plot_code}-{floor.floor_no}",
+            broker_id=sale.broker_id,
+            customer_id=sale.customer_id,
+            total_value=float(sale.total_value),
+            commission_percent=float(sale.commission_percent) if sale.commission_percent is not None else None,
+            status=sale.status,
+            initiated_at=sale.initiated_at,
+        )
+        for sale, floor, plot in rows
+    ]
 
 
 @router.get("/{sale_id}", response_model=SaleDetailResponse)
