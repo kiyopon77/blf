@@ -7,7 +7,7 @@ from app.models.plot import Plot
 from app.models.sale import Sale
 from app.models.floor_log import FloorStatusLog
 from app.models.user import User
-from app.schemas.floor import FloorCreate, FloorStatusUpdate, FloorResponse
+from app.schemas.floor import FloorCreate, FloorStatusUpdate, FloorResponse, FloorUpdate
 from app.schemas.floor_log import FloorLogResponse
 from typing import List, Optional
 
@@ -40,6 +40,25 @@ def get_floor(floor_id: int, db: Session = Depends(get_db), user=Depends(get_cur
 def create_floor(data: FloorCreate, db: Session = Depends(get_db), admin=Depends(require_admin)):
     floor = Floor(**data.model_dump())
     db.add(floor)
+    db.commit()
+    db.refresh(floor)
+    return floor
+
+
+@router.put("/{floor_id}", response_model=FloorResponse)
+def update_floor(
+    floor_id: int,
+    data: FloorUpdate,
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin)
+):
+    floor = db.query(Floor).filter(Floor.floor_id == floor_id).first()
+    if not floor:
+        raise HTTPException(status_code=404, detail="Floor not found")
+
+    for key, value in data.model_dump(exclude_none=True).items():
+        setattr(floor, key, value)
+
     db.commit()
     db.refresh(floor)
     return floor

@@ -104,6 +104,7 @@ CREATE TABLE floors (
     floor_id SERIAL PRIMARY KEY,
     plot_id INT NOT NULL REFERENCES plots(plot_id) ON DELETE CASCADE,
     floor_no INT,
+    floor_value NUMERIC(14,2),
     status inventory_status DEFAULT 'AVAILABLE',
     active_sale_id INT,
     UNIQUE(plot_id, floor_no)
@@ -146,7 +147,7 @@ CREATE TABLE customers (
 
 CREATE TABLE sales (
     sale_id SERIAL PRIMARY KEY,
-    floor_id INT UNIQUE NOT NULL REFERENCES floors(floor_id),
+    floor_id INT NOT NULL REFERENCES floors(floor_id),
     broker_id INT NOT NULL REFERENCES brokers(broker_id),
     customer_id INT NOT NULL REFERENCES customers(customer_id),
     total_value NUMERIC(14,2) NOT NULL,

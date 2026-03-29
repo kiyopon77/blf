@@ -149,11 +149,20 @@ def update_sale_status(sale_id: int, data: SaleStatusUpdate, db: Session = Depen
 
     # update floor status accordingly
     floor = db.query(Floor).filter(Floor.floor_id == sale.floor_id).first()
-    if data.status == SaleStatus.SOLD:
-        floor.status = InventoryStatus.SOLD
-    elif data.status == SaleStatus.CANCELLED:
-        floor.status = InventoryStatus.CANCELLED
-        floor.active_sale_id = None
+    if floor and floor.active_sale_id == sale.sale_id:
+        if data.status == SaleStatus.SOLD:
+            floor.status = InventoryStatus.SOLD
+            floor.active_sale_id = sale.sale_id
+        elif data.status == SaleStatus.CANCELLED:
+            # Keep sale record details unchanged, but release floor for a new sale.
+            floor.status = InventoryStatus.AVAILABLE
+            floor.active_sale_id = None
+        elif data.status == SaleStatus.HOLD:
+            floor.status = InventoryStatus.HOLD
+            floor.active_sale_id = sale.sale_id
+        elif data.status == SaleStatus.INVESTOR_UNIT:
+            floor.status = InventoryStatus.INVESTOR_UNIT
+            floor.active_sale_id = sale.sale_id
 
     db.commit()
     db.refresh(sale)
@@ -180,3 +189,18 @@ def update_sale(sale_id: int, data: SaleUpdate, db: Session = Depends(get_db), a
     db.commit()
     db.refresh(sale)
     return sale
+
+
+@router.delete("/{sale_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_sale(sale_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+
+    floor = db.query(Floor).filter(Floor.floor_id == sale.floor_id).first()
+    if floor and floor.active_sale_id == sale.sale_id:
+        floor.status = InventoryStatus.AVAILABLE
+        floor.active_sale_id = None
+
+    db.delete(sale)
+    db.commit()
