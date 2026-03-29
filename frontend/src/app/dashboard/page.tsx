@@ -13,7 +13,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const loadDashboard = async () => {
-      const data = await getDashboard()
+      const data = await getDashboard(society)
       setDashboard(data)
     }
     loadDashboard()
