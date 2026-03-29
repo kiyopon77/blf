@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
+from app.core.dependencies import get_current_user, require_admin, get_effective_society_id, ensure_society_access
 from app.models.sale import Sale, SaleStatus
 from app.models.floor import Floor, InventoryStatus
 from app.models.plot import Plot
@@ -21,10 +21,11 @@ def get_sales(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    scoped_society_id = get_effective_society_id(user, society_id)
     query = db.query(Sale)
-    if society_id is not None:
+    if scoped_society_id is not None:
         query = query.join(Floor, Sale.floor_id == Floor.floor_id).join(Plot, Floor.plot_id == Plot.plot_id).filter(
-            Plot.society_id == society_id
+            Plot.society_id == scoped_society_id
         )
     return query.all()
 
@@ -35,14 +36,15 @@ def get_floor_code_info_with_sales(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    scoped_society_id = get_effective_society_id(user, society_id)
     query = db.query(Sale, Floor, Plot).join(
         Floor, Sale.floor_id == Floor.floor_id
     ).join(
         Plot, Floor.plot_id == Plot.plot_id
     )
 
-    if society_id is not None:
-        query = query.filter(Plot.society_id == society_id)
+    if scoped_society_id is not None:
+        query = query.filter(Plot.society_id == scoped_society_id)
 
     rows = query.order_by(Plot.plot_code.asc(), Floor.floor_no.asc()).all()
 
@@ -71,6 +73,7 @@ def get_sale(sale_id: int, db: Session = Depends(get_db), user=Depends(get_curre
     sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
+    ensure_society_access(user, sale.floor.plot.society_id)
     return SaleDetailResponse(
         sale_id=sale.sale_id,
         total_value=float(sale.total_value),
@@ -98,8 +101,20 @@ def create_sale(data: SaleCreate, db: Session = Depends(get_db), user=Depends(ge
     floor = db.query(Floor).filter(Floor.floor_id == data.floor_id).first()
     if not floor:
         raise HTTPException(status_code=404, detail="Floor not found")
+    ensure_society_access(user, floor.plot.society_id)
     if floor.status != InventoryStatus.AVAILABLE:
         raise HTTPException(status_code=400, detail=f"Floor is not available — current status: {floor.status}")
+
+    broker = db.query(Broker).filter(Broker.broker_id == data.broker_id).first()
+    if not broker:
+        raise HTTPException(status_code=404, detail="Broker not found")
+
+    customer = db.query(Customer).filter(Customer.customer_id == data.customer_id).first()
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    if broker.society_id != floor.plot.society_id or customer.society_id != floor.plot.society_id:
+        raise HTTPException(status_code=400, detail="Broker/Customer must belong to the same society as floor")
 
     # create sale
     sale = Sale(**data.model_dump())
@@ -150,6 +165,7 @@ def get_sale_payments(sale_id: int, db: Session = Depends(get_db), user=Depends(
     sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
+    ensure_society_access(user, sale.floor.plot.society_id)
     return sale.payments
 
 

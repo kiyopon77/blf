@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 from app.core.database import get_db
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, ensure_society_access
 from app.models.payment import Payment, MilestoneStatus
 from app.schemas.payment import PaymentUpdate, PaymentResponse
 
@@ -14,6 +14,7 @@ def update_payment(payment_id: int, data: PaymentUpdate, db: Session = Depends(g
     payment = db.query(Payment).filter(Payment.payment_id == payment_id).first()
     if not payment:
         raise HTTPException(status_code=404, detail="Payment not found")
+    ensure_society_access(user, payment.sale.floor.plot.society_id)
 
     payment.status = data.status
     payment.amount = data.amount

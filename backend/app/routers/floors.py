@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
+from app.core.dependencies import get_current_user, require_admin, get_effective_society_id, ensure_society_access
 from app.models.floor import Floor
 from app.models.plot import Plot
 from app.models.sale import Sale
@@ -20,9 +20,10 @@ def get_floors(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    scoped_society_id = get_effective_society_id(user, society_id)
     query = db.query(Floor)
-    if society_id is not None:
-        query = query.join(Plot, Floor.plot_id == Plot.plot_id).filter(Plot.society_id == society_id)
+    if scoped_society_id is not None:
+        query = query.join(Plot, Floor.plot_id == Plot.plot_id).filter(Plot.society_id == scoped_society_id)
     return query.all()
 
 
@@ -31,6 +32,7 @@ def get_floor(floor_id: int, db: Session = Depends(get_db), user=Depends(get_cur
     floor = db.query(Floor).filter(Floor.floor_id == floor_id).first()
     if not floor:
         raise HTTPException(status_code=404, detail="Floor not found")
+    ensure_society_access(user, floor.plot.society_id)
     return floor
 
 
@@ -53,6 +55,7 @@ def update_floor_status(
     floor = db.query(Floor).filter(Floor.floor_id == floor_id).first()
     if not floor:
         raise HTTPException(status_code=404, detail="Floor not found")
+    ensure_society_access(current_user, floor.plot.society_id)
 
     old_status = floor.status
 
@@ -80,6 +83,7 @@ def get_floor_logs(
     floor = db.query(Floor).filter(Floor.floor_id == floor_id).first()
     if not floor:
         raise HTTPException(status_code=404, detail="Floor not found")
+    ensure_society_access(user, floor.plot.society_id)
 
     logs = db.query(FloorStatusLog).filter(
         FloorStatusLog.floor_id == floor_id

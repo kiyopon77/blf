@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
+from app.core.dependencies import get_current_user, require_admin, get_effective_society_id, ensure_society_access
 from app.models.plot import Plot
 from app.models.floor import Floor
 from app.models.sale import Sale
@@ -22,9 +22,10 @@ def get_plots_matrix(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    scoped_society_id = get_effective_society_id(user, society_id)
     plots_query = db.query(Plot)
-    if society_id is not None:
-        plots_query = plots_query.filter(Plot.society_id == society_id)
+    if scoped_society_id is not None:
+        plots_query = plots_query.filter(Plot.society_id == scoped_society_id)
 
     plots = plots_query.all()
     result = []
@@ -90,9 +91,10 @@ def get_plots(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    scoped_society_id = get_effective_society_id(user, society_id)
     query = db.query(Plot)
-    if society_id is not None:
-        query = query.filter(Plot.society_id == society_id)
+    if scoped_society_id is not None:
+        query = query.filter(Plot.society_id == scoped_society_id)
     return query.all()
 
 
@@ -101,6 +103,7 @@ def get_plot(plot_id: int, db: Session = Depends(get_db), user=Depends(get_curre
     plot = db.query(Plot).filter(Plot.plot_id == plot_id).first()
     if not plot:
         raise HTTPException(status_code=404, detail="Plot not found")
+    ensure_society_access(user, plot.society_id)
     return plot
 
 
@@ -109,6 +112,7 @@ def get_plot_floors(plot_id: int, db: Session = Depends(get_db), user=Depends(ge
     plot = db.query(Plot).filter(Plot.plot_id == plot_id).first()
     if not plot:
         raise HTTPException(status_code=404, detail="Plot not found")
+    ensure_society_access(user, plot.society_id)
     return db.query(Floor).filter(Floor.plot_id == plot_id).all()
 
 

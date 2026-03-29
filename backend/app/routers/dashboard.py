@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, get_effective_society_id, ensure_society_access
 from app.models.plot import Plot
 from app.models.floor import Floor, InventoryStatus
 from app.models.society import Society
@@ -43,7 +43,7 @@ def _build_dashboard_response(db: Session, society_id: int | None = None) -> Das
 
 @router.get("", response_model=DashboardResponse)
 def get_dashboard(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return _build_dashboard_response(db)
+    return _build_dashboard_response(db, society_id=get_effective_society_id(user))
 
 
 @router.get("/{society_id}", response_model=DashboardResponse)
@@ -52,4 +52,5 @@ def get_dashboard_by_society(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
+    ensure_society_access(user, society_id)
     return _build_dashboard_response(db, society_id=society_id)

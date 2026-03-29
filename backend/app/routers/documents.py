@@ -6,8 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
+from app.core.dependencies import get_current_user, require_admin, ensure_society_access
 from app.models.document import Document, EntityType
+from app.models.sale import Sale
 from app.schemas.document import DocumentResponse
 from typing import List
 
@@ -47,6 +48,10 @@ async def upload_document(
     db: Session = Depends(get_db),
     admin=Depends(require_admin)
 ):
+    sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail="Only PDF, JPG and PNG files allowed")
@@ -86,6 +91,10 @@ def get_sale_documents(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    ensure_society_access(user, sale.floor.plot.society_id)
     return db.query(Document).filter(Document.sale_id == sale_id).all()
 
 
@@ -97,6 +106,10 @@ def get_documents_by_entity(
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
+    sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    ensure_society_access(user, sale.floor.plot.society_id)
     return db.query(Document).filter(
         Document.sale_id == sale_id,
         Document.entity == entity
@@ -113,6 +126,7 @@ def download_document(
     doc = db.query(Document).filter(Document.document_id == document_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
+    ensure_society_access(user, doc.sale.floor.plot.society_id)
     if not os.path.exists(doc.file_path):
         raise HTTPException(status_code=404, detail="File not found on server")
     return FileResponse(

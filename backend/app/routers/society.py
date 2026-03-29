@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
+from app.core.dependencies import get_current_user, require_admin, is_admin
 from app.models.society import Society
 from app.schemas.society import SocietyCreate, SocietyUpdate, SocietyResponse
 from typing import List
@@ -11,11 +11,19 @@ router = APIRouter(prefix="/societies", tags=["Societies"])
 
 @router.get("", response_model=List[SocietyResponse])
 def get_societies(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(Society).all()
+    if is_admin(user):
+        return db.query(Society).all()
+    if user.society_id is None:
+        return []
+    scoped = db.query(Society).filter(Society.society_id == user.society_id).first()
+    return [scoped] if scoped else []
 
 
 @router.get("/{society_id}", response_model=SocietyResponse)
 def get_society(society_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
+    if not is_admin(user) and user.society_id != society_id:
+        raise HTTPException(status_code=403, detail="Not authorized for this society")
+
     society = db.query(Society).filter(Society.society_id == society_id).first()
     if not society:
         raise HTTPException(status_code=404, detail="Society not found")

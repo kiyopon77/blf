@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
+from app.core.dependencies import get_current_user, require_admin, is_admin
 from app.services.auth import authenticate_user, create_user, generate_tokens, get_user_by_id
 from app.schemas.user import LoginRequest, TokenResponse, UserCreate, UserResponse, UserUpdate
 from app.core.security import decode_token
@@ -96,7 +96,17 @@ def logout(response: Response):
 
 
 @router.get("/user/{user_id}", response_model=UserResponse)
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    if not is_admin(current_user) and current_user.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to access this user"
+        )
+
     user = get_user_by_id(db, user_id)
 
     if not user:
