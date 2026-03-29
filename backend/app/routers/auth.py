@@ -1,25 +1,60 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie, Request
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_admin, is_admin
 from app.services.auth import authenticate_user, create_user, generate_tokens, get_user_by_id
+from app.services.auth_guard import auth_guard
 from app.schemas.user import LoginRequest, TokenResponse, UserCreate, UserResponse, UserUpdate
 from app.core.security import decode_token
+from app.core.config import settings
 from typing import Optional
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+def _client_ip(request: Request) -> str:
+    forwarded_for = request.headers.get("x-forwarded-for")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _build_key(prefix: str, request: Request, identity: str) -> str:
+    return f"{prefix}:{_client_ip(request)}:{identity.lower()}"
+
+
 # ── Login ──────────────────────────────────────────────────────────────
 @router.post("/login", response_model=TokenResponse)
-def login(request: LoginRequest, response: Response, db: Session = Depends(get_db)):
-    user = authenticate_user(db, request.email, request.password)
+def login(payload: LoginRequest, request: Request, response: Response, db: Session = Depends(get_db)):
+    throttle_key = _build_key("login", request, payload.email)
+    allowed, retry_after = auth_guard.check_allowed(
+        throttle_key,
+        window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+        max_attempts=settings.AUTH_LOGIN_MAX_ATTEMPTS,
+        lockout_seconds=settings.AUTH_LOCKOUT_SECONDS,
+    )
+
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Too many login attempts. Try again in {retry_after} seconds"
+        )
+
+    user = authenticate_user(db, payload.email, payload.password)
 
     if not user:
+        auth_guard.register_failure(
+            throttle_key,
+            window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+            max_attempts=settings.AUTH_LOGIN_MAX_ATTEMPTS,
+            lockout_seconds=settings.AUTH_LOCKOUT_SECONDS,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
+
+    auth_guard.reset(throttle_key)
 
     tokens = generate_tokens(user)
 
@@ -28,9 +63,9 @@ def login(request: LoginRequest, response: Response, db: Session = Depends(get_d
         key="refresh_token",
         value=tokens["refresh_token"],
         httponly=True,
-        secure=False,   # set True in production (HTTPS)
-        samesite="lax",
-        max_age=7 * 24 * 60 * 60  # 7 days in seconds
+        secure=settings.COOKIE_SECURE,
+        samesite=settings.COOKIE_SAMESITE,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
     )
 
     return {
@@ -43,11 +78,31 @@ def login(request: LoginRequest, response: Response, db: Session = Depends(get_d
 # ── Refresh Token ───────────────────────────────────────────────────────
 @router.post("/refresh", response_model=TokenResponse)
 def refresh_token(
+    request: Request,
     response: Response,
     refresh_token: Optional[str] = Cookie(default=None),
     db: Session = Depends(get_db)
 ):
+    throttle_key = _build_key("refresh", request, "cookie")
+    allowed, retry_after = auth_guard.check_allowed(
+        throttle_key,
+        window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+        max_attempts=settings.AUTH_REFRESH_MAX_ATTEMPTS,
+        lockout_seconds=settings.AUTH_LOCKOUT_SECONDS,
+    )
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Too many refresh attempts. Try again in {retry_after} seconds"
+        )
+
     if not refresh_token:
+        auth_guard.register_failure(
+            throttle_key,
+            window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+            max_attempts=settings.AUTH_REFRESH_MAX_ATTEMPTS,
+            lockout_seconds=settings.AUTH_LOCKOUT_SECONDS,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No refresh token provided"
@@ -56,6 +111,12 @@ def refresh_token(
     payload = decode_token(refresh_token)
 
     if not payload or payload.get("type") != "refresh":
+        auth_guard.register_failure(
+            throttle_key,
+            window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+            max_attempts=settings.AUTH_REFRESH_MAX_ATTEMPTS,
+            lockout_seconds=settings.AUTH_LOCKOUT_SECONDS,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token"
@@ -65,10 +126,18 @@ def refresh_token(
     user = get_user_by_id(db, user_id)
 
     if not user or not user.is_active:
+        auth_guard.register_failure(
+            throttle_key,
+            window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+            max_attempts=settings.AUTH_REFRESH_MAX_ATTEMPTS,
+            lockout_seconds=settings.AUTH_LOCKOUT_SECONDS,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found or inactive"
         )
+
+    auth_guard.reset(throttle_key)
 
     tokens = generate_tokens(user)
 
@@ -76,9 +145,9 @@ def refresh_token(
         key="refresh_token",
         value=tokens["refresh_token"],
         httponly=True,
-        secure=False,
-        samesite="lax",
-        max_age=7 * 24 * 60 * 60
+        secure=settings.COOKIE_SECURE,
+        samesite=settings.COOKIE_SAMESITE,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
     )
 
     return {
@@ -91,7 +160,11 @@ def refresh_token(
 # ── Logout ──────────────────────────────────────────────────────────────
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie("refresh_token")
+    response.delete_cookie(
+        "refresh_token",
+        samesite=settings.COOKIE_SAMESITE,
+        secure=settings.COOKIE_SECURE,
+    )
     return {"message": "Logged out successfully"}
 
 
