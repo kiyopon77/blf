@@ -4,6 +4,8 @@ import { useState } from "react"
 import { updatePlot } from "@/services/admin/plot"
 import { Plot, UpdatePlotPayload } from "@/types/plot"
 import AdminButton from "@/components/ui/AdminButton"
+import DeleteButton from "@/components/ui/DeleteButton"
+import { X, Check } from "lucide-react"
 
 const PlotEditModal = ({
   open,
@@ -23,18 +25,41 @@ const PlotEditModal = ({
   })
 
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleChange = (key: keyof UpdatePlotPayload, value: any) => {
-    setForm((prev) => ({
-      ...prev,
-      [key]: value,
-    }))
+    if (key === "area_sqyd") {
+      const sqyd = value === "" ? null : Number(value)
+      setForm((prev) => ({
+        ...prev,
+        area_sqyd: sqyd,
+        area_sqft: sqyd !== null ? sqyd * 9 : null
+      }))
+    }
+
+    else if (key === "area_sqft") {
+      const sqft = value === "" ? null : Number(value)
+      setForm((prev) => ({
+        ...prev,
+        area_sqft: sqft,
+        area_sqyd: sqft !== null ? sqft / 9 : null
+      }))
+    }
+
+    else {
+      setForm((prev) => ({
+        ...prev,
+        [key]: value,
+      }))
+    }
   }
 
-  const handleSubmit = async () => {
-    try {
-      setLoading(true)
+  const handleSubmit = async (e: React.SubmitEvent) => {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
 
+    try {
       const updated = await updatePlot(plot.plot_id, form)
 
       setPlots((prev) =>
@@ -46,6 +71,7 @@ const PlotEditModal = ({
       setOpen(false)
     } catch (err) {
       console.error(err)
+      setError("Failed to update plot.")
     } finally {
       setLoading(false)
     }
@@ -54,45 +80,82 @@ const PlotEditModal = ({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-[500px] p-6 space-y-4 shadow-lg">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
 
-        <h2 className="text-lg font-semibold">Edit Plot</h2>
-
-        <input
-          type="number"
-          placeholder="Area (sqyd)"
-          className="w-full border p-2 rounded"
-          value={form.area_sqyd ?? ""}
-          onChange={(e) =>
-            handleChange("area_sqyd", Number(e.target.value))
-          }
-        />
-
-        <input
-          type="number"
-          placeholder="Area (sqft)"
-          className="w-full border p-2 rounded"
-          value={form.area_sqft ?? ""}
-          onChange={(e) =>
-            handleChange("area_sqft", Number(e.target.value))
-          }
-        />
-
-        <input
-          placeholder="Type"
-          className="w-full border p-2 rounded"
-          value={form.type ?? ""}
-          onChange={(e) => handleChange("type", e.target.value)}
-        />
-
-        <div className="flex justify-end gap-2 pt-2">
-          <button onClick={() => setOpen(false)}>Cancel</button>
-
-          <AdminButton onClick={handleSubmit}>
-            {loading ? "Saving..." : "Save Changes"}
-          </AdminButton>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">
+            Edit Plot - #{plot.plot_id}
+          </h2>
+          <button
+            onClick={() => setOpen(false)}
+            className="text-gray-400 hover:text-gray-600 text-xl"
+          >
+            ✕
+          </button>
         </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+          {/* Area sqyd */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Area (sqyd)</label>
+            <input
+              type="number"
+              value={form.area_sqyd ?? ""}
+              onChange={(e) =>
+                handleChange("area_sqyd", e.target.value)
+              }
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            />
+          </div>
+
+          {/* Area sqft */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Area (sqft)</label>
+            <input
+              type="number"
+              value={form.area_sqft ?? ""}
+              onChange={(e) =>
+                handleChange("area_sqft", e.target.value)
+              }
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            />
+          </div>
+
+          {/* Type */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Type</label>
+            <input
+              value={form.type ?? ""}
+              onChange={(e) =>
+                handleChange("type", e.target.value)
+              }
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            />
+          </div>
+
+          {/* Error */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          {/* Actions */}
+          <div className="flex justify-end gap-2 mt-2">
+            <DeleteButton onClick={() => setOpen(false)} icon={<X size={16} />}>
+              Cancel
+            </DeleteButton>
+
+            <AdminButton
+              type="submit"
+              disabled={loading}
+              icon={<Check size={16} />}
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </AdminButton>
+          </div>
+        </form>
+
       </div>
     </div>
   )

@@ -8,7 +8,8 @@ import { getCustomers } from "@/services/admin/customer"
 import { getPlots } from "@/services/admin/plot"
 import { useAuth } from "@/context/AuthContext"
 import AdminButton from "@/components/ui/AdminButton"
-import { Plus } from "lucide-react"
+import DeleteButton from "@/components/ui/DeleteButton"
+import { Plus, X } from "lucide-react"
 
 export default function SaleCreateModal({ onClose, onSuccess }: any) {
   const { society } = useAuth()
@@ -28,6 +29,9 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
     commission_percent: "",
   })
 
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+
   // fetch data
   useEffect(() => {
     const fetch = async () => {
@@ -39,8 +43,6 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
         getCustomers(society),
       ])
 
-      console.log(p, b, c)
-
       setPlots(p || [])
       setBrokers(b || [])
       setCustomers(c || [])
@@ -49,7 +51,7 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
     fetch()
   }, [society])
 
-  // filter floors based on selected plot
+  // load floors
   useEffect(() => {
     const loadFloors = async () => {
       if (!form.plot_id) {
@@ -64,8 +66,11 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
     loadFloors()
   }, [form.plot_id])
 
-  // 🔹 Submit
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+
     try {
       await createSale({
         floor_id: Number(form.floor_id),
@@ -84,130 +89,164 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
       onClose()
     } catch (err) {
       console.error(err)
+      setError("Failed to create sale.")
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-xl w-150 shadow-lg">
-        <h2 className="text-lg font-bold mb-4">Create Sale</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-xl">
 
-        <div className="grid grid-cols-2 gap-4">
-          {/* Plot */}
-          <select
-            value={form.plot_id}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                plot_id: e.target.value,
-                floor_id: "",
-              })
-            }
-            className="border p-2 rounded"
-          >
-            <option value="">Select Plot</option>
-            {plots?.map((p: any) => (
-              <option key={p.plot_id} value={p.plot_id}>
-                {p.plot_code}
-              </option>
-            ))}
-          </select>
-
-          {/* Floor */}
-          <select
-            value={form.floor_id}
-            onChange={(e) =>
-              setForm({ ...form, floor_id: e.target.value })
-            }
-            disabled={!form.plot_id}
-            className="border p-2 rounded"
-          >
-            <option value="">Select Floor</option>
-            {filteredFloors
-              .filter((f: any) => f.status === "AVAILABLE")
-              .map((f: any) => (
-                <option key={f.floor_id} value={f.floor_id}>
-                  Floor {f.floor_no}
-                </option>
-              ))}
-            {filteredFloors.filter((f: any) => f.status === "AVAILABLE").length === 0 && (
-              <option disabled>No available floors</option>
-            )}
-          </select>
-
-          {/* Broker */}
-          <select
-            value={form.broker_id}
-            onChange={(e) =>
-              setForm({ ...form, broker_id: e.target.value })
-            }
-            className="border p-2 rounded"
-          >
-            <option value="">Select Broker</option>
-            {brokers.map((b: any) => (
-              <option key={b.broker_id} value={b.broker_id}>
-                {b.broker_name}
-              </option>
-            ))}
-          </select>
-
-          {/* Customer select */}
-          <select
-            value={form.customer_id}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                customer_id: e.target.value,
-                customer_name: "",
-              })
-            }
-            className="border p-2 rounded"
-          >
-            <option value="">Select Customer</option>
-            {customers.map((c: any) => (
-              <option key={c.customer_id} value={c.customer_id}>
-                {c.full_name}
-              </option>
-            ))}
-          </select>
-
-          {/* Total value */}
-          <input
-            placeholder="Total Value"
-            value={form.total_value}
-            onChange={(e) =>
-              setForm({ ...form, total_value: e.target.value })
-            }
-            className="border p-2 rounded"
-          />
-
-          {/* Commission */}
-          <input
-            placeholder="Commission %"
-            value={form.commission_percent}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                commission_percent: e.target.value,
-              })
-            }
-            className="border p-2 rounded"
-          />
-        </div>
-
-        {/* Actions */}
-        <div className="flex justify-end gap-3 mt-6">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Create Sale</h2>
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:cursor-pointer"
+            className="text-gray-400 hover:text-gray-600 text-xl"
           >
-            Cancel
+            ✕
           </button>
-
-          <AdminButton onClick={handleSubmit} icon={<Plus size={16} />}>
-            Create
-          </AdminButton>
         </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+
+          {/* Plot */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Plot</label>
+            <select
+              value={form.plot_id}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  plot_id: e.target.value,
+                  floor_id: "",
+                })
+              }
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            >
+              <option value="">Select Plot</option>
+              {plots.map((p: any) => (
+                <option key={p.plot_id} value={p.plot_id}>
+                  {p.plot_code}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Floor */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Floor</label>
+            <select
+              value={form.floor_id}
+              onChange={(e) =>
+                setForm({ ...form, floor_id: e.target.value })
+              }
+              disabled={!form.plot_id}
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            >
+              <option value="">Select Floor</option>
+              {filteredFloors
+                .filter((f: any) => f.status === "AVAILABLE")
+                .map((f: any) => (
+                  <option key={f.floor_id} value={f.floor_id}>
+                    Floor {f.floor_no}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {/* Broker */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Broker</label>
+            <select
+              value={form.broker_id}
+              onChange={(e) =>
+                setForm({ ...form, broker_id: e.target.value })
+              }
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            >
+              <option value="">Select Broker</option>
+              {brokers.map((b: any) => (
+                <option key={b.broker_id} value={b.broker_id}>
+                  {b.broker_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Customer */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Customer</label>
+            <select
+              value={form.customer_id}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  customer_id: e.target.value,
+                  customer_name: "",
+                })
+              }
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            >
+              <option value="">Select Customer</option>
+              {customers.map((c: any) => (
+                <option key={c.customer_id} value={c.customer_id}>
+                  {c.full_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Total Value */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Total Value</label>
+            <input
+              value={form.total_value}
+              onChange={(e) =>
+                setForm({ ...form, total_value: e.target.value })
+              }
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            />
+          </div>
+
+          {/* Commission */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Commission (%)</label>
+            <input
+              value={form.commission_percent}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  commission_percent: e.target.value,
+                })
+              }
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            />
+          </div>
+
+          {/* Error */}
+          {error && (
+            <p className="text-red-500 text-sm col-span-2">{error}</p>
+          )}
+
+          {/* Actions */}
+          <div className="col-span-2 flex justify-end gap-2 mt-2">
+            <DeleteButton onClick={onClose} icon={<X size={16} />}>
+              Cancel
+            </DeleteButton>
+
+            <AdminButton
+              type="submit"
+              disabled={loading}
+              icon={<Plus size={16} />}
+            >
+              {loading ? "Creating..." : "Create"}
+            </AdminButton>
+          </div>
+        </form>
       </div>
     </div>
   )

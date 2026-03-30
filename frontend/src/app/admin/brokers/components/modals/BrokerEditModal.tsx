@@ -3,45 +3,47 @@
 import { useEffect, useState } from "react"
 import { updateBroker } from "@/services/admin/broker"
 import { useAuth } from "@/context/AuthContext"
+import AdminButton from "@/components/ui/AdminButton"
+import DeleteButton from "@/components/ui/DeleteButton"
+import { X, Check } from "lucide-react"
 
 const BrokerEditModal = ({ open, setOpen, broker, setBrokers }: any) => {
   const [form, setForm] = useState({
     broker_name: "",
     phone: "",
-    user_id: "",
-    society_id: ""
   })
 
-  const {user,society} = useAuth()
+  const { user, society } = useAuth()
 
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    if (broker) {
+    if (broker && open) {
       setForm({
         broker_name: broker.broker_name || "",
         phone: broker.phone || "",
-        user_id: broker.user_id?.toString() || "",
-        society_id: broker.society_id?.toString() || ""
       })
     }
-  }, [broker])
+  }, [broker, open])
 
-  if (!open) return null
+  if (!open || !broker) return null
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async () => {
-    try {
-      setLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
 
+    try {
       const payload = {
         broker_name: form.broker_name,
         phone: form.phone,
         user_id: user.user_id,
-        society_id: society
+        society_id: society // ⚠️ ensure this is ID
       }
 
       const updated = await updateBroker(broker.broker_id, payload)
@@ -55,52 +57,72 @@ const BrokerEditModal = ({ open, setOpen, broker, setBrokers }: any) => {
       setOpen(false)
     } catch (err) {
       console.error(err)
+      setError("Failed to update broker.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-105 p-6 shadow-xl">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
 
-        <h2 className="text-xl font-semibold mb-4">
-          Edit Broker
-        </h2>
-
-        <div className="flex flex-col gap-3">
-          <input
-            name="broker_name"
-            placeholder="Name"
-            value={form.broker_name}
-            onChange={handleChange}
-            className="border p-2 rounded-md"
-          />
-
-          <input
-            name="phone"
-            placeholder="Phone"
-            value={form.phone}
-            onChange={handleChange}
-            className="border p-2 rounded-md"
-          />
-        </div>
-
-        <div className="flex justify-end gap-3 mt-5">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Edit Broker</h2>
           <button
             onClick={() => setOpen(false)}
-            className="border px-4 py-2 rounded-md"
+            className="text-gray-400 hover:text-gray-600 text-xl"
           >
-            Cancel
-          </button>
-
-          <button
-            onClick={handleSubmit}
-            className="bg-[#D4A22A] text-white px-4 py-2 rounded-md"
-          >
-            {loading ? "Updating..." : "Update"}
+            ✕
           </button>
         </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+          {/* Name */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Broker Name</label>
+            <input
+              name="broker_name"
+              value={form.broker_name}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            />
+          </div>
+
+          {/* Phone */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">Phone</label>
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              required
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            />
+          </div>
+
+          {/* Error */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          {/* Actions */}
+          <div className="flex justify-end gap-2 mt-2">
+            <DeleteButton onClick={() => setOpen(false)} icon={<X size={16} />}>
+              Cancel
+            </DeleteButton>
+
+            <AdminButton
+              type="submit"
+              disabled={loading}
+              icon={<Check size={16} />}
+            >
+              {loading ? "Updating..." : "Update"}
+            </AdminButton>
+          </div>
+        </form>
 
       </div>
     </div>
