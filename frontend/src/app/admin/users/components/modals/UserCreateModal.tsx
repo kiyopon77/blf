@@ -39,7 +39,7 @@ const UserCreateModal = ({ open, setOpen, setUsers }: any) => {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
