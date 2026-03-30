@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { updateCustomer } from "@/services/admin/customer"
+import { updateCustomer, updateCustomerPan } from "@/services/admin/customer"
 import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { X, Check } from "lucide-react"
@@ -13,6 +13,7 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
     email: "",
     address: "",
     kyc_status: "PENDING",
+    pan: "",
   })
 
   const [loading, setLoading] = useState(false)
@@ -26,6 +27,7 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
         email: customer.email || "",
         address: customer.address || "",
         kyc_status: customer.kyc_status || "PENDING",
+        pan: customer.pan || "", 
       })
     }
   }, [customer, open])
@@ -52,14 +54,22 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
         kyc_status: form.kyc_status || null,
       }
 
+      // update basic fields
       const updated = await updateCustomer(
         customer.customer_id,
-        cleanForm // ✅ FIXED (was using form before)
+        cleanForm
       )
+
+      // update PAN separately (only if changed)
+      if (form.pan && form.pan !== customer.pan) {
+        await updateCustomerPan(customer.customer_id, form.pan)
+      }
 
       setCustomers((prev: any) =>
         prev.map((c: any) =>
-          c.customer_id === customer.customer_id ? updated : c
+          c.customer_id === customer.customer_id
+            ? { ...updated, pan: form.pan }
+            : c
         )
       )
 
@@ -97,6 +107,19 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
               name="full_name"
               value={form.full_name}
               onChange={handleChange}
+              className="border border-gray-300 rounded-md p-2 text-sm"
+            />
+          </div>
+
+          {/* PAN */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">PAN</label>
+            <input
+              name="pan"
+              value={form.pan}
+              onChange={(e) =>
+                setForm({ ...form, pan: e.target.value.toUpperCase() }) // 🔥 auto uppercase
+              }
               className="border border-gray-300 rounded-md p-2 text-sm"
             />
           </div>
