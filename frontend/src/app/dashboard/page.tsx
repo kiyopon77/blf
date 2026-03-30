@@ -5,13 +5,16 @@ import { getDashboard } from "@/services/dashboard"
 import { useState, useEffect } from "react"
 import { ThreeDot } from "react-loading-indicators"
 import { useAuth } from "@/context/AuthContext"
+import { useRouter } from "next/navigation"
 
 const Dashboard = () => {
   const [dashboard, setDashboard] = useState<any>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const {society} = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
+    if(!society) router.replace("/society")
     const loadDashboard = async () => {
       const data = await getDashboard(society)
       setDashboard(data)
