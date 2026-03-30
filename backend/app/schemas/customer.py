@@ -3,8 +3,9 @@ from datetime import datetime
 from typing import Optional
 
 class CustomerBase(BaseModel):
-    full_name: str = None
-    pan: str = None
+    society_id: int
+    full_name: Optional[str] = None
+    pan: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
     address: Optional[str] = None

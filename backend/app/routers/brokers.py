@@ -1,17 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
+from app.core.dependencies import get_current_user, require_admin, get_effective_society_id, ensure_society_access
 from app.models.broker import Broker
 from app.schemas.broker import BrokerCreate, BrokerUpdate, BrokerResponse
-from typing import List
+from typing import List, Optional
 
 router = APIRouter(prefix="/brokers", tags=["Brokers"])
 
 
 @router.get("", response_model=List[BrokerResponse])
-def get_brokers(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(Broker).all()
+def get_brokers(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    scoped_society_id = get_effective_society_id(user, society_id)
+    query = db.query(Broker)
+    if scoped_society_id is not None:
+        query = query.filter(Broker.society_id == scoped_society_id)
+    return query.all()
 
 
 @router.get("/{broker_id}", response_model=BrokerResponse)
@@ -19,6 +27,7 @@ def get_broker(broker_id: int, db: Session = Depends(get_db), user=Depends(get_c
     broker = db.query(Broker).filter(Broker.broker_id == broker_id).first()
     if not broker:
         raise HTTPException(status_code=404, detail="Broker not found")
+    ensure_society_access(user, broker.society_id)
     return broker
 
 

@@ -6,16 +6,23 @@ import { Sale } from "@/types/sales"
 import SalesHeader from "./components/SalesHeader"
 import SalesTable from "./components/SalesTable"
 import SaleEditModal from "./components/modals/SaleEditModal"
+import SaleCreateModal from "./components/modals/SaleCreateModal"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/context/AuthContext"
 
 export default function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([])
   const [loading, setLoading] = useState(true)
 
   const [editingSale, setEditingSale] = useState<Sale | null>(null)
+  const [openCreate, setOpenCreate] = useState(false)
+
+  const router = useRouter()
+  const {society} = useAuth()
 
   const fetchSales = async () => {
     try {
-      const data = await getSales()
+      const data = await getSales(society)
 
       const sorted = data.sort(
         (a, b) => Number(a.sale_id) - Number(b.sale_id)
@@ -37,18 +44,26 @@ export default function SalesPage() {
     setEditingSale(sale)
   }
 
+  const handleView = (sale: Sale) => {
+    router.push(`/admin/sales/${sale.sale_id}`)
+  }
+
   if (loading) return <div className="p-6">Loading...</div>
 
   return (
-    <div className="p-6 ">
-      <SalesHeader onRefresh={fetchSales} />
+    <div className="p-6">
+
+      {/* ✅ FIXED: pass onCreate */}
+      <SalesHeader onCreate={() => setOpenCreate(true)} />
 
       <SalesTable
         sales={sales}
         setSales={setSales}
-        onEdit={handleEdit}   // ✅ PASS IT HERE
+        onEdit={handleEdit}
+        onView={handleView}
       />
 
+      {/* EDIT MODAL */}
       {editingSale && (
         <SaleEditModal
           sale={editingSale}
@@ -57,6 +72,14 @@ export default function SalesPage() {
           onSuccess={fetchSales}
         />
       )}
+
+      {openCreate && (
+        <SaleCreateModal
+          onClose={() => setOpenCreate(false)}
+          onSuccess={fetchSales}
+        />
+      )}
+
     </div>
   )
 }

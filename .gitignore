@@ -92,3 +92,12 @@ desktop.ini
 *.crt
 *.p12
 *.pfx
+
+# ============================================
+# PROJECT-SPECIFIC LOCAL/SENSITIVE FILES
+# ============================================
+.tmp-endpoint-smoke.ps1
+backend/.env
+dbms/db/.env
+backend/uploads/
+uploads/

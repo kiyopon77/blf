@@ -8,45 +8,65 @@ const formatDate = (date: string) => {
   })
 }
 
-const SalesRow = ({ s, setSales, onEdit }: any) => {
+const SalesRow = ({ s, setSales, onEdit, onView }: any) => {
   return (
-    <tr className="border-t hover:bg-gray-50">
-      <td className="p-4 font-medium text-center">
-        SALE{s.sale_id.toString().padStart(3, "0")}
+    <tr className="group hover:bg-[#F9FAFB] transition h-13">
+      
+      {/* SALE ID */}
+      <td className="px-6 py-3 font-semibold text-black">
+        ID-{s.sale_id}
       </td>
 
-      <td className="p-4 text-center">Floor {s.floor_id}</td>
+      {/* FLOOR */}
+      <td className="px-6 py-3 text-gray-600">
+        {s.floor_code}
+      </td>
 
-      <td className="p-4 text-center">{s.broker_id}</td>
+      {/* BROKER */}
+      <td className="px-6 py-3 text-gray-700">
+        {s.broker_id}
+      </td>
 
-      <td className="p-4 text-center">{s.customer_id}</td>
+      {/* CUSTOMER */}
+      <td className="px-6 py-3 text-gray-700">
+        {s.customer_id}
+      </td>
 
-      <td className="p-4 text-center font-medium">
+      {/* VALUE (RIGHT ALIGNED 🔥) */}
+      <td className="px-6 py-3 font-semibold text-black">
         ₹ {s.total_value.toLocaleString()}
       </td>
 
-      {/* STATUS BADGE (like KYC) */}
-      <td className="p-4 text-center">
+      {/* STATUS */}
+      <td className="px-6 py-3">
         <span
-          className={`px-2 py-1 text-xs rounded-full ${s.status === "SOLD"
-              ? "bg-green-100 text-green-600"
+          className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${
+            s.status === "SOLD"
+              ? "bg-green-50 text-green-800"
               : s.status === "HOLD"
-                ? "bg-yellow-100 text-yellow-600"
-                : s.status === "INVESTOR_UNIT"
-                  ? "bg-purple-100 text-purple-600"   // ✅ NEW COLOR
-                  : "bg-red-100 text-red-600"
-            }`}
+              ? "bg-yellow-50 text-yellow-800"
+              : s.status === "INVESTOR_UNIT"
+              ? "bg-purple-50 text-purple-700"
+              : "bg-gray-100 text-gray-700"
+          }`}
         >
           {s.status === "INVESTOR_UNIT" ? "INVESTOR" : s.status}
         </span>
       </td>
 
-      <td className="p-4 text-center text-gray-500">
+      {/* DATE */}
+      <td className="px-6 py-3 text-gray-500">
         {formatDate(s.initiated_at)}
       </td>
 
-      <td className="p-4 text-center">
-        <SalesActions s={s} setSales={setSales} onEdit={onEdit} />
+      {/* ACTIONS */}
+      <td className="px-6 py-3 text-right">
+        <SalesActions
+          s={s}
+          setSales={setSales}
+          onEdit={onEdit}
+          onView={onView}
+        />
       </td>
     </tr>
   )

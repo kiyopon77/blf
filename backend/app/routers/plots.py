@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
+from app.core.dependencies import get_current_user, require_admin, get_effective_society_id, ensure_society_access
 from app.models.plot import Plot
 from app.models.floor import Floor
 from app.models.sale import Sale
@@ -10,15 +10,24 @@ from app.models.user import User
 from app.models.floor_log import FloorStatusLog
 from app.schemas.plot import PlotCreate, PlotUpdate, PlotResponse, PlotMatrixResponse, FloorMatrixItem
 from app.schemas.floor import FloorResponse
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 router = APIRouter(prefix="/plots", tags=["Plots"])  # ← this must be before any @router.get
 
 
 @router.get("/matrix", response_model=list[PlotMatrixResponse])
-def get_plots_matrix(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    plots = db.query(Plot).all()
+def get_plots_matrix(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    scoped_society_id = get_effective_society_id(user, society_id)
+    plots_query = db.query(Plot)
+    if scoped_society_id is not None:
+        plots_query = plots_query.filter(Plot.society_id == scoped_society_id)
+
+    plots = plots_query.all()
     result = []
 
     for plot in plots:
@@ -77,8 +86,16 @@ def get_plots_matrix(db: Session = Depends(get_db), user=Depends(get_current_use
 
 
 @router.get("", response_model=List[PlotResponse])
-def get_plots(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(Plot).all()
+def get_plots(
+    society_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    scoped_society_id = get_effective_society_id(user, society_id)
+    query = db.query(Plot)
+    if scoped_society_id is not None:
+        query = query.filter(Plot.society_id == scoped_society_id)
+    return query.all()
 
 
 @router.get("/{plot_id}", response_model=PlotResponse)
@@ -86,6 +103,7 @@ def get_plot(plot_id: int, db: Session = Depends(get_db), user=Depends(get_curre
     plot = db.query(Plot).filter(Plot.plot_id == plot_id).first()
     if not plot:
         raise HTTPException(status_code=404, detail="Plot not found")
+    ensure_society_access(user, plot.society_id)
     return plot
 
 
@@ -94,6 +112,7 @@ def get_plot_floors(plot_id: int, db: Session = Depends(get_db), user=Depends(ge
     plot = db.query(Plot).filter(Plot.plot_id == plot_id).first()
     if not plot:
         raise HTTPException(status_code=404, detail="Plot not found")
+    ensure_society_access(user, plot.society_id)
     return db.query(Floor).filter(Floor.plot_id == plot_id).all()
 
 

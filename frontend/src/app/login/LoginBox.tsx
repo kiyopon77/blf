@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 
 const LoginBox = () => {
-  const { login } = useAuth()
+  const { login, role } = useAuth()
   const router = useRouter()
 
   const [email, setEmail] = useState("")
@@ -13,14 +13,19 @@ const LoginBox = () => {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
 
     try {
       await login(email, password)
-      router.push("/dashboard") // redirect after login
+      if (role == "admin") {
+        router.push("/dashboard") // redirect after login
+      }
+      else{
+        router.push("/rmdashboard")
+      }
     } catch (err) {
       setError("Invalid email or password")
     } finally {

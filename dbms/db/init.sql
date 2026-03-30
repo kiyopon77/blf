@@ -104,6 +104,7 @@ CREATE TABLE floors (
     floor_id SERIAL PRIMARY KEY,
     plot_id INT NOT NULL REFERENCES plots(plot_id) ON DELETE CASCADE,
     floor_no INT,
+    floor_value NUMERIC(14,2),
     status inventory_status DEFAULT 'AVAILABLE',
     active_sale_id INT,
     UNIQUE(plot_id, floor_no)
@@ -146,7 +147,7 @@ CREATE TABLE customers (
 
 CREATE TABLE sales (
     sale_id SERIAL PRIMARY KEY,
-    floor_id INT UNIQUE NOT NULL REFERENCES floors(floor_id),
+    floor_id INT NOT NULL REFERENCES floors(floor_id),
     broker_id INT NOT NULL REFERENCES brokers(broker_id),
     customer_id INT NOT NULL REFERENCES customers(customer_id),
     total_value NUMERIC(14,2) NOT NULL,
@@ -239,15 +240,3 @@ CREATE INDEX idx_sales_broker ON sales(broker_id);
 CREATE INDEX idx_sales_status ON sales(status);
 CREATE INDEX idx_payments_sale ON payments(sale_id);
 
-
--- ==================================================
--- DEFAULT ADMIN USER
--- ==================================================
-INSERT INTO users (full_name, email, hashed_password, role, is_active)
-VALUES (
-    'Admin',
-    'admin@blf.com',
-    '$2b$12$ytRFOrhRkVH2t2Qye1g.m.jH1diVJTqFbq2OWGfzEzPrdcCz6doZC',
-    'admin',
-    true
-);

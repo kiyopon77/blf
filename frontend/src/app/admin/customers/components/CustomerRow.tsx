@@ -1,4 +1,3 @@
-// components/CustomerRow.tsx
 import CustomerActions from "./CustomerActions"
 
 const formatDate = (date: string) => {
@@ -11,32 +10,57 @@ const formatDate = (date: string) => {
 
 const CustomerRow = ({ c, setCustomers, onEdit }: any) => {
   return (
-    <tr className="border-t hover:bg-gray-50">
-      <td className="p-4">{c.customer_id}</td>
-      <td className="p-4 font-medium">{c.full_name}</td>
-      <td className="p-4">{c.pan}</td>
-      <td className="p-4">{c.phone || "-"}</td>
-      <td className="p-4">{c.email || "-"}</td>
+    <tr className="group hover:bg-[#F9FAFB] transition-colors duration-150 h-[52px]">
+      <td className="px-6 py-3 font-semibold text-black">
+        {c.customer_id}
+      </td>
 
-      {/* KYC badge */}
-      <td className="p-4">
+      <td className="px-6 py-3 font-semibold text-black">
+        {c.society_id}
+      </td>
+
+      <td className="px-6 py-3 text-gray-800 font-medium">
+        {c.full_name}
+      </td>
+
+      <td className="px-6 py-3 text-gray-600">
+        {c.pan}
+      </td>
+
+      <td className="px-6 py-3 text-gray-600">
+        {c.phone || "-"}
+      </td>
+
+      <td className="px-6 py-3 text-gray-600">
+        {c.address}
+      </td>
+
+      <td className="px-6 py-3 text-gray-600">
+        {c.email || "-"}
+      </td>
+
+      {/* KYC Badge */}
+      <td className="px-6 py-3">
         <span
-          className={`px-2 py-1 text-xs rounded-full ${
-            c.kyc_status === "VERIFIED"
-              ? "bg-green-100 text-green-600"
-              : "bg-yellow-100 text-yellow-600"
-          }`}
+          className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium ${c.kyc_status === "DONE"
+            ? "bg-green-50 text-green-700"
+            : "bg-yellow-50 text-yellow-700"
+            }`}
         >
           {c.kyc_status}
         </span>
       </td>
 
-      <td className="p-4 text-gray-500">
+      <td className="px-6 py-3 text-gray-500">
         {formatDate(c.created_at)}
       </td>
 
-      <td className="p-4">
-        <CustomerActions c={c} setCustomers={setCustomers} onEdit={onEdit} />
+      <td className="px-6 py-3 text-right">
+        <CustomerActions
+          c={c}
+          setCustomers={setCustomers}
+          onEdit={onEdit}
+        />
       </td>
     </tr>
   )

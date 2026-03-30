@@ -6,8 +6,10 @@ export const setAccessToken = (token: string | null) => {
   accessToken = token
 }
 
+const baseURL = process.env.NEXT_PUBLIC_API_URL
+
 const api = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: baseURL,
   withCredentials: true,
 })
 
@@ -26,7 +28,7 @@ api.interceptors.response.use(
       error.config._retry = true
       try {
         const { data } = await axios.post(
-          "http://localhost:8000/api/auth/refresh",
+          `${baseURL}/api/auth/refresh`,
           {},
           { withCredentials: true }
         )

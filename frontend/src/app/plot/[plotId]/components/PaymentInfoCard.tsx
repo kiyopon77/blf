@@ -56,7 +56,7 @@ const PaymentInfoCard = ({ payments = [] }: { payments?: Payment[] }) => {
                   isDone ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"
                 }`}
               >
-                <span className="text-xs text-gray-500">{formatMilestone(m)}</span>
+                <span className="text-xs font-bold text-green-700">{formatMilestone(m)}</span>
                 <span className={`font-bold text-lg ${isDone ? "text-gray-800" : "text-gray-400"}`}>
                   {payment?.amount != null
                     ? `₹ ${payment.amount.toLocaleString("en-IN")}`

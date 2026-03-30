@@ -1,8 +1,11 @@
+// services/admin/sales.ts
 import api from "@/lib/api"
 import { Sale } from "@/types/sales"
 
-export const getSales = async (): Promise<Sale[]> => {
-  const res = await api.get("/sales")
+export const getSales = async (society_id? : number): Promise<Sale[]> => {
+  const res = await api.get("/sales/floor-code-info", {
+    params: { society_id },
+  })
   return res.data
 }
 
@@ -31,4 +34,8 @@ export const updateSale = async (
   }
 ) => {
   return api.put(`/sales/${sale_id}`, data)
+}
+
+export const deleteSale = async (sale_id: number) => {
+  return api.delete(`/sales/${sale_id}`)
 }
