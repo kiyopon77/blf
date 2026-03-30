@@ -6,13 +6,18 @@ import Image from "next/image"
 import LoginBox from "./LoginBox"
 
 export default function LoginPage() {
-  const { accessToken, loading } = useAuth()
+  const { accessToken, loading, role } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (loading) return
     if (accessToken) {
-      router.replace("/dashboard")
+      if (role == "admin") {
+        router.replace("/dashboard")
+      }
+      else {
+        router.replace("/rmdashboard")
+      }
     }
   }, [accessToken, loading])
 

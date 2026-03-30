@@ -10,7 +10,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { logout } = useAuth();
+  const { logout, role } = useAuth();
 
   const router = useRouter();
 
@@ -41,9 +41,16 @@ const Navbar = () => {
         <Link href="/dashboard" className={`hover:text-[#f4d98b] ${pathname === "/dashboard" ? "text-[#f4d98b]" : ""}`}>
           Plot Dashboard
         </Link>
-        <Link href="/admin" className={`hover:text-[#f4d98b] ${pathname === "/admin" ? "text-[#f4d98b]" : ""}`}>
-          Admin Dashboard
-        </Link>
+        {role === "admin" && (
+          <Link
+            href="/admin"
+            className={`hover:text-[#f4d98b] ${pathname === "/admin" ? "text-[#f4d98b]" : ""
+              }`}
+          >
+            Admin Dashboard
+          </Link>
+        )}
+
       </div>
       <div className="flex justify-end" ref={menuRef}>
         <div className="relative">
