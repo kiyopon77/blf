@@ -7,13 +7,13 @@ interface AuthContextType {
   accessToken: string | null
   role: string | null
   user: any | null
-  society: number | null              
-  user_society_id: number | null     
+  society: number | null
+  user_society_id: number | null
   societies: any[]
   setSociety: (id: number) => void
 
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<string>
   logout: () => Promise<void>
 }
 
@@ -86,25 +86,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const { data } = await api.post("/auth/login", { email, password })
-
     setAccessToken(data.access_token)
     setAccessTokenState(data.access_token)
-    setRole(data.role)
 
     const me = await api.get("/auth/me")
     setUser(me.data)
-
+    setRole(me.data.role)  // use /me as source of truth
     setUserSocietyId(me.data.society_id || null)
 
     const societiesRes = await api.get("/societies")
     setSocieties(societiesRes.data)
 
-    if (data.role === "admin") {
-      const saved = localStorage.getItem("society_id")
-      setSocietyState(saved ? Number(saved) : null)
+    if (me.data.role === "admin") {
+      localStorage.removeItem("society_id")  // ← clear stale society on fresh login
+      setSocietyState(null)                  // ← force /society selection
     } else {
       setSocietyState(me.data.society_id || null)
     }
+    return me.data.role
   }
 
   const logout = async () => {

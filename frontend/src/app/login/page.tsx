@@ -11,15 +11,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (loading) return
-    if (accessToken) {
-      if (role == "admin") {
-        router.replace("/dashboard")
-      }
-      else {
-        router.replace("/rmdashboard")
-      }
+    if (!accessToken) return
+    if (!role) return  // guard added
+    if (role === "admin") {
+      router.replace("/society")
+    } else if (role === "rm") {
+      router.replace("/rmdashboard")
     }
-  }, [accessToken, loading])
+  }, [accessToken, loading, role])  // ← add role here
 
   if (loading) return null
   if (accessToken) return null

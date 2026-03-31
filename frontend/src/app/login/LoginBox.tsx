@@ -17,13 +17,11 @@ const LoginBox = () => {
     e.preventDefault()
     setError("")
     setLoading(true)
-
     try {
-      await login(email, password)
-      if (role == "admin") {
-        router.push("/dashboard") // redirect after login
-      }
-      else{
+      const resolvedRole = await login(email, password)  // ← use returned role
+      if (resolvedRole == "admin") {
+        router.push("/society")
+      } else {
         router.push("/rmdashboard")
       }
     } catch (err) {

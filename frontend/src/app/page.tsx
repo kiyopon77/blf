@@ -7,22 +7,21 @@ import { useEffect } from "react"
 export default function Home() {
   const { accessToken, loading, role } = useAuth()
   const router = useRouter()
-  console.log(role)
 
   useEffect(() => {
+    console.log("effect fired", { loading, accessToken, role })
     if (loading) return
-
-    if (accessToken) {
-      if (role == "admin") {
-        router.replace("/society")
-      }
-      else if (role == "rm") {
-        router.replace("/rmdashboard")
-      }
-    } else {
+    if (!accessToken) {
       router.replace("/login")
+      return
     }
-  }, [accessToken, loading])
+    if (!role) return 
+    if (role === "admin") {
+      router.replace("/society")
+    } else if (role === "rm") {
+      router.replace("/rmdashboard")
+    }
+  }, [accessToken, loading, role])
 
   return null
 }
