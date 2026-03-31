@@ -1,4 +1,5 @@
 // CustomerCard.tsx
+import { KYCStatus } from "@/types/customer"
 const CustomerCard = ({
   kyc,
   fullName,
@@ -7,14 +8,19 @@ const CustomerCard = ({
   email,
   address,
 }: {
-  kyc?: string
+  kyc?: KYCStatus
   fullName?: string
   pan?: string
   phone?: string
   email?: string
   address?: string
 }) => {
-  const color = kyc === "DONE" ? "text-green-500" : "text-red-500"
+  const color =
+    kyc === "DONE"
+      ? "text-green-500"
+      : kyc === "PENDING"
+        ? "text-red-500"
+        : "text-gray-400"
   return (
     <div className="bg-white px-9 py-6 rounded-xl border border-gray-400">
       <div className="flex flex-col gap-9">
@@ -42,7 +48,7 @@ const CustomerCard = ({
           </div>
           <div className="flex flex-col">
             <span className="text-gray-600">KYC Status</span>
-            <span className={`text-xl font-bold ${color}`}>{kyc ?? "Pending"}</span>
+            <span className={`text-xl font-bold ${color}`}>{kyc ?? "PENDING"}</span>
           </div>
         </div>
       </div>

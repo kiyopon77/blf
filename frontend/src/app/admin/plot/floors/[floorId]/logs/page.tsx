@@ -47,7 +47,7 @@ const FloorLogsPage = () => {
   }, [floorId])
 
   return (
-    <div className="max-w-[800px] mx-auto px-6 py-10">
+    <div className="max-w-200 mx-auto px-6 py-10">
 
       {/* HEADER */}
       <div className="mb-10">
@@ -74,7 +74,7 @@ const FloorLogsPage = () => {
             <div key={log.log_id} className="relative">
 
               {/* Dot */}
-              <div className="absolute -left-[10px] top-1 w-4 h-4 bg-white border-2 border-[#D4A22A] rounded-full" />
+              <div className="absolute -left-2.5 top-1 w-4 h-4 bg-white border-2 border-[#D4A22A] rounded-full" />
 
               {/* Content */}
               <div className="bg-white border border-[#E5E5E5] rounded-lg p-4 shadow-sm">

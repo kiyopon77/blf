@@ -29,7 +29,7 @@ const PlotCreateModal = ({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  // 🔥 smart conversion handler
+  // smart conversion handler
   const handleChange = (key: keyof CreatePlotPayload, value: any) => {
     if (key === "area_sqyd") {
       const sqyd = value === "" ? null : Number(value)

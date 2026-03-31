@@ -1,5 +1,4 @@
 // components/RMRow.tsx
-import { RM } from "@/types/rm"
 import RMActions from "./RMActions"
 
 const RMRow = ({ rm, setRms, onEdit}: any) => {

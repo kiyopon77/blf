@@ -5,9 +5,26 @@ import { updateCustomer, updateCustomerPan } from "@/services/admin/customer"
 import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { X, Check } from "lucide-react"
+import type { Customer, UpdateCustomerDTO, KYCStatus } from "@/types/customer"
 
-const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
-  const [form, setForm] = useState({
+interface Props {
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  customer: Customer | null
+  setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>
+}
+
+type FormState = {
+  full_name: string
+  phone: string
+  email: string
+  address: string
+  kyc_status: KYCStatus
+  pan: string
+}
+
+const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: Props) => {
+  const [form, setForm] = useState<FormState>({
     full_name: "",
     phone: "",
     email: "",
@@ -40,13 +57,13 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: any) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError("")
     setLoading(true)
 
     try {
-      const cleanForm = {
+      const cleanForm: UpdateCustomerDTO = {
         full_name: form.full_name || null,
         phone: form.phone || null,
         email: form.email || null,

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import BrokerInfoCard from "./components/BrokerInfoCard"
 import CustomerCard from "./components/CustomerCard"
@@ -10,21 +10,35 @@ import ValueCard from "./components/ValueCard"
 import DocumentsCard from "./components/DocumentsCard"
 import { getPlotDetail } from "@/services/plot"
 import { ThreeDot } from "react-loading-indicators"
+import type { SaleDetail } from "@/types/sales"
+import type { Plot } from "@/types/plot"
+import type { Floor, FloorStatus } from "@/types/floor"
+import type { Broker } from "@/types/broker"
+import type { Customer } from "@/types/customer"
+import type { Payment } from "@/types/payment"
+
+type PlotDetailResponse = {
+  sale?: SaleDetail
+  plot: Plot
+  floor: Floor
+  broker?: Broker
+  customer?: Customer
+  payments: Payment[]
+}
 
 export default function Plot() {
-  const params = useParams()
   const router = useRouter()
-  const plotId = params.plotId as string
-  const [data, setData] = useState<any>(null)
-  const [category, floor] = plotId.split("-")
+  const { plotId } = useParams() as { plotId: string }
+  const [data, setData] = useState<PlotDetailResponse | null>(null)
+  const [category, floor] = useMemo(() => plotId.split("-"), [plotId])
 
   useEffect(() => {
     const load = async () => {
-      const res = await getPlotDetail(category, Number(floor))
+      const res: PlotDetailResponse = await getPlotDetail(category, Number(floor))
       setData(res)
     }
     load()
-  }, [plotId])
+  }, [category, floor])
 
   if (!data) {
     return (
@@ -36,14 +50,14 @@ export default function Plot() {
 
   const { sale, plot, floor: floorData, broker, customer } = data
 
-  const statusColors: Record<string, string> = {
-    AVAILABLE:     "bg-green-600",
-    HOLD:          "bg-yellow-500",
-    SOLD:          "bg-red-600",
-    CANCELLED:     "bg-gray-500",
+  const statusColors: Record<FloorStatus, string> = {
+    AVAILABLE: "bg-green-600",
+    HOLD: "bg-yellow-500",
+    SOLD: "bg-red-600",
+    CANCELLED: "bg-gray-500",
     INVESTOR_UNIT: "bg-blue-500",
   }
-  const statusLabel = floorData?.status ?? "AVAILABLE"
+  const statusLabel: FloorStatus = floorData?.status ?? "AVAILABLE"
   const statusColor = statusColors[statusLabel] ?? "bg-blue-500"
 
   return (
@@ -88,16 +102,24 @@ export default function Plot() {
           />
           <PaymentInfoCard payments={data.payments} />
           <CustomerCard
-            kyc={customer?.kyc_status ?? sale?.customer_kyc_status}
-            fullName={customer?.full_name ?? sale?.customer_name}
-            pan={customer?.pan}
-            phone={customer?.phone}
-            email={customer?.email}
-            address={customer?.address}
+            kyc={
+              customer?.kyc_status ??
+              sale?.customer_kyc_status ??
+              undefined
+            }
+            fullName={
+              customer?.full_name ??
+              sale?.customer_name ??
+              undefined
+            }
+            pan={customer?.pan ?? undefined}
+            phone={customer?.phone ?? undefined}
+            email={customer?.email ?? undefined}
+            address={customer?.address ?? undefined}
           />
           <MilestoneCard payments={data?.payments} />
           {sale && (
-            <DocumentsCard entityType="sale" entityId={sale.sale_id} />
+            <DocumentsCard entityType="SALE" entityId={sale.sale_id} />
           )}
         </div>
       </div>

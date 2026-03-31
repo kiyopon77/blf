@@ -7,7 +7,7 @@ interface AuthContextType {
   accessToken: string | null
   role: string | null
   user: any | null
-  society: number | null
+  society: number
   user_society_id: number | null
   societies: any[]
   setSociety: (id: number) => void

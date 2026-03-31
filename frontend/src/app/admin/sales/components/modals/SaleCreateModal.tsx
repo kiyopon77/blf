@@ -10,16 +10,35 @@ import { useAuth } from "@/context/AuthContext"
 import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { Plus, X } from "lucide-react"
+import type { Plot } from "@/types/plot"
+import type { Floor } from "@/types/floor"
+import type { Customer } from "@/types/customer"
+import type { Broker } from "@/types/broker"
 
-export default function SaleCreateModal({ onClose, onSuccess }: any) {
+interface Props {
+  onClose: () => void
+  onSuccess: () => void
+}
+
+type FormState = {
+  plot_id: string
+  floor_id: string
+  broker_id: string
+  customer_id: string
+  customer_name: string
+  total_value: string
+  commission_percent: string
+}
+
+export default function SaleCreateModal({ onClose, onSuccess }: Props) {
   const { society } = useAuth()
 
-  const [plots, setPlots] = useState<any[]>([])
-  const [filteredFloors, setFilteredFloors] = useState<any[]>([])
-  const [brokers, setBrokers] = useState<any[]>([])
-  const [customers, setCustomers] = useState<any[]>([])
+  const [plots, setPlots] = useState<Plot[]>([])
+  const [filteredFloors, setFilteredFloors] = useState<Floor[]>([])
+  const [brokers, setBrokers] = useState<Broker[]>([])
+  const [customers, setCustomers] = useState<Customer[]>([])
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     plot_id: "",
     floor_id: "",
     broker_id: "",
@@ -66,7 +85,7 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
     loadFloors()
   }, [form.plot_id])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError("")
     setLoading(true)
@@ -128,7 +147,7 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
               className="border border-gray-300 rounded-md p-2 text-sm"
             >
               <option value="">Select Plot</option>
-              {plots.map((p: any) => (
+              {plots.map((p) => (
                 <option key={p.plot_id} value={p.plot_id}>
                   {p.plot_code}
                 </option>
@@ -149,8 +168,8 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
             >
               <option value="">Select Floor</option>
               {filteredFloors
-                .filter((f: any) => f.status === "AVAILABLE")
-                .map((f: any) => (
+                .filter((f) => f.status === "AVAILABLE")
+                .map((f) => (
                   <option key={f.floor_id} value={f.floor_id}>
                     Floor {f.floor_no}
                   </option>
@@ -169,7 +188,7 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
               className="border border-gray-300 rounded-md p-2 text-sm"
             >
               <option value="">Select Broker</option>
-              {brokers.map((b: any) => (
+              {brokers.map((b) => (
                 <option key={b.broker_id} value={b.broker_id}>
                   {b.broker_name}
                 </option>
@@ -192,7 +211,7 @@ export default function SaleCreateModal({ onClose, onSuccess }: any) {
               className="border border-gray-300 rounded-md p-2 text-sm"
             >
               <option value="">Select Customer</option>
-              {customers.map((c: any) => (
+              {customers.map((c) => (
                 <option key={c.customer_id} value={c.customer_id}>
                   {c.full_name}
                 </option>

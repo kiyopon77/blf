@@ -16,14 +16,14 @@ const SUGGESTED_LABELS: Record<string, string[]> = {
   ],
 }
 
-interface UploadModalProps {
+interface Props {
   entityType: string
   entityId: number
   onClose: () => void
   onSuccess: (doc: DocumentResponse) => void
 }
 
-export function UploadModal({ entityType, entityId, onClose, onSuccess }: UploadModalProps) {
+export function UploadModal({ entityType, entityId, onClose, onSuccess }: Props) {
   const [label, setLabel] = useState("")
   const [customLabel, setCustomLabel] = useState("")
   const [file, setFile] = useState<File | null>(null)

@@ -50,7 +50,7 @@ const RMEditModal = ({ open, setOpen, rm, setRms }: any) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-[400px] p-6 shadow-xl">
+      <div className="bg-white rounded-xl w-100 p-6 shadow-xl">
         <h2 className="text-xl font-semibold mb-4">Edit RM</h2>
 
         <div className="flex flex-col gap-3">

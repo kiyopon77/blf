@@ -20,7 +20,7 @@ const FloorCreateModal = ({ open, setOpen, plot, setFloors }: any) => {
         floor_no: Number(floorNo),
       })
 
-      // ✅ add to UI instantly
+      // add to UI instantly
       setFloors((prev: any) => [...prev, newFloor])
 
       setFloorNo("")

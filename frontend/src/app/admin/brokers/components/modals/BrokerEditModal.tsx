@@ -33,7 +33,7 @@ const BrokerEditModal = ({ open, setOpen, broker, setBrokers }: any) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
@@ -43,7 +43,7 @@ const BrokerEditModal = ({ open, setOpen, broker, setBrokers }: any) => {
         broker_name: form.broker_name,
         phone: form.phone,
         user_id: user.user_id,
-        society_id: society // ⚠️ ensure this is ID
+        society_id: society 
       }
 
       const updated = await updateBroker(broker.broker_id, payload)

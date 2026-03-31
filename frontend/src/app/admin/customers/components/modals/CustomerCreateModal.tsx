@@ -29,14 +29,14 @@ const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
 
     try {
       const newCustomer = await createCustomer({
-        society_id: society, // ⚠️ ensure ID
+        society_id: society,
         ...form,
       })
 

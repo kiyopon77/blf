@@ -16,30 +16,39 @@ function FileIcon({ fileType }: { fileType: string }) {
   )
 }
 
-export default function DocumentsCard({ entityId }: { entityId: number }) {
+type EntityType = "SALE" | "CUSTOMER"
+
+export default function DocumentsCard({
+  entityType,
+  entityId,
+}: {
+  entityType: EntityType
+  entityId: number
+}) {
+  type EntityType = "SALE" | "CUSTOMER"
+
   const [documents, setDocuments] = useState<DocumentResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [activeTab, setActiveTab] = useState<"SALE" | "CUSTOMER">("SALE")
+  const [activeTab, setActiveTab] = useState<EntityType>("SALE")
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [downloadingId, setDownloadingId] = useState<number | null>(null)
-  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => { load() }, [entityId])
+  useEffect(() => { load() }, [entityId, activeTab])
 
   const load = async () => {
     setLoading(true)
     try {
-      const docs = await getDocuments("sale", entityId)
+      const docs = await getDocuments(entityType, entityId)
       setDocuments(docs)
-    } catch { setError("Could not load documents.") }
+    } catch { }
     finally { setLoading(false) }
   }
 
   const handleDelete = async (doc: DocumentResponse) => {
-    // ✅ Added Delete Confirmation
+    // Added Delete Confirmation
     if (!confirm(`Are you sure you want to delete "${doc.label}"?`)) return
-    
+
     setDeletingId(doc.document_id)
     try {
       await deleteDocument(doc.document_id)
@@ -55,7 +64,7 @@ export default function DocumentsCard({ entityId }: { entityId: number }) {
     finally { setDownloadingId(null) }
   }
 
-  const filteredDocs = documents.filter((d) => d.entity === activeTab)
+  const filteredDocs = documents
 
   return (
     <>
@@ -72,12 +81,11 @@ export default function DocumentsCard({ entityId }: { entityId: number }) {
             {["SALE", "CUSTOMER"].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
-                  activeTab === tab ? "bg-[#D4A22A] text-white border-[#D4A22A]" : "border-gray-200 text-gray-600"
-                }`}
+                onClick={() => setActiveTab(tab as EntityType)}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${activeTab === tab ? "bg-[#D4A22A] text-white border-[#D4A22A]" : "border-gray-200 text-gray-600"
+                  }`}
               >
-                {tab === "SALE" ? "Sale Docs" : "Customer Docs"} ({documents.filter(d => d.entity === tab).length})
+                {tab === "SALE" ? "Sale Docs" : "Customer Docs"} ({documents.filter(d => d.entity_type === tab).length})
               </button>
             ))}
           </div>
@@ -117,12 +125,12 @@ export default function DocumentsCard({ entityId }: { entityId: number }) {
 
       {showModal && (
         <UploadModal
-          entityType={activeTab.toLowerCase()}
+          entityType={activeTab}
           entityId={entityId}
           onClose={() => setShowModal(false)}
           onSuccess={(doc) => {
             setDocuments((prev) => [...prev, doc])
-            setActiveTab(doc.entity as any)
+            setActiveTab(doc.entity_type as EntityType)
           }}
         />
       )}

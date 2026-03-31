@@ -5,19 +5,41 @@ import { getSocieties } from "@/services/admin/society"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { Check, X } from "lucide-react"
 import AdminButton from "@/components/ui/AdminButton"
+import type { User } from "@/types/user"
+import type { Society } from "@/types/society"
 
-const UserCreateModal = ({ open, setOpen, setUsers }: any) => {
-  const [form, setForm] = useState({
+interface Props {
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>
+}
+
+type FormState = {
+  full_name: string
+  email: string
+  password: string
+  role: "admin" | "rm"
+  society_id: string
+}
+
+const UserCreateModal = ({ open, setOpen, setUsers }: Props) => {
+  const [form, setForm] = useState<FormState>({
     full_name: "",
     email: "",
     password: "",
-    role: "rm" as "admin" | "rm",
+    role: "rm",
     society_id: ""
   })
 
-  const [societies, setSocieties] = useState<any[]>([])
+  const [societies, setSocieties] = useState<Society[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  const isInvalid =
+    !form.full_name ||
+    !form.email ||
+    !form.password ||
+    !form.society_id
 
   // Fetch societies when modal opens
   useEffect(() => {
@@ -42,7 +64,7 @@ const UserCreateModal = ({ open, setOpen, setUsers }: any) => {
     }))
   }
 
-  const handleSubmit = async (e: React.SubmitEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError("")
     setLoading(true)
@@ -54,7 +76,7 @@ const UserCreateModal = ({ open, setOpen, setUsers }: any) => {
       }
 
       const newUser = await createUser(payload)
-      setUsers((prev: any) => [...prev, newUser])
+      setUsers((prev) => [...prev, newUser])
 
       setOpen(false)
 
@@ -175,7 +197,7 @@ const UserCreateModal = ({ open, setOpen, setUsers }: any) => {
               Cancel
             </DeleteButton>
 
-            <AdminButton type="submit" disabled={loading} icon={<Check size={16} />}>
+            <AdminButton type="submit" disabled={loading || isInvalid} icon={<Check size={16} />}>
               {loading ? "Creating..." : "Create"}
             </AdminButton>
           </div>

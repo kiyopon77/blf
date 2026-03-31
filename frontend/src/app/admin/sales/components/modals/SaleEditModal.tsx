@@ -5,20 +5,34 @@ import { updateSale, updateSaleStatus } from "@/services/admin/sales"
 import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { X, Check } from "lucide-react"
+import type { Sale, SaleStatus } from "@/types/sales"
 
-const SaleEditModal = ({ sale, open, setOpen, onSuccess }: any) => {
+interface Props {
+  sale: Sale
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  onSuccess: () => void
+}
+
+type FormState = {
+  total_value: string
+  commission_percent: string
+  status: SaleStatus
+}
+
+const SaleEditModal = ({ sale, open, setOpen, onSuccess }: Props) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const [form, setForm] = useState({
-    total_value: sale.total_value,
-    commission_percent: sale.commission_percent || "",
+  const [form, setForm] = useState<FormState>({
+    total_value: sale.total_value.toString(),
+    commission_percent: sale.commission_percent?.toString() || "",
     status: sale.status,
   })
 
   if (!open) return null
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError("")
     setLoading(true)
@@ -101,7 +115,7 @@ const SaleEditModal = ({ sale, open, setOpen, onSuccess }: any) => {
             <select
               value={form.status}
               onChange={(e) =>
-                setForm({ ...form, status: e.target.value })
+                setForm({ ...form, status: e.target.value as SaleStatus })
               }
               className="border border-gray-300 rounded-md p-2 text-sm"
             >

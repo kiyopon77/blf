@@ -18,7 +18,7 @@ export default function LoginPage() {
     } else if (role === "rm") {
       router.replace("/rmdashboard")
     }
-  }, [accessToken, loading, role])  // ← add role here
+  }, [accessToken, loading, role])  // add role here
 
   if (loading) return null
   if (accessToken) return null

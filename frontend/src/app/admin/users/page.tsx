@@ -5,15 +5,16 @@ import UserHeader from "./components/UserHeader"
 import UserTable from "./components/UserTable"
 import UserCreateModal from "./components/modals/UserCreateModal"
 import UserEditModal from "./components/modals/UserEditModal"
+import type { User } from "@/types/user"
 
 const UsersPage = () => {
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<any>(null)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
-  const handleEdit = (user: any) => {
+  const handleEdit = (user: User) => {
     setSelectedUser(user)
     setEditOpen(true)
   }

@@ -5,14 +5,21 @@ import { getPlotFloors, createFloor } from "@/services/admin/floor"
 import FloorTable from "./FloorTable"
 import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
-import { deletePlot, updatePlot } from "@/services/admin/plot"
-import { Edit, Plus, PlusIcon, Trash } from "lucide-react"
+import { deletePlot } from "@/services/admin/plot"
+import { Edit, PlusIcon, Trash } from "lucide-react"
 import PlotEditModal from "./modals/PlotEditModal"
 import { sortByFloorNo } from "@/app/utils/sort"
 import AddButton from "@/components/ui/AddButton"
+import type { Plot } from "@/types/plot"
+import type { Floor } from "@/types/floor"
 
-const PlotSection = ({ plot, setPlots }: any) => {
-  const [floors, setFloors] = useState([])
+interface Props {
+  plot: Plot
+  setPlots: React.Dispatch<React.SetStateAction<Plot[]>>
+}
+
+const PlotSection = ({ plot, setPlots }: Props) => {
+  const [floors, setFloors] = useState<Floor[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -35,7 +42,7 @@ const PlotSection = ({ plot, setPlots }: any) => {
 
   const getNextFloorNo = () => {
     if (floors.length === 0) return 1
-    return Math.max(...floors.map((f: any) => f.floor_no)) + 1
+    return Math.max(...floors.map((f) => f.floor_no)) + 1
   }
 
   const handleAddFloor = async () => {
@@ -47,7 +54,7 @@ const PlotSection = ({ plot, setPlots }: any) => {
         floor_no: getNextFloorNo(),
       })
 
-      setFloors((prev: any) => [...prev, newFloor])
+      setFloors((prev) => [...prev, newFloor])
     } catch (err) {
       console.error(err)
     } finally {
@@ -62,8 +69,8 @@ const PlotSection = ({ plot, setPlots }: any) => {
       await deletePlot(plot.plot_id)
 
       // remove from UI
-      setPlots((prev: any) =>
-        prev.filter((p: any) => p.plot_id !== plot.plot_id)
+      setPlots((prev) =>
+        prev.filter((p) => p.plot_id !== plot.plot_id)
       )
     } catch (err) {
       console.error(err)
@@ -99,8 +106,12 @@ const PlotSection = ({ plot, setPlots }: any) => {
 
         <div className="flex items-center gap-2">
 
-          <AddButton onClick={handleAddFloor} icon={<PlusIcon size={16} />} >
-            Add Floor
+          <AddButton
+            onClick={handleAddFloor}
+            icon={<PlusIcon size={16} />}
+            disabled={creating}
+          >
+            {creating ? "Adding..." : "Add Floor"}
           </AddButton>
 
           <AdminButton

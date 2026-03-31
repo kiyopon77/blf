@@ -1,4 +1,4 @@
-import { Eye, Pencil, Trash } from "lucide-react"
+import {  Pencil } from "lucide-react"
 
 const formatDate = (date: string) =>
   new Date(date).toLocaleDateString("en-IN", {
@@ -7,7 +7,7 @@ const formatDate = (date: string) =>
     year: "numeric",
   })
 
-const UserRow = ({ u, onEdit, onDelete }: any) => {
+const UserRow = ({ u, onEdit }: any) => {
   return (
     <tr className="group hover:bg-gray-50 transition-colors duration-150 ">
       <td className="px-6 py-3 font-semibold text-gray-900">

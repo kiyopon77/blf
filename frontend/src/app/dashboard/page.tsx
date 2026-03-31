@@ -1,5 +1,5 @@
 "use client"
-import Card from "./components/Card"
+import DashboardCard from "@/components/ui/DashboardCard"
 import PlotMatrix from "./PlotMatrix"
 import { getDashboard } from "@/services/dashboard"
 import { useState, useEffect } from "react"
@@ -86,7 +86,7 @@ const Dashboard = () => {
           ${isActive ? "scale-105 border-2 border-black rounded-2xl" : "hover:scale-105"}
         `}
             >
-              <Card
+              <DashboardCard
                 heading={card.heading}
                 value={card.value}
                 icon={card.icon}

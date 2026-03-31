@@ -8,8 +8,8 @@ const ValueCard = ({
   floorValue?: number | null
   saleValue?: number | null
   date?: string
-  area_sqft?: number
-  area_sqyd?: number
+  area_sqft?: number | null
+  area_sqyd?: number | null
 }) => {
   return (
     <div className="bg-white px-9 py-6 rounded-xl border border-gray-400">

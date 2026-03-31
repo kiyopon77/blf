@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 
 const LoginBox = () => {
-  const { login, role } = useAuth()
+  const { login } = useAuth()
   const router = useRouter()
 
   const [email, setEmail] = useState("")
@@ -18,7 +18,7 @@ const LoginBox = () => {
     setError("")
     setLoading(true)
     try {
-      const resolvedRole = await login(email, password)  // ← use returned role
+      const resolvedRole = await login(email, password)  // use returned role
       if (resolvedRole == "admin") {
         router.push("/society")
       } else {

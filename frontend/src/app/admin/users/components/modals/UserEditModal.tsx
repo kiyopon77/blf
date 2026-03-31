@@ -6,13 +6,29 @@ import { getSocieties } from "@/services/admin/society"
 import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { Check, X } from "lucide-react"
+import type { User, UpdateUser } from "@/types/user"
+import type { Society } from "@/types/society"
 
-const UserEditModal = ({ user, open, setOpen, onSuccess }: any) => {
+interface Props {
+  user: User | null
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  onSuccess: () => void
+}
+
+type FormState = {
+  full_name: string
+  email: string
+  is_active: boolean
+  society_id: string
+}
+
+const UserEditModal = ({ user, open, setOpen, onSuccess }: Props) => {
   const [loading, setLoading] = useState(false)
-  const [societies, setSocieties] = useState<any[]>([])
+  const [societies, setSocieties] = useState<Society[]>([])
   const [error, setError] = useState("")
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     full_name: "",
     email: "",
     is_active: true,
@@ -54,17 +70,18 @@ const UserEditModal = ({ user, open, setOpen, onSuccess }: any) => {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if(!user) return
     setError("")
     setLoading(true)
 
     try {
-      const payload = {
+      const payload: UpdateUser = {
         full_name: form.full_name,
         email: form.email,
         is_active: form.is_active,
-        society_id: form.society_id ? Number(form.society_id) : null
+        society_id: form.society_id ? Number(form.society_id) : null,
       }
 
       await updateUser(user.user_id, payload)
@@ -83,7 +100,7 @@ const UserEditModal = ({ user, open, setOpen, onSuccess }: any) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
-        
+
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">
@@ -99,7 +116,7 @@ const UserEditModal = ({ user, open, setOpen, onSuccess }: any) => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          
+
           {/* Full Name */}
           <div className="flex flex-col gap-1">
             <label className="text-sm text-gray-600">Full Name</label>

@@ -1,5 +1,5 @@
 import AdminButton from "@/components/ui/AdminButton"
-import { Plus, PlusIcon } from "lucide-react"
+import { Plus } from "lucide-react"
 
 const UserHeader = ({ onCreate }: any) => {
   return (
