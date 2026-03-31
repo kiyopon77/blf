@@ -1,39 +1,55 @@
-// lib/api/floor.ts
 import api from "@/lib/api"
-import { FloorLog } from "@/types/floor"
+import type {
+  Floor,
+  CreateFloorDTO,
+  FloorLog,
+  FloorStatus,
+} from "@/types/floor"
 
-export const getFloors = async (society_id?: number) => {
-  const res = await api.get("/floors", {
+// GET ALL FLOORS
+export const getFloors = async (
+  society_id?: number
+): Promise<Floor[]> => {
+  const res = await api.get<Floor[]>("/floors", {
     params: { society_id },
   })
   return res.data
 }
 
-export const createFloor = async (data: {
-  plot_id: number
-  floor_no: number
-}) => {
-  const res = await api.post("/floors", data)
+// CREATE
+export const createFloor = async (
+  data: CreateFloorDTO
+): Promise<Floor> => {
+  const res = await api.post<Floor>("/floors", data)
   return res.data
 }
 
+// DELETE
 export const deleteFloor = async (id: number): Promise<void> => {
   await api.delete(`/floors/${id}`)
 }
 
-export const updateFloorStatus = async (id: number, status: string) => {
-  const res = await api.put(`/floors/${id}/status`, { status })
+// UPDATE STATUS
+export const updateFloorStatus = async (
+  id: number,
+  status: FloorStatus
+): Promise<Floor> => {
+  const res = await api.put<Floor>(`/floors/${id}/status`, { status })
   return res.data
 }
 
-export const getPlotFloors = async (plotId: number) => {
-  const res = await api.get(`/plots/${plotId}/floors`)
+// GET FLOORS OF A PLOT
+export const getPlotFloors = async (
+  plotId: number
+): Promise<Floor[]> => {
+  const res = await api.get<Floor[]>(`/plots/${plotId}/floors`)
   return res.data
 }
 
+// LOGS
 export const getFloorLogs = async (
   floorId: number
 ): Promise<FloorLog[]> => {
-  const res = await api.get(`/floors/${floorId}/logs`)
+  const res = await api.get<FloorLog[]>(`/floors/${floorId}/logs`)
   return res.data
 }

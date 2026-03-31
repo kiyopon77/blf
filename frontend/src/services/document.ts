@@ -1,28 +1,31 @@
 import api from "@/lib/api"
 import type { DocumentResponse } from "@/types/document"
 
+type EntityType = "SALE" | "CUSTOMER"
 export const getDocuments = async (
-  entityType: string,
+  entityType: EntityType,
   entityId: number
 ): Promise<DocumentResponse[]> => {
-  const { data } = await api.get(`/documents/${entityType}/${entityId}`)
+  const { data } = await api.get<DocumentResponse[]>(
+    `/documents/${entityType}/${entityId}`
+  )
   return data
 }
 
 export const uploadDocument = async (
   label: string,
-  entityType: string,
-  saleId: number, 
+  entityType: EntityType,
+  entityId: number,
   file: File
 ): Promise<DocumentResponse> => {
   const form = new FormData()
 
   form.append("label", label)
-  form.append("entity", entityType.toUpperCase()) 
-  form.append("sale_id", String(saleId)) 
+  form.append("entity_type", entityType)
+  form.append("entity_id", String(entityId))
   form.append("file", file)
 
-  const { data } = await api.post("/documents/upload", form)
+  const { data } = await api.post<DocumentResponse>("/documents/upload", form)
   return data
 }
 

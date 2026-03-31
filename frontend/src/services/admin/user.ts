@@ -1,5 +1,5 @@
 import api from "@/lib/api"
-import { User, UserCreate } from "@/types/user"
+import { User, UserCreate, UpdateUser } from "@/types/user"
 
 export const getUsers = async (): Promise<User[]> => {
   const { data } = await api.get<User[]>("/auth/users")
@@ -11,7 +11,10 @@ export const createUser = async (payload: UserCreate): Promise<User> => {
   return data
 }
 
-export const updateUser = async (userId: number, payload: any) => {
-  const res = await api.put(`/auth/users/${userId}`, payload)
+export const updateUser = async (
+  userId: number,
+  payload: UpdateUser
+): Promise<User> => {
+  const res = await api.put<User>(`/auth/users/${userId}`, payload)
   return res.data
 }
