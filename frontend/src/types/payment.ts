@@ -1,4 +1,4 @@
-type PaymentMilestone =
+export type PaymentMilestone =
   | "TOKEN"
   | "ATS"
   | "SUPERSTRUCTURE"
@@ -6,11 +6,13 @@ type PaymentMilestone =
   | "REGISTRY"
   | "POSSESSION"
 
+export type PaymentStatus = "PENDING" | "DONE"
+
 export type Payment = {
   payment_id: number
   sale_id: number
   milestone: PaymentMilestone
   amount?: number
-  status: "PENDING" | "DONE"
+  status: PaymentStatus
   paid_at?: string
 }
