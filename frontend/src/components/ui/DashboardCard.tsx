@@ -1,6 +1,13 @@
 import Image from "next/image"
 
-const Card = ({ heading, icon, value, bgColor }: {heading: string, icon: string, value: number, bgColor: string}) => {
+interface Props {
+  heading: string
+  icon: string
+  value: number
+  bgColor: string
+}
+
+const DashboardCard = ({ heading, icon, value, bgColor }: Props) => {
   return (
     <div className={`${bgColor} shadow-gray-300 shadow-sm p-5 rounded-2xl h-35 flex flex-col justify-between`}>
       <div className="flex items-center justify-between w-full">
@@ -13,4 +20,4 @@ const Card = ({ heading, icon, value, bgColor }: {heading: string, icon: string,
   )
 }
 
-export default Card
+export default DashboardCard
