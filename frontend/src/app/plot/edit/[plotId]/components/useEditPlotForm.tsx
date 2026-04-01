@@ -4,6 +4,7 @@ import { useForm, useWatch } from "react-hook-form"
 import { App } from "antd"
 
 import { updateCustomerPan, getCustomers, updateCustomer } from "@/services/admin/customer"
+import type { KYCStatus } from "@/types/customer"
 import { updateSale } from "@/services/admin/sales"
 import { getBrokers, updateBroker } from "@/services/admin/broker"
 import { updateFloorStatus } from "@/services/admin/floor"
@@ -25,6 +26,10 @@ export function useEditPlotForm() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loadingBrokers, setLoadingBrokers] = useState(false)
   const [loadingCustomers, setLoadingCustomers] = useState(false)
+
+  // ── Initial Assignments for Locking ────────────────────────────────────────
+  const [initialBrokerId, setInitialBrokerId] = useState<number | null>(null)
+  const [initialCustomerId, setInitialCustomerId] = useState<number | null>(null)
 
   // ── Dialog visibility ──────────────────────────────────────────────────────
   const [showAddBroker, setShowAddBroker] = useState(false)
@@ -101,6 +106,9 @@ export function useEditPlotForm() {
     const [plotCode, floorNo] = (plotId as string).split("-")
     const { plot, floor, sale, broker, customer, payments } =
       await getPlotDetail(plotCode, Number(floorNo))
+
+    setInitialBrokerId(sale?.broker_id || null)
+    setInitialCustomerId(sale?.customer_id || null)
 
     reset({
       plot_id: plot?.plot_id,
@@ -217,7 +225,7 @@ export function useEditPlotForm() {
           phone: data.customer_phone,
           email: data.customer_email,
           address: data.customer_address,
-          kyc_status: data.customer_kyc_status,
+          kyc_status: data.customer_kyc_status as KYCStatus,
         }))
         if (data.customer_pan) {
           requests.push(updateCustomerPan(data.customer_id, data.customer_pan))
@@ -280,8 +288,9 @@ export function useEditPlotForm() {
     showAddBroker, setShowAddBroker,
     showAddCustomer, setShowAddCustomer,
     showCreateSale, setShowCreateSale,
-    // constants
     society,
-    loadPlot
+    loadPlot,
+    initialBrokerId,
+    initialCustomerId
   }
 }

@@ -79,7 +79,7 @@ const PlotsPage = () => {
         open={createOpen}
         setOpen={setCreateOpen}
         setPlots={setPlots}
-        societyId={society}
+        societyId={society!}
       />
     </div>
   )

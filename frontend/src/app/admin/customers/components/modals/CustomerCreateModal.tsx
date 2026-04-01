@@ -36,8 +36,12 @@ const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
 
     try {
       const newCustomer = await createCustomer({
-        society_id: society,
-        ...form,
+        society_id: society!,
+        full_name: form.full_name || "",
+        pan: form.pan || "",
+        phone: form.phone || undefined,
+        email: form.email || undefined,
+        address: form.address || undefined,
       })
 
       setCustomers((prev: any) => [newCustomer, ...prev])

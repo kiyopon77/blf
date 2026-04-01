@@ -8,7 +8,7 @@ import type {
 
 // GET ALL FLOORS
 export const getFloors = async (
-  society_id?: number
+  society_id?: number | null
 ): Promise<Floor[]> => {
   const res = await api.get<Floor[]>("/floors", {
     params: { society_id },

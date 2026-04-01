@@ -4,7 +4,7 @@ import type { Customer, CreateCustomerDTO, UpdateCustomerDTO } from "@/types/cus
 
 // GET
 export const getCustomers = async (
-  society_id?: number
+  society_id?: number | null
 ): Promise<Customer[]> => {
   const res = await api.get<Customer[]>("/customers", {
     params: { society_id },

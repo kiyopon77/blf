@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { updateFloorStatus } from "@/services/admin/floor"
+import type { FloorStatus } from "@/types/floor"
 
 export type FloorItem = {
   floor: number
@@ -93,7 +94,7 @@ export default function PlotTooltip({
     try {
       setLoading(true)
       onStatusChange(floor.floor_id, status)
-      await updateFloorStatus(floor.floor_id, status)
+      await updateFloorStatus(floor.floor_id, status as FloorStatus)
     } catch (err) {
       console.error(err)
     } finally {

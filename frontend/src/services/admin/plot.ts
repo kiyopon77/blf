@@ -5,7 +5,7 @@ import {
   UpdatePlotPayload,
 } from "@/types/plot"
 
-export const getPlots = async (society_id?: number): Promise<Plot[]> => {
+export const getPlots = async (society_id?: number | null): Promise<Plot[]> => {
   const res = await api.get("/plots", {
     params: { society_id },
   })

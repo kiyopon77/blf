@@ -1,6 +1,6 @@
 import api from "@/lib/api"
 
-export const getPlotMatrix = async (society_id?: number) => {
+export const getPlotMatrix = async (society_id?: number | null) => {
   const { data } = await api.get("/plots/matrix", {
     params: { society_id },
   })

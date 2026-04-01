@@ -14,6 +14,7 @@ const RMDashboard = () => {
 
   useEffect(() => {
     const loadDashboard = async () => {
+      if (user_society_id == null) return
       const data = await getDashboard(user_society_id)
       setDashboard(data)
     }

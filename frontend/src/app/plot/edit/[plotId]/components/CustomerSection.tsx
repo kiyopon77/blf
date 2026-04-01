@@ -11,6 +11,7 @@ interface Props {
   loadingCustomers: boolean
   onCustomerChange: (customerIdOrObject: number | Customer | null) => void
   onAddNew: () => void
+  isLocked?: boolean
 }
  
 export function CustomerSection({
@@ -20,6 +21,7 @@ export function CustomerSection({
   loadingCustomers,
   onCustomerChange,
   onAddNew,
+  isLocked,
 }: Props) {
   return (
     <div className="grid grid-cols-2 gap-6">
@@ -27,13 +29,15 @@ export function CustomerSection({
       <div className="flex flex-col gap-1 col-span-2 md:col-span-1">
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-500 font-semibold">CUSTOMER NAME</span>
-          <button
-            type="button"
-            onClick={onAddNew}
-            className="text-xs text-green-700 font-semibold hover:underline"
-          >
-            + Add New
-          </button>
+          {!isLocked && (
+            <button
+              type="button"
+              onClick={onAddNew}
+              className="text-xs text-green-700 font-semibold hover:underline"
+            >
+              + Add New
+            </button>
+          )}
         </div>
         <Controller
           name="customer_id"
@@ -42,6 +46,7 @@ export function CustomerSection({
             <Select
               showSearch
               allowClear
+              disabled={isLocked}
               loading={loadingCustomers}
               placeholder="Select customer"
               value={field.value}

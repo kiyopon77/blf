@@ -1,5 +1,5 @@
 "use client"
-import { useFieldArray, Control, useWatch } from "react-hook-form"
+import { useFieldArray, UseFormRegister, UseFormSetValue, Control, useWatch } from "react-hook-form"
 import { useState } from "react"
 
 const MILESTONES = [
@@ -25,10 +25,10 @@ const PRESET_BUCKET: Record<string, number> = {
   "40:60":    0.40,
 }
 
-type Props = {
+interface Props {
   control: Control<any>
-  register: any
-  setValue: (name: string, value: any) => void
+  register: UseFormRegister<any>
+  setValue: UseFormSetValue<any>
   floorValue: number | null
 }
 

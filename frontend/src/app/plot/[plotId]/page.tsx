@@ -98,7 +98,7 @@ export default function Plot() {
           />
           <BrokerInfoCard
             broker={broker?.broker_name ?? sale?.broker_name}
-            phone={broker?.phone}
+            phone={broker?.phone ?? undefined}
           />
           <PaymentInfoCard payments={data.payments} />
           <CustomerCard

@@ -9,9 +9,10 @@ import CustomerCreateModal from "./components/modals/CustomerCreateModal"
 import CustomerEditModal from "./components/modals/CustomerEditModal"
 import { sortByCustomerId } from "@/app/utils/sort"
 import { useAuth } from "@/context/AuthContext"
+import type { Customer } from "@/types/customer"
 
 const CustomersPage = () => {
-  const [customers, setCustomers] = useState([])
+  const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)

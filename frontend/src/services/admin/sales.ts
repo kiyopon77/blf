@@ -1,14 +1,22 @@
-// services/admin/sales.ts
 import api from "@/lib/api"
-import { Sale, CreateSaleDTO, SaleStatus } from "@/types/sales"
+import type {
+  Sale,
+  CreateSaleDTO,
+  SaleStatus,
+  UpdateSaleDTO,
+} from "@/types/sales"
 
-export const getSales = async (society_id?: number): Promise<Sale[]> => {
+// GET (this endpoint DOES NOT return Sale[])
+export const getSales = async (
+  society_id?: number | null
+): Promise<any[]> => {
   const res = await api.get("/sales/floor-code-info", {
     params: { society_id },
   })
   return res.data
 }
 
+// CREATE
 export const createSale = async (
   data: CreateSaleDTO
 ): Promise<Sale> => {
@@ -16,6 +24,7 @@ export const createSale = async (
   return res.data
 }
 
+// UPDATE STATUS
 export const updateSaleStatus = async (
   sale_id: number,
   status: SaleStatus
@@ -24,17 +33,16 @@ export const updateSaleStatus = async (
   return res.data
 }
 
+// UPDATE
 export const updateSale = async (
   sale_id: number,
-  data: {
-    total_value?: number
-    commission_percent?: number
-  }
+  data: UpdateSaleDTO
 ): Promise<Sale> => {
   const res = await api.put<Sale>(`/sales/${sale_id}`, data)
   return res.data
 }
 
+// DELETE
 export const deleteSale = async (sale_id: number): Promise<void> => {
   await api.delete(`/sales/${sale_id}`)
 }

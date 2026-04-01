@@ -91,13 +91,15 @@ export default function SaleCreateModal({ onClose, onSuccess }: Props) {
     setLoading(true)
 
     try {
+      if (!form.customer_id) {
+        setError("Customer is required.")
+        setLoading(false)
+        return
+      }
       await createSale({
         floor_id: Number(form.floor_id),
         broker_id: Number(form.broker_id),
-        customer_id: form.customer_id
-          ? Number(form.customer_id)
-          : undefined,
-        customer_name: form.customer_name || undefined,
+        customer_id: Number(form.customer_id),
         total_value: Number(form.total_value),
         commission_percent: form.commission_percent
           ? Number(form.commission_percent)

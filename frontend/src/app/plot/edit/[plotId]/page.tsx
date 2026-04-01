@@ -45,6 +45,8 @@ export default function EditPlot() {
     showCreateSale,  setShowCreateSale,
     society,
     loadPlot,
+    initialBrokerId,
+    initialCustomerId,
   } = useEditPlotForm()
 
   return (
@@ -53,7 +55,7 @@ export default function EditPlot() {
       <AddBrokerDialog
         open={showAddBroker}
         onClose={() => setShowAddBroker(false)}
-        societyId={society}
+        societyId={society!}
         onCreated={broker => {
           setBrokers(prev => [...prev, broker])
           handleBrokerChange(broker)
@@ -63,7 +65,7 @@ export default function EditPlot() {
       <AddCustomerDialog
         open={showAddCustomer}
         onClose={() => setShowAddCustomer(false)}
-        societyId={society}
+        societyId={society!}
         onCreated={customer => {
           setCustomers(prev => [...prev, customer])
           handleCustomerChange(customer)
@@ -167,6 +169,7 @@ export default function EditPlot() {
             loadingBrokers={loadingBrokers}
             onBrokerChange={handleBrokerChange}
             onAddNew={() => setShowAddBroker(true)}
+            isLocked={!!initialBrokerId}
           />
         </SectionCard>
 
@@ -179,6 +182,7 @@ export default function EditPlot() {
             loadingCustomers={loadingCustomers}
             onCustomerChange={handleCustomerChange}
             onAddNew={() => setShowAddCustomer(true)}
+            isLocked={!!initialCustomerId}
           />
         </SectionCard>
 

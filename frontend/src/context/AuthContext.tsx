@@ -7,10 +7,11 @@ interface AuthContextType {
   accessToken: string | null
   role: string | null
   user: any | null
-  society: number
+  society: number | null
   user_society_id: number | null
   societies: any[]
   setSociety: (id: number) => void
+  setSocieties: React.Dispatch<React.SetStateAction<any[]>>
 
   loading: boolean
   login: (email: string, password: string) => Promise<string>
@@ -132,6 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         societies,
         setSociety,
+        setSocieties,
 
         loading,
         login,

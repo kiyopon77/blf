@@ -10,17 +10,52 @@ interface Props {
   societyId: number
 }
 
-const FIELDS = [
-  { key: "full_name", label: "FULL NAME", required: true, placeholder: "Enter full name" },
-  { key: "pan",       label: "PAN",        required: true, placeholder: "e.g. ABCDE1234F", upper: true },
-  { key: "phone",     label: "PHONE",      placeholder: "Enter phone" },
-  { key: "email",     label: "EMAIL",      placeholder: "Enter email" },
-] as const
+type FieldConfig = {
+  key: keyof FormState
+  label: string
+  required?: boolean
+  placeholder?: string
+  upper?: boolean
+}
+
+const FIELDS: FieldConfig[] = [
+  {
+    key: "full_name",
+    label: "FULL NAME",
+    required: true,
+    placeholder: "Enter full name",
+  },
+  {
+    key: "pan",
+    label: "PAN",
+    required: true,
+    placeholder: "e.g. ABCDE1234F",
+    upper: true,
+  },
+  {
+    key: "phone",
+    label: "PHONE",
+    placeholder: "Enter phone",
+  },
+  {
+    key: "email",
+    label: "EMAIL",
+    placeholder: "Enter email",
+  },
+]
+
+type FormState = {
+  full_name: string
+  pan: string
+  phone: string
+  email: string
+  address: string
+}
 
 export function AddCustomerDialog({ open, onClose, onCreated, societyId }: Props) {
   const { message } = App.useApp()
   const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     full_name: "",
     pan: "",
     phone: "",
@@ -30,16 +65,16 @@ export function AddCustomerDialog({ open, onClose, onCreated, societyId }: Props
 
   const handleSubmit = async () => {
     if (!form.full_name.trim()) { message.error("Name is required"); return }
-    if (!form.pan.trim())       { message.error("PAN is required");  return }
+    if (!form.pan.trim()) { message.error("PAN is required"); return }
     setLoading(true)
     try {
       const customer = await createCustomer({
         society_id: societyId,
         full_name: form.full_name,
         pan: form.pan,
-        phone: form.phone,
-        email: form.email,
-        address: form.address,
+        phone: form.phone || null,
+        email: form.email || null,
+        address: form.address || null,
       })
       message.success("Customer created")
       onCreated(customer)
@@ -74,12 +109,12 @@ export function AddCustomerDialog({ open, onClose, onCreated, societyId }: Props
               <input
                 className="h-10 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
                 placeholder={placeholder}
-                value={form[key]}
+                value={form[key as keyof FormState]}
                 onChange={e =>
                   setForm(f => ({
                     ...f,
                     [key]: upper ? e.target.value.toUpperCase() : e.target.value,
-                  }))
+                  } as FormState))
                 }
               />
             </div>
