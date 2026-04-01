@@ -34,7 +34,7 @@ export default function SaleDetailPage() {
   if (!sale) return <div>Loading...</div>
 
   return (
-    <div className="w-3/4 mx-auto mt-5 mb-10 flex flex-col gap-4">
+    <div className="w-full px-4 md:px-0 md:w-3/4 mx-auto mt-5 mb-10 flex flex-col gap-4">
       <SaleHeader sale={sale} />
       <SummaryBar sale={sale} />
       <PaymentsCard payments={payments} />

@@ -13,7 +13,7 @@ export default function SaleHeader({ sale }: { sale: SaleDetail }) {
   const statusColor = STATUS_STYLES[sale.status] ?? "bg-gray-500"
 
   return (
-    <div className="flex justify-between items-start mt-5">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between items-start gap-4 mt-5">
       <div>
         <h1 className="text-3xl font-extrabold">
           Sale #{sale.sale_id}

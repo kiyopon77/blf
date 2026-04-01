@@ -26,12 +26,12 @@ export default function PaymentsCard({ payments }: { payments: Payment[] }) {
     .reduce((sum, p) => sum + (p.amount ?? 0), 0)
 
   return (
-    <div className="bg-white px-9 py-6 rounded-xl border border-gray-400">
+    <div className="bg-white p-5 md:px-9 md:py-6 rounded-xl border border-gray-400">
       <div className="flex flex-col gap-6">
         {/* Header row */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
           <span className="text-gray-700 font-extrabold">Payment Milestones</span>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <span className="text-sm text-gray-500">
               {doneCount}/{MILESTONE_ORDER.length} done
             </span>
@@ -56,25 +56,25 @@ export default function PaymentsCard({ payments }: { payments: Payment[] }) {
             const isDone = payment?.status === "DONE"
 
             return (
-              <div key={name} className="flex items-center justify-between py-3">
+              <div key={name} className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-3 gap-2 sm:gap-0">
                 <div className="flex items-center gap-3">
                   <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isDone ? "bg-green-500" : "bg-gray-200"}`} />
                   <span className={`font-medium text-sm ${isDone ? "text-gray-800" : "text-gray-400"}`}>
                     {formatMilestone(name)}
                   </span>
                 </div>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-6 w-full sm:w-auto mt-1 sm:mt-0 ml-5 sm:ml-0">
                   <span className={`text-sm ${isDone ? "text-gray-500" : "text-gray-300"}`}>
                     {payment?.paid_at
                       ? new Date(payment.paid_at).toLocaleDateString("en-IN")
                       : "—"}
                   </span>
-                  <span className={`font-bold text-sm w-32 text-right ${isDone ? "text-gray-800" : "text-gray-300"}`}>
+                  <span className={`font-bold text-sm w-auto sm:w-32 text-right ${isDone ? "text-gray-800" : "text-gray-300"}`}>
                     {payment?.amount != null
                       ? `₹ ${payment.amount.toLocaleString("en-IN")}`
                       : "—"}
                   </span>
-                  <span className={`text-xs font-semibold w-16 text-right ${isDone ? "text-green-600" : "text-red-400"}`}>
+                  <span className={`text-xs font-semibold w-auto sm:w-16 text-right ${isDone ? "text-green-600" : "text-red-400"}`}>
                     {payment?.status ?? "PENDING"}
                   </span>
                 </div>

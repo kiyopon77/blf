@@ -8,11 +8,11 @@ export default function SummaryBar({ sale }: { sale: SaleDetail }) {
       : null
 
   return (
-    <div className="bg-white px-9 py-6 rounded-xl border border-gray-400">
+    <div className="bg-white p-5 md:px-9 md:py-6 rounded-xl border border-gray-400">
       <div className="flex flex-col gap-6">
         <span className="text-gray-700 font-extrabold">Sale Overview</span>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="flex flex-col col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="flex flex-col col-span-1 sm:col-span-2">
             <span className="text-gray-500 text-sm">Total Value</span>
             <span className="font-extrabold text-4xl">
               ₹ {sale.total_value.toLocaleString("en-IN")}
