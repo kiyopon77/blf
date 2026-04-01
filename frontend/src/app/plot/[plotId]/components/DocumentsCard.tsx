@@ -39,7 +39,7 @@ export default function DocumentsCard({
   const load = async () => {
     setLoading(true)
     try {
-      const docs = await getDocumentsByEntity(saleId, entityType)
+      const docs = await getDocumentsByEntity(saleId, activeTab)
       setDocuments(docs)
     } catch { }
     finally { setLoading(false) }
