@@ -1,3 +1,4 @@
+// app/admin/sales/components/modals/SaleCreateModal.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -30,6 +31,7 @@ type FormState = {
   commission_percent: string
 }
 
+// handles sale create modal functionality
 export default function SaleCreateModal({ onClose, onSuccess }: Props) {
   const { society } = useAuth()
 
@@ -109,7 +111,6 @@ export default function SaleCreateModal({ onClose, onSuccess }: Props) {
       onSuccess()
       onClose()
     } catch (err) {
-      console.error(err)
       setError("Failed to create sale.")
     } finally {
       setLoading(false)

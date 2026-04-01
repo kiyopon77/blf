@@ -1,6 +1,8 @@
+// app/admin/users/components/UserHeader.tsx
 import AdminButton from "@/components/ui/AdminButton"
 import { Plus } from "lucide-react"
 
+// handles user header functionality
 const UserHeader = ({ onCreate }: any) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">

@@ -1,3 +1,4 @@
+// app/admin/plot/floors/[floorId]/logs/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -22,6 +23,7 @@ const getStatusStyle = (status?: string | null) => {
   }
 }
 
+// handles floor logs page functionality
 const FloorLogsPage = () => {
   const params = useParams()
   const floorId = Number(params.floorId)
@@ -37,7 +39,6 @@ const FloorLogsPage = () => {
         // latest first
         setLogs(data.reverse())
       } catch (err) {
-        console.error(err)
       } finally {
         setLoading(false)
       }

@@ -1,3 +1,4 @@
+// app/admin/plot/components/FloorTable.tsx
 import { useState } from "react"
 import { updateFloorStatus, deleteFloor } from "@/services/admin/floor"
 import { Check, Eye, Trash } from "lucide-react"
@@ -21,6 +22,7 @@ const getStatusStyle = (status: string) => {
   }
 }
 
+// handles floor table functionality
 const FloorTable = ({ floors, setFloors }: any) => {
   const [changes, setChanges] = useState<any>({})
   const router = useRouter()
@@ -41,7 +43,6 @@ const FloorTable = ({ floors, setFloors }: any) => {
         prev.filter((f) => f.floor_id !== floorId)
       )
     } catch (err) {
-      console.error(err)
     }
   }
 
@@ -67,7 +68,6 @@ const FloorTable = ({ floors, setFloors }: any) => {
       setFloors(updatedFloors)
       setChanges({})
     } catch (err) {
-      console.error(err)
     }
   }
 

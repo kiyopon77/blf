@@ -1,3 +1,4 @@
+// types/plot.ts
 export type Plot = {
   plot_id: number
   plot_code: string

@@ -1,3 +1,4 @@
+// app/admin/users/components/modals/UserCreateModal.tsx
 "use client"
 import { useState, useEffect } from "react"
 import { createUser } from "@/services/admin/user"
@@ -22,6 +23,7 @@ type FormState = {
   society_id: string
 }
 
+// handles user create modal functionality
 const UserCreateModal = ({ open, setOpen, setUsers }: Props) => {
   const [form, setForm] = useState<FormState>({
     full_name: "",
@@ -48,7 +50,6 @@ const UserCreateModal = ({ open, setOpen, setUsers }: Props) => {
         const data = await getSocieties()
         setSocieties(data)
       } catch (err) {
-        console.error("Failed to fetch societies")
       }
     }
 

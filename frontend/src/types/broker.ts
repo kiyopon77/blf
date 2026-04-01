@@ -1,3 +1,4 @@
+// types/broker.ts
 export interface Broker {
   broker_id: number
   broker_name: string | null

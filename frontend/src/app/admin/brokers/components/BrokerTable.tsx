@@ -1,5 +1,7 @@
+// app/admin/brokers/components/BrokerTable.tsx
 import BrokerRow from "./BrokerRow"
 
+// handles broker table functionality
 const BrokerTable = ({ brokers, setBrokers, onEdit }: any) => {
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">

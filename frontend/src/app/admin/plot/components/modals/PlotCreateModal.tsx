@@ -1,3 +1,4 @@
+// app/admin/plot/components/modals/PlotCreateModal.tsx
 "use client"
 
 import { useState } from "react"
@@ -7,6 +8,7 @@ import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { X, Check } from "lucide-react"
 
+// handles plot create modal functionality
 const PlotCreateModal = ({
   open,
   setOpen,
@@ -75,7 +77,6 @@ const PlotCreateModal = ({
         type: "",
       })
     } catch (err) {
-      console.error(err)
       setError("Failed to create plot.")
     } finally {
       setLoading(false)

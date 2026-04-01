@@ -1,3 +1,4 @@
+// services/admin/user.ts
 import api from "@/lib/api"
 import { User, UserCreate, UpdateUser } from "@/types/user"
 
@@ -11,6 +12,7 @@ export const createUser = async (payload: UserCreate): Promise<User> => {
   return data
 }
 
+// handles update user functionality
 export const updateUser = async (
   userId: number,
   payload: UpdateUser

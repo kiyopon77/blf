@@ -1,3 +1,4 @@
+// app/rmdashboard/components/Tooltip.tsx
 "use client"
 
 import { useState } from "react"
@@ -74,6 +75,7 @@ export type TooltipState = {
   y: number
 }
 
+// handles plot tooltip functionality
 export default function PlotTooltip({
   data,
   onMouseEnter,
@@ -96,7 +98,6 @@ export default function PlotTooltip({
       onStatusChange(floor.floor_id, status)
       await updateFloorStatus(floor.floor_id, status as FloorStatus)
     } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }

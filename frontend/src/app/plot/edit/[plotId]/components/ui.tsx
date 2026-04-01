@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/components/ui.tsx
 import { Tooltip } from "antd"
 
 // ─── ReadOnlyField ────────────────────────────────────────────────────────────
@@ -59,6 +60,7 @@ const BADGE_STYLES: Record<
   },
 }
 
+// handles price badge functionality
 export function PriceBadge({
   label,
   amount,

@@ -1,3 +1,4 @@
+// services/plot.ts
 import api from "@/lib/api"
 
 export const getPlotDetail = async (plotCode: string, floorNo: number) => {
@@ -57,6 +58,7 @@ export const updatePayment = async (
   return data
 }
 
+// handles update sale status functionality
 export const updateSaleStatus = async (
   saleId: number,
   status: "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR_UNIT"

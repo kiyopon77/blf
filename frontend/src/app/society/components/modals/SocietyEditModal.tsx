@@ -1,3 +1,4 @@
+// app/society/components/modals/SocietyEditModal.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -14,6 +15,7 @@ interface Props {
   setSocieties: React.Dispatch<React.SetStateAction<any[]>>
 }
 
+// handles society edit modal functionality
 const SocietyEditModal = ({ open, setOpen, society, setSocieties }: Props) => {
   const [form, setForm] = useState({
     society_name: "",
@@ -54,7 +56,6 @@ const SocietyEditModal = ({ open, setOpen, society, setSocieties }: Props) => {
       )
       setOpen(false)
     } catch (err) {
-      console.error(err)
       setError("Failed to update society.")
     } finally {
       setLoading(false)

@@ -1,9 +1,11 @@
+// app/admin/rm/components/RMEditModal.tsx
 // components/RMEditModal.tsx
 "use client"
 
 import { useEffect, useState } from "react"
 import { updateRM } from "@/services/rm"
 
+// handles r m edit modal functionality
 const RMEditModal = ({ open, setOpen, rm, setRms }: any) => {
   const [form, setForm] = useState({
     name: "",
@@ -42,7 +44,6 @@ const RMEditModal = ({ open, setOpen, rm, setRms }: any) => {
 
       setOpen(false)
     } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }

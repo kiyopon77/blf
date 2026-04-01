@@ -1,3 +1,4 @@
+// app/admin/users/components/UserRow.tsx
 import {  Pencil } from "lucide-react"
 
 const formatDate = (date: string) =>
@@ -7,6 +8,7 @@ const formatDate = (date: string) =>
     year: "numeric",
   })
 
+// handles user row functionality
 const UserRow = ({ u, onEdit }: any) => {
   return (
     <tr className="group hover:bg-gray-50 transition-colors duration-150 ">

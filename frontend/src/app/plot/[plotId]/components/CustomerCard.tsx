@@ -1,5 +1,7 @@
+// app/plot/[plotId]/components/CustomerCard.tsx
 // CustomerCard.tsx
 import { KYCStatus } from "@/types/customer"
+// handles customer card functionality
 const CustomerCard = ({
   kyc,
   fullName,

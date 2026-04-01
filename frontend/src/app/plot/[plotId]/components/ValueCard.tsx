@@ -1,3 +1,5 @@
+// app/plot/[plotId]/components/ValueCard.tsx
+// handles value card functionality
 const ValueCard = ({
   floorValue,
   saleValue,

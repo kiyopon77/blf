@@ -1,3 +1,4 @@
+// app/admin/users/page.tsx
 "use client"
 import { useEffect, useState } from "react"
 import { getUsers } from "@/services/admin/user"
@@ -7,6 +8,7 @@ import UserCreateModal from "./components/modals/UserCreateModal"
 import UserEditModal from "./components/modals/UserEditModal"
 import type { User } from "@/types/user"
 
+// handles users page functionality
 const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,7 +27,6 @@ const UsersPage = () => {
         const data = await getUsers()
         setUsers(data)
       } catch (err) {
-        console.error(err)
       } finally {
         setLoading(false)
       }

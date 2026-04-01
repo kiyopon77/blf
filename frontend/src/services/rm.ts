@@ -1,3 +1,4 @@
+// services/rm.ts
 // lib/api/rm.ts
 import api from "@/lib/api" // your configured axios
 
@@ -19,6 +20,7 @@ export const createRM = async (data: {
   return res.data
 }
 
+// handles update r m functionality
 export const updateRM = async (
   rm_id: number,
   data: {

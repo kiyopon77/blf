@@ -1,3 +1,4 @@
+// app/plot/[plotId]/components/PaymentInfoCard.tsx
 // PaymentInfoCard.tsx
 type Payment = {
   milestone: string
@@ -22,6 +23,7 @@ const formatMilestone = (m: string) =>
     .replace(/\bAts\b/g, "ATS")
     .replace(/\bId\b/g, "ID")
 
+// handles payment info card functionality
 const PaymentInfoCard = ({ payments = [] }: { payments?: Payment[] }) => {
   if (!payments.length) {
     return (

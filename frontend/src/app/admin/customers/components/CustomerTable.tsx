@@ -1,5 +1,7 @@
+// app/admin/customers/components/CustomerTable.tsx
 import CustomerRow from "./CustomerRow"
 
+// handles customer table functionality
 const CustomerTable = ({ customers, setCustomers, onEdit }: any) => {
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">

@@ -1,3 +1,4 @@
+// app/admin/sales/[saleId]/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -10,6 +11,7 @@ import SaleHeader from "./components/SaleHeader"
 import SummaryBar from "./components/SummaryBar"
 import PaymentsCard from "./components/PaymentsCard"
 
+// handles sale detail page functionality
 export default function SaleDetailPage() {
   const params = useParams()
   const saleId = Number(params.saleId)

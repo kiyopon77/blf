@@ -1,5 +1,7 @@
+// app/rmdashboard/components/Card.tsx
 import Image from "next/image"
 
+// handles card functionality
 const Card = ({ heading, icon, value, bgColor }: {heading: string, icon: string, value: number, bgColor: string}) => {
   return (
     <div className={`${bgColor} shadow-gray-300 shadow-sm p-5 rounded-2xl h-35 flex flex-col justify-between`}>

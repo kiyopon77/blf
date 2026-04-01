@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/ui/MilestoneStatus.tsx
 "use client"
 import { useFieldArray, UseFormRegister, UseFormSetValue, Control, useWatch } from "react-hook-form"
 import { useState } from "react"
@@ -32,6 +33,7 @@ interface Props {
   floorValue: number | null
 }
 
+// handles milestone section functionality
 const MilestoneSection = ({ control, register, setValue, floorValue }: Props) => {
   const { fields } = useFieldArray({ control, name: "payments" })
   const payments = useWatch({ control, name: "payments" })

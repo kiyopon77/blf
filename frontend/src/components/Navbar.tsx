@@ -1,3 +1,4 @@
+// components/Navbar.tsx
 "use client"
 import Image from "next/image"
 import { FaUserCircle } from "react-icons/fa";
@@ -6,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 
+// handles navbar functionality
 const Navbar = () => {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);

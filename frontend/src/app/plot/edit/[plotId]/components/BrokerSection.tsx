@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/components/BrokerSection.tsx
 import { Control, Controller, UseFormWatch } from "react-hook-form"
 import { Select } from "antd"
 import { ReadOnlyField } from "./ui"
@@ -14,6 +15,7 @@ interface Props {
   isLocked?: boolean
 }
 
+// handles broker section functionality
 export function BrokerSection({
   control,
   watch,

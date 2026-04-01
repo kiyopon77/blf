@@ -1,3 +1,4 @@
+// services/admin/floor.ts
 import api from "@/lib/api"
 import type {
   Floor,
@@ -47,6 +48,7 @@ export const getPlotFloors = async (
 }
 
 // LOGS
+// handles get floor logs functionality
 export const getFloorLogs = async (
   floorId: number
 ): Promise<FloorLog[]> => {

@@ -1,7 +1,9 @@
+// app/admin/customers/components/CustomerActions.tsx
 // components/CustomerActions.tsx
 import { Pencil, Trash } from "lucide-react"
 import { deleteCustomer } from "@/services/admin/customer"
 
+// handles customer actions functionality
 const CustomerActions = ({ c, setCustomers, onEdit }: any) => {
   const handleDelete = async () => {
     try {
@@ -11,7 +13,6 @@ const CustomerActions = ({ c, setCustomers, onEdit }: any) => {
         prev.filter((x: any) => x.customer_id !== c.customer_id)
       )
     } catch (err: any) {
-      console.error("DELETE ERROR:", err.response?.data || err.message)
     }
   }
 

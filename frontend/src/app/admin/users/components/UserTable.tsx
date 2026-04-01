@@ -1,5 +1,7 @@
+// app/admin/users/components/UserTable.tsx
 import UserRow from "./UserRow"
 
+// handles user table functionality
 const UserTable = ({ users, onEdit }: any) => {
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">

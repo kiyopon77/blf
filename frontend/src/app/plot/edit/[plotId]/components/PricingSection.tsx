@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/components/PricingSection.tsx
 import { UseFormRegister } from "react-hook-form"
 import type { EditPlotFormValues } from "../types"
 
@@ -6,6 +7,7 @@ interface Props {
   hasSale: boolean
 }
 
+// handles pricing section functionality
 export function PricingSection({ register, hasSale }: Props) {
   return (
     <div className="flex flex-col gap-6">

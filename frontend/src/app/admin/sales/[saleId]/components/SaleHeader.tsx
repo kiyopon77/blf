@@ -1,3 +1,4 @@
+// app/admin/sales/[saleId]/components/SaleHeader.tsx
 import { SaleDetail } from "@/types/sales"
 
 const STATUS_STYLES: Record<string, string> = {
@@ -7,6 +8,7 @@ const STATUS_STYLES: Record<string, string> = {
   INVESTOR_UNIT: "bg-blue-500",
 }
 
+// handles sale header functionality
 export default function SaleHeader({ sale }: { sale: SaleDetail }) {
   const statusColor = STATUS_STYLES[sale.status] ?? "bg-gray-500"
 

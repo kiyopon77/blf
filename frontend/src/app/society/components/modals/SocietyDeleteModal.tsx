@@ -1,3 +1,4 @@
+// app/society/components/modals/SocietyDeleteModal.tsx
 "use client"
 
 import { useState } from "react"
@@ -13,6 +14,7 @@ interface Props {
   onDeleted: () => void
 }
 
+// handles society delete modal functionality
 const SocietyDeleteModal = ({ open, setOpen, society, setSocieties, onDeleted }: Props) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -29,7 +31,6 @@ const SocietyDeleteModal = ({ open, setOpen, society, setSocieties, onDeleted }:
       onDeleted()
       setOpen(false)
     } catch (err) {
-      console.error(err)
       setError("Failed to delete society. It may be linked to active plots or users.")
     } finally {
       setLoading(false)

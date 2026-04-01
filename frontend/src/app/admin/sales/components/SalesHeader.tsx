@@ -1,6 +1,8 @@
+// app/admin/sales/components/SalesHeader.tsx
 import AdminButton from "@/components/ui/AdminButton"
 import { Plus } from "lucide-react"
 
+// handles sales header functionality
 const SalesHeader = ({ onCreate }: any) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">

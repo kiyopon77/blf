@@ -1,3 +1,4 @@
+// context/AuthContext.tsx
 "use client"
 import { createContext, useContext, useEffect, useState } from "react"
 import axios from "axios"
@@ -145,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+// handles use auth functionality
 export const useAuth = () => {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error("useAuth must be used inside AuthProvider")

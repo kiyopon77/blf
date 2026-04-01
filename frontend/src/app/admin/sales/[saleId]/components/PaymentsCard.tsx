@@ -1,3 +1,4 @@
+// app/admin/sales/[saleId]/components/PaymentsCard.tsx
 import { Payment } from "@/types/payment"
 
 const MILESTONE_ORDER = [
@@ -16,6 +17,7 @@ const formatMilestone = (m: string) =>
     .replace(/\bAts\b/g, "ATS")
     .replace(/\bId\b/g, "ID")
 
+// handles payments card functionality
 export default function PaymentsCard({ payments }: { payments: Payment[] }) {
   const ordered = MILESTONE_ORDER.map((m) => payments.find((p) => p.milestone === m))
   const doneCount = payments.filter((p) => p.status === "DONE").length

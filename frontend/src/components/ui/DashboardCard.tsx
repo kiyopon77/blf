@@ -1,3 +1,4 @@
+// components/ui/DashboardCard.tsx
 import Image from "next/image"
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
   bgColor: string
 }
 
+// handles dashboard card functionality
 const DashboardCard = ({ heading, icon, value, bgColor }: Props) => {
   return (
     <div className={`${bgColor} shadow-gray-300 shadow-sm p-5 rounded-2xl h-35 flex flex-col justify-between`}>

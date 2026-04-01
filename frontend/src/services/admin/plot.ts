@@ -1,3 +1,4 @@
+// services/admin/plot.ts
 import api from "@/lib/api"
 import {
   Plot,
@@ -27,6 +28,7 @@ export const updatePlot = async (
   return res.data
 }
 
+// handles delete plot functionality
 export const deletePlot = async (id: number): Promise<void> => {
   await api.delete(`/plots/${id}`)
 }

@@ -1,3 +1,4 @@
+// app/plot/[plotId]/components/modals/UploadModal.tsx
 "use client"
 
 import { useRef, useState } from "react"
@@ -23,6 +24,7 @@ interface Props {
   onSuccess: (doc: DocumentResponse) => void
 }
 
+// handles upload modal functionality
 export function UploadModal({ entityType, saleId, onClose, onSuccess }: Props) {
   const [label, setLabel] = useState("")
   const [customLabel, setCustomLabel] = useState("")

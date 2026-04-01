@@ -1,3 +1,4 @@
+// app/admin/brokers/components/modals/BrokerEditModal.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -7,6 +8,7 @@ import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { X, Check } from "lucide-react"
 
+// handles broker edit modal functionality
 const BrokerEditModal = ({ open, setOpen, broker, setBrokers }: any) => {
   const [form, setForm] = useState({
     broker_name: "",
@@ -56,7 +58,6 @@ const BrokerEditModal = ({ open, setOpen, broker, setBrokers }: any) => {
 
       setOpen(false)
     } catch (err) {
-      console.error(err)
       setError("Failed to update broker.")
     } finally {
       setLoading(false)

@@ -1,3 +1,4 @@
+// app/admin/sales/components/SalesRow.tsx
 import SalesActions from "./SalesActions"
 
 const formatDate = (date: string) => {
@@ -8,6 +9,7 @@ const formatDate = (date: string) => {
   })
 }
 
+// handles sales row functionality
 const SalesRow = ({ s, setSales, onEdit, onView }: any) => {
   return (
     <tr className="group hover:bg-[#F9FAFB] transition h-13">

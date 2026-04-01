@@ -1,3 +1,4 @@
+// app/admin/users/components/modals/UserEditModal.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -23,6 +24,7 @@ type FormState = {
   society_id: string
 }
 
+// handles user edit modal functionality
 const UserEditModal = ({ user, open, setOpen, onSuccess }: Props) => {
   const [loading, setLoading] = useState(false)
   const [societies, setSocieties] = useState<Society[]>([])
@@ -54,7 +56,6 @@ const UserEditModal = ({ user, open, setOpen, onSuccess }: Props) => {
         const data = await getSocieties()
         setSocieties(data)
       } catch (err) {
-        console.error("Failed to fetch societies")
       }
     }
 

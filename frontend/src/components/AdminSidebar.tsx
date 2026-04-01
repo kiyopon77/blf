@@ -1,3 +1,4 @@
+// components/AdminSidebar.tsx
 "use client"
 
 import Link from "next/link"
@@ -11,6 +12,7 @@ const navItems = [
   { name: "Sales", href: "/admin/sales" },
 ]
 
+// handles admin sidebar functionality
 export default function AdminSidebar() {
   const pathname = usePathname()
 

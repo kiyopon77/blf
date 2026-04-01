@@ -1,3 +1,4 @@
+// app/admin/plot/components/PlotSection.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -18,6 +19,7 @@ interface Props {
   setPlots: React.Dispatch<React.SetStateAction<Plot[]>>
 }
 
+// handles plot section functionality
 const PlotSection = ({ plot, setPlots }: Props) => {
   const [floors, setFloors] = useState<Floor[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,7 +33,6 @@ const PlotSection = ({ plot, setPlots }: Props) => {
         const data = await getPlotFloors(plot.plot_id)
         setFloors(sortByFloorNo(data))
       } catch (err) {
-        console.error(err)
       } finally {
         setLoading(false)
       }
@@ -56,7 +57,6 @@ const PlotSection = ({ plot, setPlots }: Props) => {
 
       setFloors((prev) => [...prev, newFloor])
     } catch (err) {
-      console.error(err)
     } finally {
       setCreating(false)
     }
@@ -73,7 +73,6 @@ const PlotSection = ({ plot, setPlots }: Props) => {
         prev.filter((p) => p.plot_id !== plot.plot_id)
       )
     } catch (err) {
-      console.error(err)
     } finally {
       setDeleting(false)
     }

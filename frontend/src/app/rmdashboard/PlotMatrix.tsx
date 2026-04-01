@@ -1,3 +1,4 @@
+// app/rmdashboard/PlotMatrix.tsx
 "use client"
 
 import { useEffect, useRef, useState } from "react"
@@ -47,6 +48,7 @@ const sortPlots = (plots: Plot[]): Plot[] =>
     return aP.num - bP.num
   })
 
+// handles plot matrix functionality
 export default function PlotMatrix({
   filter,
   onStatusChange,

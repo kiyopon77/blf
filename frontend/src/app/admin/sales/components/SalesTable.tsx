@@ -1,5 +1,7 @@
+// app/admin/sales/components/SalesTable.tsx
 import SalesRow from "./SalesRow"
 
+// handles sales table functionality
 const SalesTable = ({ sales, setSales, onEdit, onView }: any) => {
   return (
     <div className="bg-white border border-[#E5E5E5] rounded-lg shadow-sm overflow-hidden">

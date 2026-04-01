@@ -1,9 +1,11 @@
+// app/admin/rm/components/RMCreateModal.tsx
 // components/RMCreateModal.tsx
 "use client"
 
 import { useState } from "react"
 import { createRM } from "@/services/rm"
 
+// handles r m create modal functionality
 const RMCreateModal = ({ open, setOpen, setRms }: any) => {
   const [form, setForm] = useState({
     name: "",
@@ -30,7 +32,6 @@ const RMCreateModal = ({ open, setOpen, setRms }: any) => {
       setOpen(false)
       setForm({ name: "", email: "", phone: "" })
     } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }

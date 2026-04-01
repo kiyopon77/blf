@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/components/CustomerSection.tsx
 import { Control, Controller, UseFormWatch } from "react-hook-form"
 import { Select } from "antd"
 import { ReadOnlyField } from "./ui"
@@ -14,6 +15,7 @@ interface Props {
   isLocked?: boolean
 }
  
+// handles customer section functionality
 export function CustomerSection({
   control,
   watch,

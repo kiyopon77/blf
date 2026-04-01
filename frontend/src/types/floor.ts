@@ -1,3 +1,4 @@
+// types/floor.ts
 import type { UnitStatus } from "./status"
 export type FloorStatus = UnitStatus
 

@@ -1,5 +1,7 @@
+// components/ui/AdminButton.tsx
 import { ReactNode } from "react"
 
+// handles admin button functionality
 const AdminButton = ({
   children,
   onClick,

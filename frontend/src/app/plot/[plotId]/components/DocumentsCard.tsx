@@ -1,3 +1,4 @@
+// app/plot/[plotId]/components/DocumentsCard.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -18,6 +19,7 @@ function FileIcon({ fileType }: { fileType: string }) {
 
 type EntityType = "SALE" | "CUSTOMER"
 
+// handles documents card functionality
 export default function DocumentsCard({
   entityType,
   saleId,

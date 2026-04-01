@@ -1,3 +1,4 @@
+// app/admin/sales/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -10,6 +11,7 @@ import SaleCreateModal from "./components/modals/SaleCreateModal"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/AuthContext"
 
+// handles sales page functionality
 export default function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,7 +32,6 @@ export default function SalesPage() {
 
       setSales(sorted)
     } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }

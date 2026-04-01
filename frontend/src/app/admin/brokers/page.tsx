@@ -1,3 +1,4 @@
+// app/admin/brokers/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -9,6 +10,7 @@ import BrokerEditModal from "./components/modals/BrokerEditModal"
 import { sortByBrokerId } from "@/app/utils/sort"
 import { useAuth } from "@/context/AuthContext"
 
+// handles brokers page functionality
 const BrokersPage = () => {
   const [brokers, setBrokers] = useState<any>([])
   const [loading, setLoading] = useState(true)
@@ -22,9 +24,7 @@ const BrokersPage = () => {
       try {
         const data = await getBrokers(society)
         setBrokers(sortByBrokerId(data))
-        console.log(sortByBrokerId(data))
       } catch (err) {
-        console.error(err)
       } finally {
         setLoading(false)
       }

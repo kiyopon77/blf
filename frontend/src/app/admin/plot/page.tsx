@@ -1,3 +1,4 @@
+// app/admin/plot/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -9,6 +10,7 @@ import PlotCreateModal from "./components/modals/PlotCreateModal"
 import { Plus } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
+// handles plots page functionality
 const PlotsPage = () => {
   const [plots, setPlots] = useState<Plot[]>([])
   const [createOpen, setCreateOpen] = useState(false)
@@ -38,7 +40,6 @@ const PlotsPage = () => {
 
         setPlots(sorted)
       } catch (err) {
-        console.error(err)
       }
     }
 

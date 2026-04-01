@@ -1,6 +1,8 @@
+// app/admin/rm/components/RMHeader.tsx
 // components/RMHeader.tsx
 import { Plus } from "lucide-react"
 
+// handles r m header functionality
 const RMHeader = ({ onCreate }: any) => {
   return (
     <div className="flex justify-between items-center mb-6">

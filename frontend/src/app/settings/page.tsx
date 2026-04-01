@@ -1,3 +1,5 @@
+// app/settings/page.tsx
+// handles settings functionality
 const Settings = () => {
   return (
     <div>

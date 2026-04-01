@@ -1,3 +1,4 @@
+// app/plot/[plotId]/page.tsx
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
@@ -26,6 +27,7 @@ type PlotDetailResponse = {
   payments: Payment[]
 }
 
+// handles plot functionality
 export default function Plot() {
   const router = useRouter()
   const { plotId } = useParams() as { plotId: string }

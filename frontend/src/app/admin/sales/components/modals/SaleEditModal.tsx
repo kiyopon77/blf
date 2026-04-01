@@ -1,3 +1,4 @@
+// app/admin/sales/components/modals/SaleEditModal.tsx
 "use client"
 
 import { useState } from "react"
@@ -20,6 +21,7 @@ type FormState = {
   status: SaleStatus
 }
 
+// handles sale edit modal functionality
 const SaleEditModal = ({ sale, open, setOpen, onSuccess }: Props) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -53,7 +55,6 @@ const SaleEditModal = ({ sale, open, setOpen, onSuccess }: Props) => {
       onSuccess()
       setOpen(false)
     } catch (err) {
-      console.error(err)
       setError("Failed to update sale.")
     } finally {
       setLoading(false)

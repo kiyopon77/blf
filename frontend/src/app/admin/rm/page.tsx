@@ -9,6 +9,7 @@ import RMTable from "./components/RMTable"
 import RMCreateModal from "./components/RMCreateModal"
 import RMEditModal from "./components/RMEditModal"
 
+// handles r m page functionality
 const RMPage = () => {
   const [rms, setRms] = useState<RM[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,7 +23,6 @@ const RMPage = () => {
         const data = await getRMs()
         setRms(data)
       } catch (err) {
-        console.error(err)
       } finally {
         setLoading(false)
       }

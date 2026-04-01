@@ -1,9 +1,11 @@
+// app/login/LoginBox.tsx
 "use client"
 
 import { useState } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 
+// handles login box functionality
 const LoginBox = () => {
   const { login } = useAuth()
   const router = useRouter()

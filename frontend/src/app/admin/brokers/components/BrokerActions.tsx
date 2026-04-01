@@ -1,6 +1,8 @@
+// app/admin/brokers/components/BrokerActions.tsx
 import { Pencil, Trash } from "lucide-react"
 import { deleteBroker } from "@/services/admin/broker"
 
+// handles broker actions functionality
 const BrokerActions = ({ b, setBrokers, onEdit }: any) => {
   const handleDelete = async () => {
     try {
@@ -10,7 +12,6 @@ const BrokerActions = ({ b, setBrokers, onEdit }: any) => {
         prev.filter((x: any) => x.broker_id !== b.broker_id)
       )
     } catch (err) {
-      console.error(err)
     }
   }
 

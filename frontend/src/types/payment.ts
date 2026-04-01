@@ -1,3 +1,4 @@
+// types/payment.ts
 export type PaymentMilestone =
   | "TOKEN"
   | "ATS"

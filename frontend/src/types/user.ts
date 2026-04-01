@@ -1,3 +1,4 @@
+// types/user.ts
 export interface User {
   user_id: number
   society_id: number

@@ -1,7 +1,9 @@
+// app/admin/rm/components/RMTable.tsx
 // components/RMTable.tsx
 import { RM } from "@/types/rm"
 import RMRow from "./RMRow"
 
+// handles r m table functionality
 const RMTable = ({ rms, setRms, onEdit }: any) => {
   return (
     <div className="border rounded-xl overflow-hidden">

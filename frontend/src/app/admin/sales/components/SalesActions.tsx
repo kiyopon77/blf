@@ -1,6 +1,8 @@
+// app/admin/sales/components/SalesActions.tsx
 import { Eye, Pencil, Trash } from "lucide-react"
 import { deleteSale } from "@/services/admin/sales"
 
+// handles sales actions functionality
 const SalesActions = ({ s, setSales, onEdit, onView }: any) => {
   const handleDelete = async () => {
     try {
@@ -11,7 +13,6 @@ const SalesActions = ({ s, setSales, onEdit, onView }: any) => {
         prev.filter((x: any) => x.sale_id !== s.sale_id)
       )
     } catch (err) {
-      console.error(err)
     }
   }
 

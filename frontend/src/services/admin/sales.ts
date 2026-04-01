@@ -1,3 +1,4 @@
+// services/admin/sales.ts
 import api from "@/lib/api"
 import type {
   Sale,
@@ -43,6 +44,7 @@ export const updateSale = async (
 }
 
 // DELETE
+// handles delete sale functionality
 export const deleteSale = async (sale_id: number): Promise<void> => {
   await api.delete(`/sales/${sale_id}`)
 }

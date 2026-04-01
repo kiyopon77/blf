@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/components/AddBrokerDialog.tsx
 import { useState } from "react"
 import { App, Modal } from "antd"
 import { createBroker } from "@/services/admin/broker"
@@ -16,6 +17,7 @@ type FormState = {
   phone: string
 }
 
+// handles add broker dialog functionality
 export function AddBrokerDialog({
   open,
   onClose,
@@ -52,7 +54,6 @@ export function AddBrokerDialog({
       setForm({ broker_name: "", phone: "" })
       onClose()
     } catch (err) {
-      console.error(err)
       message.error("Failed to create broker")
     } finally {
       setLoading(false)

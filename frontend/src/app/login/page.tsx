@@ -1,3 +1,4 @@
+// app/login/page.tsx
 "use client"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
@@ -5,6 +6,7 @@ import { useEffect } from "react"
 import Image from "next/image"
 import LoginBox from "./LoginBox"
 
+// handles login page functionality
 export default function LoginPage() {
   const { accessToken, loading, role } = useAuth()
   const router = useRouter()

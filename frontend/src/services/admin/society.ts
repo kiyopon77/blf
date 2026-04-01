@@ -26,6 +26,7 @@ export const updateSociety = async (
   return res.data
 }
 
+// handles delete society functionality
 export const deleteSociety = async (id: number) => {
   await api.delete(`/societies/${id}`)
 }

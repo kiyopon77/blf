@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/types.ts
 interface PaymentRow {
   payment_id: number | null
   milestone: string

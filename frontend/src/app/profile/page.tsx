@@ -1,3 +1,4 @@
+// app/profile/page.tsx
 "use client"
 import { useEffect, useState } from "react"
 import { FaUserCircle } from "react-icons/fa"
@@ -6,6 +7,7 @@ import { User } from "@/types/user"
 import { getMe } from "@/services/profile"
 import GoToHome from "@/components/GoToHome"
 
+// handles profile page functionality
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)

@@ -1,3 +1,4 @@
+// app/rmdashboard/page.tsx
 "use client"
 
 import DashboardCard from "@/components/ui/DashboardCard"
@@ -7,6 +8,7 @@ import { useState, useEffect } from "react"
 import { ThreeDot } from "react-loading-indicators"
 import { useAuth } from "@/context/AuthContext"
 
+// handles r m dashboard functionality
 const RMDashboard = () => {
   const [dashboard, setDashboard] = useState<any>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)

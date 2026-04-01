@@ -1,3 +1,4 @@
+// services/admin/customer.ts
 // lib/api/customer.ts
 import api from "@/lib/api"
 import type { Customer, CreateCustomerDTO, UpdateCustomerDTO } from "@/types/customer"
@@ -35,6 +36,7 @@ export const updateCustomer = async (
 }
 
 // UPDATE PAN
+// handles update customer pan functionality
 export const updateCustomerPan = async (
   customerId: number,
   pan: string

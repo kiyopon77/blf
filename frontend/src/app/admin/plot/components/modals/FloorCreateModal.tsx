@@ -1,8 +1,10 @@
+// app/admin/plot/components/modals/FloorCreateModal.tsx
 "use client"
 
 import { useState } from "react"
 import { createFloor } from "@/services/admin/floor"
 
+// handles floor create modal functionality
 const FloorCreateModal = ({ open, setOpen, plot, setFloors }: any) => {
   const [floorNo, setFloorNo] = useState("")
   const [loading, setLoading] = useState(false)
@@ -26,7 +28,6 @@ const FloorCreateModal = ({ open, setOpen, plot, setFloors }: any) => {
       setFloorNo("")
       setOpen(false)
     } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }

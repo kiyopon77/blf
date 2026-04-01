@@ -1,3 +1,4 @@
+// app/society/components/modals/SocietyCreateModal.tsx
 "use client"
 
 import { useState } from "react"
@@ -12,6 +13,7 @@ interface Props {
   setSocieties: React.Dispatch<React.SetStateAction<any[]>>
 }
 
+// handles society create modal functionality
 const SocietyCreateModal = ({ open, setOpen, setSocieties }: Props) => {
   const [form, setForm] = useState({
     society_name: "",
@@ -42,7 +44,6 @@ const SocietyCreateModal = ({ open, setOpen, setSocieties }: Props) => {
       setOpen(false)
       setForm({ society_name: "", address: "" })
     } catch (err) {
-      console.error(err)
       setError("Failed to create society.")
     } finally {
       setLoading(false)

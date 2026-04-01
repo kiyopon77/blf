@@ -1,3 +1,4 @@
+// types/sales.ts
 import type { UnitStatus } from "./status"
 export type Sale = {
   sale_id: number

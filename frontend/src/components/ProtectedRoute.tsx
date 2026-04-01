@@ -1,9 +1,11 @@
+// components/ProtectedRoute.tsx
 "use client"
 
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
+// handles protected route functionality
 export function ProtectedRoute({
   children,
   requireAdmin = false,

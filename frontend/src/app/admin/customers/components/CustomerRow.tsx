@@ -1,3 +1,4 @@
+// app/admin/customers/components/CustomerRow.tsx
 import CustomerActions from "./CustomerActions"
 
 const formatDate = (date: string) => {
@@ -8,6 +9,7 @@ const formatDate = (date: string) => {
   })
 }
 
+// handles customer row functionality
 const CustomerRow = ({ c, setCustomers, onEdit }: any) => {
   return (
     <tr className="group hover:bg-[#F9FAFB] transition-colors duration-150 h-[52px]">

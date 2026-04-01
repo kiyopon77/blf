@@ -1,3 +1,4 @@
+// types/status.ts
 export type UnitStatus =
   | "AVAILABLE"
   | "HOLD"

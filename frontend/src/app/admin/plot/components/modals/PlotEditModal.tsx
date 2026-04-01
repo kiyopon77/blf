@@ -1,3 +1,4 @@
+// app/admin/plot/components/modals/PlotEditModal.tsx
 "use client"
 
 import { useState } from "react"
@@ -7,6 +8,7 @@ import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { X, Check } from "lucide-react"
 
+// handles plot edit modal functionality
 const PlotEditModal = ({
   open,
   setOpen,
@@ -70,7 +72,6 @@ const PlotEditModal = ({
 
       setOpen(false)
     } catch (err) {
-      console.error(err)
       setError("Failed to update plot.")
     } finally {
       setLoading(false)

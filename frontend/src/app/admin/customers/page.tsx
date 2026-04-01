@@ -11,6 +11,7 @@ import { sortByCustomerId } from "@/app/utils/sort"
 import { useAuth } from "@/context/AuthContext"
 import type { Customer } from "@/types/customer"
 
+// handles customers page functionality
 const CustomersPage = () => {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
@@ -24,7 +25,6 @@ const CustomersPage = () => {
         const data = await getCustomers(society)
         setCustomers(sortByCustomerId(data))
       } catch (err) {
-        console.error(err)
       } finally {
         setLoading(false)
       }

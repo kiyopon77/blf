@@ -1,7 +1,9 @@
+// lib/api.ts
 import axios from "axios"
 
 let accessToken: string | null = null
 
+// handles set access token functionality
 export const setAccessToken = (token: string | null) => {
   accessToken = token
 }

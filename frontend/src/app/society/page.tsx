@@ -1,3 +1,4 @@
+// app/society/page.tsx
 "use client"
 
 import { useAuth } from "@/context/AuthContext"
@@ -9,6 +10,7 @@ import SocietyCreateModal from "./components/modals/SocietyCreateModal"
 import SocietyEditModal from "./components/modals/SocietyEditModal"
 import SocietyDeleteModal from "./components/modals/SocietyDeleteModal"
 
+// handles select society page functionality
 const SelectSocietyPage = () => {
   const { societies, setSociety, setSocieties, role } = useAuth()
   const router = useRouter()

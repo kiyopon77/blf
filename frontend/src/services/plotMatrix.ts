@@ -1,5 +1,7 @@
+// services/plotMatrix.ts
 import api from "@/lib/api"
 
+// handles get plot matrix functionality
 export const getPlotMatrix = async (society_id?: number | null) => {
   const { data } = await api.get("/plots/matrix", {
     params: { society_id },

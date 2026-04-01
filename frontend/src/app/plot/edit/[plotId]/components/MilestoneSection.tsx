@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/components/MilestoneSection.tsx
 import {
   Control,
   UseFormRegister,
@@ -18,6 +19,7 @@ interface Props {
   onCreateSale: () => void
 }
 
+// handles milestones section functionality
 export function MilestonesSection({
   control,
   register,

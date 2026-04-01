@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/components/AddCustomerDialog.tsx
 import { useState } from "react"
 import { App, Modal } from "antd"
 import { createCustomer } from "@/services/admin/customer"
@@ -52,6 +53,7 @@ type FormState = {
   address: string
 }
 
+// handles add customer dialog functionality
 export function AddCustomerDialog({ open, onClose, onCreated, societyId }: Props) {
   const { message } = App.useApp()
   const [loading, setLoading] = useState(false)

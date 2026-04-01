@@ -1,6 +1,8 @@
+// app/admin/brokers/components/BrokerHeader.tsx
 import AdminButton from "@/components/ui/AdminButton"
 import { Plus } from "lucide-react"
 
+// handles broker header functionality
 const BrokerHeader = ({ onCreate }: any) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">

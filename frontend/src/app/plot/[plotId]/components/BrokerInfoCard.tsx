@@ -1,4 +1,6 @@
+// app/plot/[plotId]/components/BrokerInfoCard.tsx
 // BrokerInfoCard.tsx
+// handles broker info card functionality
 const BrokerInfoCard = ({
   broker,
   phone,

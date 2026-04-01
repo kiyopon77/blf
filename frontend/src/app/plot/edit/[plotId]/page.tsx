@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/page.tsx
 "use client"
 
 import { Controller } from "react-hook-form"
@@ -16,6 +17,7 @@ import { AddBrokerDialog } from "./components/AddBrokerDialog"
 import { AddCustomerDialog } from "./components/AddCustomerDialog"
 import { CreateSaleDialog } from "./components/CreateSaleDialog"
 
+// handles edit plot functionality
 export default function EditPlot() {
   const {
     plotId,

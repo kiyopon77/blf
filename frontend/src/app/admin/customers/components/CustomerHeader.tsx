@@ -1,6 +1,8 @@
+// app/admin/customers/components/CustomerHeader.tsx
 import AdminButton from "@/components/ui/AdminButton"
 import { Plus } from "lucide-react"
 
+// handles customer header functionality
 const CustomerHeader = ({ onCreate }: any) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">

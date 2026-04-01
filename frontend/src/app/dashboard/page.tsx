@@ -1,3 +1,4 @@
+// app/dashboard/page.tsx
 "use client"
 import DashboardCard from "@/components/ui/DashboardCard"
 import PlotMatrix from "./PlotMatrix"
@@ -7,6 +8,7 @@ import { ThreeDot } from "react-loading-indicators"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
 
+// handles dashboard functionality
 const Dashboard = () => {
   const [dashboard, setDashboard] = useState<any>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
@@ -21,9 +23,6 @@ const Dashboard = () => {
     }
     loadDashboard()
   }, [])
-
-  console.log(society)
-
   if (!dashboard) return <div className="h-screen w-screen flex items-center justify-center">
     <ThreeDot color="#D4A22A" size="medium" text="" textColor="" />
   </div>

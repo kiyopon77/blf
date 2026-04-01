@@ -1,5 +1,7 @@
+// components/ui/AddButton.tsx
 import { ReactNode } from "react"
 
+// handles add button functionality
 const AddButton = ({
   children,
   onClick,

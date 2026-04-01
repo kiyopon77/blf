@@ -1,3 +1,4 @@
+// services/document.ts
 import api from "@/lib/api"
 import type { DocumentResponse } from "@/types/document"
 
@@ -52,6 +53,7 @@ export const downloadDocument = async (
   URL.revokeObjectURL(url)
 }
 
+// handles delete document functionality
 export const deleteDocument = async (documentId: number): Promise<void> => {
   await api.delete(`/documents/${documentId}`)
 }

@@ -1,3 +1,4 @@
+// types/document.ts
 export type DocumentResponse = {
   document_id: number
   label: string

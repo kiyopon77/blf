@@ -1,3 +1,4 @@
+// app/dashboard/components/Tooltip.tsx
 "use client"
 
 export type FloorItem = {
@@ -45,6 +46,7 @@ export type TooltipState = {
   y: number
 }
 
+// handles plot tooltip functionality
 export default function PlotTooltip({ data }: { data: TooltipState }) {
   const { floor, plotCode } = data
   const cfg = statusConfig[floor.status]

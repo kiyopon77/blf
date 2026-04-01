@@ -1,3 +1,4 @@
+// app/admin/customers/components/modals/CustomerCreateModal.tsx
 "use client"
 
 import { useState } from "react"
@@ -7,6 +8,7 @@ import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { X, Check } from "lucide-react"
 
+// handles customer create modal functionality
 const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
   const [form, setForm] = useState({
     full_name: "",
@@ -57,7 +59,6 @@ const CustomerCreateModal = ({ open, setOpen, setCustomers }: any) => {
         address: "",
       })
     } catch (err) {
-      console.error(err)
       setError("Failed to create customer.")
     } finally {
       setLoading(false)

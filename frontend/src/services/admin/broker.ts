@@ -45,6 +45,7 @@ export const updateBroker = async (
 }
 
 // DELETE
+// handles delete broker functionality
 export const deleteBroker = async (id: number): Promise<void> => {
   await api.delete(`/brokers/${id}`)
 }

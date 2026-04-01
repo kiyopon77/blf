@@ -1,3 +1,4 @@
+// app/admin/customers/components/modals/CustomerEditModal.tsx
 "use client"
 
 import { useEffect, useState } from "react"
@@ -23,6 +24,7 @@ type FormState = {
   pan: string
 }
 
+// handles customer edit modal functionality
 const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: Props) => {
   const [form, setForm] = useState<FormState>({
     full_name: "",
@@ -92,7 +94,6 @@ const CustomerEditModal = ({ open, setOpen, customer, setCustomers }: Props) => 
 
       setOpen(false)
     } catch (err) {
-      console.error(err)
       setError("Failed to update customer.")
     } finally {
       setLoading(false)

@@ -1,5 +1,7 @@
+// components/ui/DeleteButton.tsx
 import { ReactNode } from "react"
 
+// handles delete button functionality
 const DeleteButton = ({
   children,
   onClick,

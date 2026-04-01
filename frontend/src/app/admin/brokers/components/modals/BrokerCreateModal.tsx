@@ -1,3 +1,4 @@
+// app/admin/brokers/components/modals/BrokerCreateModal.tsx
 "use client"
 
 import { useState } from "react"
@@ -7,6 +8,7 @@ import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { X, Check } from "lucide-react"
 
+// handles broker create modal functionality
 const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
   const [form, setForm] = useState({
     broker_name: "",
@@ -46,7 +48,6 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
         phone: ""
       })
     } catch (err) {
-      console.error(err)
       setError("Failed to create broker.")
     } finally {
       setLoading(false)

@@ -1,3 +1,4 @@
+// app/admin/brokers/components/BrokerRow.tsx
 import BrokerActions from "./BrokerActions"
 
 const formatDate = (date: string) => {
@@ -8,6 +9,7 @@ const formatDate = (date: string) => {
   })
 }
 
+// handles broker row functionality
 const BrokerRow = ({ b, setBrokers, onEdit }: any) => {
   return (
     <tr className="hover:bg-gray-50 transition-colors duration-150">

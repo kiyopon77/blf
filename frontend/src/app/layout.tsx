@@ -1,3 +1,4 @@
+// app/layout.tsx
 import "./globals.css";
 import { Metadata } from "next";
 import { Inter } from 'next/font/google'
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
   description: "BLF Inventory Management",
 };
 
+// handles root layout functionality
 export default function RootLayout({ children }: {children: React.ReactNode}) {
   return (
     <html lang="en">

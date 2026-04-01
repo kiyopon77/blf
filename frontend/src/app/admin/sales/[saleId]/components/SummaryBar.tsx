@@ -1,5 +1,7 @@
+// app/admin/sales/[saleId]/components/SummaryBar.tsx
 import { SaleDetail } from "@/types/sales"
- export default function SummaryBar({ sale }: { sale: SaleDetail }) {
+ // handles summary bar functionality
+export default function SummaryBar({ sale }: { sale: SaleDetail }) {
   const commission =
     sale.commission_percent != null
       ? (sale.total_value * sale.commission_percent) / 100

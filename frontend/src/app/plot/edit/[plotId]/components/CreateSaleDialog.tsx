@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/components/CreateSaleDialog.tsx
 import { useEffect, useState } from "react"
 import { App, Modal, Select } from "antd"
 import { createSale } from "@/services/admin/sales"
@@ -17,6 +18,7 @@ interface Props {
   customers: Customer[]
 }
 
+// handles create sale dialog functionality
 export function CreateSaleDialog({
   open,
   onClose,
