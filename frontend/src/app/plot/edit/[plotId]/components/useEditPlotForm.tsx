@@ -39,7 +39,7 @@ export function useEditPlotForm() {
   const [showCreateSale, setShowCreateSale] = useState(false)
 
   // ── Form ───────────────────────────────────────────────────────────────────
-  const { register, control, handleSubmit, reset, setValue, watch } =
+  const { register, control, handleSubmit, reset, setValue, watch, formState: { isSubmitting } } =
     useForm<EditPlotFormValues>({
       defaultValues: {
         plot_id: null,
@@ -269,6 +269,7 @@ export function useEditPlotForm() {
     setValue,
     watch,
     onSubmit,
+    isSubmitting,
     // derived state
     hasSale,
     paymentsSum,

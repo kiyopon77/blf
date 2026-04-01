@@ -7,6 +7,7 @@ import SectionCard from "./ui/SectionCard"
 import Field from "./ui/Field"
 import StatusRadio from "./ui/StatusRadio"
 
+import { ThreeDot } from "react-loading-indicators"
 import { useEditPlotForm } from "./components/useEditPlotForm"
 import { PriceBadge } from "./components/ui"
 import { PricingSection } from "./components/PricingSection"
@@ -49,6 +50,7 @@ export default function EditPlot() {
     loadPlot,
     initialBrokerId,
     initialCustomerId,
+    isSubmitting,
   } = useEditPlotForm()
 
   return (
@@ -107,10 +109,16 @@ export default function EditPlot() {
           <span className="text-3xl font-bold">Edit Floor: {plotId}</span>
           <button
             type="submit"
-            disabled={sumExceedsSaleValue}
-            className="px-6 py-2 bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={sumExceedsSaleValue || isSubmitting}
+            className="px-6 py-2 bg-green-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[140px]"
           >
-            Save Changes
+            {isSubmitting ? (
+              <div style={{ transform: "scale(0.5)", margin: "-10px 0" }}>
+                <ThreeDot color="currentColor" size="small" text="" textColor="" />
+              </div>
+            ) : (
+              "Save Changes"
+            )}
           </button>
         </div>
 
