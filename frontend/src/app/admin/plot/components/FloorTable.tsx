@@ -72,7 +72,7 @@ const FloorTable = ({ floors, setFloors }: any) => {
   }
 
   return (
-    <div className="px-6 pb-6">
+    <div className="px-6 pb-6 overflow-x-auto">
       <table className="w-full border-collapse text-left">
         <thead>
           <tr className="bg-[#FAFAFA] border-y border-[#E5E5E5]">

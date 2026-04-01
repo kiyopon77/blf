@@ -63,11 +63,11 @@ export default function Plot() {
   const statusColor = statusColors[statusLabel] ?? "bg-blue-500"
 
   return (
-    <div className="w-3/4 mx-auto mt-5 mb-10">
+    <div className="w-full px-4 md:px-0 md:w-3/4 mx-auto mt-5 mb-10">
       <div className="flex flex-col">
 
         {/* ── Header ── */}
-        <div className="flex justify-between items-start mb-15 mt-5">
+        <div className="flex flex-col md:flex-row justify-between items-start mb-15 mt-5 gap-4">
           <div className="flex flex-col">
             <span className="font-extrabold text-3xl">{plotId}</span>
             <span className="text-gray-500">

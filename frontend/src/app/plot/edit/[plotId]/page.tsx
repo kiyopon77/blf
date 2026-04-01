@@ -100,7 +100,7 @@ export default function EditPlot() {
       {/* ── Form ── */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-8 p-10 bg-gray-50 min-h-screen w-3/4 mx-auto"
+        className="flex flex-col gap-8 p-4 md:p-10 bg-gray-50 min-h-screen w-full md:w-3/4 mx-auto"
       >
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -115,7 +115,7 @@ export default function EditPlot() {
         </div>
 
         {/* Price overview */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <PriceBadge
             label="Floor Base Value"
             amount={watchedFloorValue}
@@ -142,7 +142,7 @@ export default function EditPlot() {
 
         {/* Floor status */}
         <SectionCard title="FLOOR STATUS">
-          <div className="flex flex-col gap-2 w-64">
+          <div className="flex flex-col gap-2 w-full md:w-64">
             <span className="text-xs text-gray-500 font-semibold">AVAILABILITY STATUS</span>
             <select
               {...register("floor_status")}
@@ -205,7 +205,7 @@ export default function EditPlot() {
 
         {/* Floor details */}
         <SectionCard title="FLOOR DETAILS">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Field label="AREA (SQ YD)" {...register("area_sqyd")} />
             <Field label="AREA (SQ FT)" {...register("area_sqft")} />
           </div>

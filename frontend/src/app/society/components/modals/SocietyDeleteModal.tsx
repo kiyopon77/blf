@@ -39,7 +39,7 @@ const SocietyDeleteModal = ({ open, setOpen, society, setSocieties, onDeleted }:
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-xl p-6 w-[400px] shadow-lg flex flex-col items-center">
+      <div className="bg-white rounded-xl p-6 w-[95%] sm:w-[400px] max-w-md shadow-lg flex flex-col items-center">
         <h2 className="text-lg font-bold mb-2">Delete Society</h2>
         <p className="text-sm text-gray-500 mb-6 text-center">
           Are you sure you want to delete <strong>{society.society_name || `Society ${society.society_id}`}</strong>? This action cannot be undone.

@@ -70,7 +70,7 @@ export default function DocumentsCard({
 
   return (
     <>
-      <div className="bg-white px-9 py-6 rounded-xl border border-gray-400">
+      <div className="bg-white p-5 md:px-9 md:py-6 rounded-xl border border-gray-400">
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <span className="text-gray-700 font-extrabold">Documents</span>
@@ -110,7 +110,7 @@ export default function DocumentsCard({
                     <p className="font-semibold text-gray-800 text-sm truncate">{doc.label}</p>
                     <p className="text-xs text-gray-400 truncate">{doc.file_name}</p>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 shrink-0">
                     <button onClick={() => handleDownload(doc)} disabled={downloadingId === doc.document_id} className="p-2 hover:cursor-pointer text-gray-400 hover:text-[#D4A22A] disabled:opacity-50">
                       {downloadingId === doc.document_id ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                     </button>

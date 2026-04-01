@@ -204,7 +204,7 @@ export default function PlotMatrix({
         />
       )}
 
-      <div className="bg-white rounded-xl shadow p-8">
+      <div className="bg-white rounded-xl shadow p-4 md:p-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-xl font-semibold text-gray-800">
@@ -222,13 +222,14 @@ export default function PlotMatrix({
           </div>
         </div>
 
-        {/* Grid */}
-        <div
-          className="grid gap-y-2"
-          style={{
-            gridTemplateColumns: `5rem repeat(${floorList.length}, minmax(0, 1fr))`,
-          }}
-        >
+        {/* Grid Wrapper */}
+        <div className="overflow-x-auto pb-4">
+          <div
+            className="grid gap-y-2 min-w-[600px]"
+            style={{
+              gridTemplateColumns: `5rem repeat(${floorList.length}, minmax(80px, 1fr))`,
+            }}
+          >
           {/* Column headers */}
           <div />
           {floorList.map((floor) => (
@@ -300,6 +301,7 @@ export default function PlotMatrix({
               })}
             </div>
           ))}
+          </div>
         </div>
       </div>
     </div>

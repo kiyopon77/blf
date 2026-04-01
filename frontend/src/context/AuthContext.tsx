@@ -14,6 +14,9 @@ interface AuthContextType {
   setSociety: (id: number) => void
   setSocieties: React.Dispatch<React.SetStateAction<any[]>>
 
+  sidebarOpen: boolean
+  setSidebarOpen: (v: boolean) => void
+
   loading: boolean
   login: (email: string, password: string) => Promise<string>
   logout: () => Promise<void>
@@ -31,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userSocietyId, setUserSocietyId] = useState<number | null>(null)
 
   const [societies, setSocieties] = useState<any[]>([])
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     const initAuth = async () => {
@@ -135,6 +139,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         societies,
         setSociety,
         setSocieties,
+
+        sidebarOpen,
+        setSidebarOpen,
 
         loading,
         login,

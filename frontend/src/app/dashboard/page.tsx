@@ -68,7 +68,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-6 p-10 gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 p-4 md:p-10 gap-4 md:gap-8">
         {cards.map((card, index) => {
           const isActive = activeFilter === card.heading
 

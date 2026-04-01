@@ -14,12 +14,12 @@ const ValueCard = ({
   area_sqyd?: number | null
 }) => {
   return (
-    <div className="bg-white px-9 py-6 rounded-xl border border-gray-400">
+    <div className="bg-white p-5 md:px-9 md:py-6 rounded-xl border border-gray-400">
       <div className="flex flex-col gap-6">
         <span className="text-gray-700 font-extrabold">Floor & Value</span>
 
         {/* ── Two price columns ── */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Floor base value — from FloorResponse.floor_value */}
           <div className="flex flex-col gap-1 rounded-xl border border-blue-200 bg-blue-50 px-5 py-4">
             <div className="flex items-center gap-1.5">
@@ -54,7 +54,7 @@ const ValueCard = ({
         </div>
 
         {/* ── Area row ── */}
-        <div className="flex gap-8 border-t border-gray-100 pt-4">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 border-t border-gray-100 pt-4">
           <div className="flex flex-col">
             <span className="text-gray-600 text-sm">Area (sq ft)</span>
             <span className="font-bold text-lg">{area_sqft ? `${area_sqft} sq ft` : "—"}</span>

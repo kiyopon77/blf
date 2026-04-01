@@ -35,7 +35,7 @@ const FloorCreateModal = ({ open, setOpen, plot, setFloors }: any) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-96 p-6 shadow-xl">
+      <div className="bg-white rounded-xl w-[95%] sm:w-96 max-w-md p-6 shadow-xl">
         <h2 className="text-lg font-semibold mb-4">
           Add Floor to {plot.plot_code}
         </h2>
