@@ -119,7 +119,7 @@ export default function Plot() {
           />
           <MilestoneCard payments={data?.payments} />
           {sale && (
-            <DocumentsCard entityType="SALE" entityId={sale.sale_id} />
+            <DocumentsCard entityType="SALE" saleId={sale.sale_id} />
           )}
         </div>
       </div>

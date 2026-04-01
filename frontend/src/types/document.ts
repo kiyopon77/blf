@@ -3,7 +3,7 @@ export type DocumentResponse = {
   label: string
   file_name: string
   file_type: string
-  entity_type: string
-  entity_id: number
+  entity: "CUSTOMER" | "SALE"   
+  sale_id: number 
   uploaded_at: string
 }

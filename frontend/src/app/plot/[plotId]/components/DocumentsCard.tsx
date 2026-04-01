@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { FileText, Trash2, Download, Plus, Loader2 } from "lucide-react"
-import { getDocuments, downloadDocument, deleteDocument } from "@/services/document"
+import { downloadDocument, deleteDocument, getDocumentsByEntity } from "@/services/document"
 import type { DocumentResponse } from "@/types/document"
 import { UploadModal } from "./modals/UploadModal"
 
@@ -20,10 +20,10 @@ type EntityType = "SALE" | "CUSTOMER"
 
 export default function DocumentsCard({
   entityType,
-  entityId,
+  saleId,
 }: {
   entityType: EntityType
-  entityId: number
+  saleId: number
 }) {
   type EntityType = "SALE" | "CUSTOMER"
 
@@ -34,12 +34,12 @@ export default function DocumentsCard({
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [downloadingId, setDownloadingId] = useState<number | null>(null)
 
-  useEffect(() => { load() }, [entityId, activeTab])
+  useEffect(() => { load() }, [saleId, activeTab])
 
   const load = async () => {
     setLoading(true)
     try {
-      const docs = await getDocuments(entityType, entityId)
+      const docs = await getDocumentsByEntity(saleId, entityType)
       setDocuments(docs)
     } catch { }
     finally { setLoading(false) }
@@ -85,7 +85,7 @@ export default function DocumentsCard({
                 className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${activeTab === tab ? "bg-[#D4A22A] text-white border-[#D4A22A]" : "border-gray-200 text-gray-600"
                   }`}
               >
-                {tab === "SALE" ? "Sale Docs" : "Customer Docs"} ({documents.filter(d => d.entity_type === tab).length})
+                {tab === "SALE" ? "Sale Docs" : "Customer Docs"} ({documents.filter(d => d.entity === tab).length})
               </button>
             ))}
           </div>
@@ -126,11 +126,11 @@ export default function DocumentsCard({
       {showModal && (
         <UploadModal
           entityType={activeTab}
-          entityId={entityId}
+          saleId={saleId}
           onClose={() => setShowModal(false)}
           onSuccess={(doc) => {
             setDocuments((prev) => [...prev, doc])
-            setActiveTab(doc.entity_type as EntityType)
+            setActiveTab(doc.entity as EntityType)
           }}
         />
       )}

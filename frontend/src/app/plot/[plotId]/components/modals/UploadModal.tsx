@@ -17,13 +17,13 @@ const SUGGESTED_LABELS: Record<string, string[]> = {
 }
 
 interface Props {
-  entityType: string
-  entityId: number
+  entityType: "CUSTOMER" | "SALE"
+  saleId: number        // renamed from entityId — API always needs sale_id
   onClose: () => void
   onSuccess: (doc: DocumentResponse) => void
 }
 
-export function UploadModal({ entityType, entityId, onClose, onSuccess }: Props) {
+export function UploadModal({ entityType, saleId, onClose, onSuccess }: Props) {
   const [label, setLabel] = useState("")
   const [customLabel, setCustomLabel] = useState("")
   const [file, setFile] = useState<File | null>(null)
@@ -34,6 +34,8 @@ export function UploadModal({ entityType, entityId, onClose, onSuccess }: Props)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const labels = SUGGESTED_LABELS[entityType] ?? SUGGESTED_LABELS.customer
   const effectiveLabel = label === "Other" ? customLabel : label
+
+  // API expects uppercase: "CUSTOMER" | "SALE"
 
   const handleFile = (f: File) => {
     setFile(f)
@@ -55,7 +57,7 @@ export function UploadModal({ entityType, entityId, onClose, onSuccess }: Props)
     setError(null)
 
     try {
-      const doc = await uploadDocument(effectiveLabel.trim(), entityType, entityId, file)
+      const doc = await uploadDocument(effectiveLabel.trim(), entityType, saleId, file)
       onSuccess(doc)
       onClose()
     } catch {
@@ -83,9 +85,10 @@ export function UploadModal({ entityType, entityId, onClose, onSuccess }: Props)
                 <button
                   key={l}
                   onClick={() => setLabel(l)}
-                  className={`px-3 py-1 rounded-full text-sm font-medium border transition-all ${
-                    label === l ? "bg-[#D4A22A] border-[#D4A22A] text-white" : "border-gray-200 text-gray-600 hover:border-[#D4A22A]"
-                  }`}
+                  className={`px-3 py-1 rounded-full text-sm font-medium border transition-all ${label === l
+                    ? "bg-[#D4A22A] border-[#D4A22A] text-white"
+                    : "border-gray-200 text-gray-600 hover:border-[#D4A22A]"
+                    }`}
                 >
                   {l}
                 </button>
@@ -107,9 +110,12 @@ export function UploadModal({ entityType, entityId, onClose, onSuccess }: Props)
             onDragLeave={() => setDragging(false)}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
-              dragging ? "border-[#D4A22A] bg-amber-50" : file ? "border-green-400 bg-green-50" : "border-gray-200 hover:border-[#D4A22A]"
-            }`}
+            className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${dragging
+              ? "border-[#D4A22A] bg-amber-50"
+              : file
+                ? "border-green-400 bg-green-50"
+                : "border-gray-200 hover:border-[#D4A22A]"
+              }`}
           >
             <input
               ref={fileInputRef}
@@ -122,19 +128,33 @@ export function UploadModal({ entityType, entityId, onClose, onSuccess }: Props)
               <div className="flex flex-col items-center gap-1">
                 <CheckCircle size={28} className="text-green-500" />
                 <span className="font-semibold text-green-700 text-sm truncate max-w-xs">{file.name}</span>
+                <span className="text-xs text-gray-400 mt-1">Click to change file</span>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2 text-gray-400">
                 <Upload size={28} />
-                <span className="text-sm font-medium">Drop file here or <span className="text-[#D4A22A] underline">browse</span></span>
+                <span className="text-sm font-medium">
+                  Drop file here or <span className="text-[#D4A22A] underline">browse</span>
+                </span>
+                <span className="text-xs">PDF, JPG, PNG, DOC up to any size</span>
               </div>
             )}
           </div>
 
-          {error && <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg"><AlertCircle size={15} />{error}</div>}
+          {error && (
+            <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">
+              <AlertCircle size={15} />
+              {error}
+            </div>
+          )}
 
           <div className="flex gap-3">
-            <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 text-sm">Cancel</button>
+            <button
+              onClick={onClose}
+              className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 text-sm"
+            >
+              Cancel
+            </button>
             <button
               onClick={handleSubmit}
               disabled={uploading}

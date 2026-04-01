@@ -2,12 +2,22 @@ import api from "@/lib/api"
 import type { DocumentResponse } from "@/types/document"
 
 type EntityType = "SALE" | "CUSTOMER"
+
 export const getDocuments = async (
-  entityType: EntityType,
-  entityId: number
+  saleId: number
 ): Promise<DocumentResponse[]> => {
   const { data } = await api.get<DocumentResponse[]>(
-    `/documents/${entityType}/${entityId}`
+    `/documents/sale/${saleId}`
+  )
+  return data
+}
+
+export const getDocumentsByEntity = async (
+  saleId: number,
+  entityType: EntityType
+): Promise<DocumentResponse[]> => {
+  const { data } = await api.get<DocumentResponse[]>(
+    `/documents/sale/${saleId}/${entityType}`
   )
   return data
 }
@@ -15,16 +25,14 @@ export const getDocuments = async (
 export const uploadDocument = async (
   label: string,
   entityType: EntityType,
-  entityId: number,
+  saleId: number,       
   file: File
 ): Promise<DocumentResponse> => {
   const form = new FormData()
-
   form.append("label", label)
-  form.append("entity_type", entityType)
-  form.append("entity_id", String(entityId))
+  form.append("entity", entityType)   
+  form.append("sale_id", String(saleId))  
   form.append("file", file)
-
   const { data } = await api.post<DocumentResponse>("/documents/upload", form)
   return data
 }
