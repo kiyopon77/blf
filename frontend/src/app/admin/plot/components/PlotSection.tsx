@@ -82,13 +82,13 @@ const PlotSection = ({ plot, setPlots }: Props) => {
     <div className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm overflow-hidden">
 
       {/* Header */}
-      <div className="p-6 pb-5 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="p-4 sm:p-6 pb-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
           <h2 className="text-xl font-bold text-gray-900">
             {plot.plot_code}
           </h2>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
               {plot.area_sqft || "-"} sqft
             </span>
@@ -103,7 +103,7 @@ const PlotSection = ({ plot, setPlots }: Props) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
 
           <AddButton
             onClick={handleAddFloor}

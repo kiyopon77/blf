@@ -50,7 +50,7 @@ const PlotsPage = () => {
     <div className="max-w-350 mx-auto px-8 py-10 w-full">
 
       {/* HEADER */}
-      <div className="mb-10 flex items-center justify-between">
+      <div className="mb-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-[28px] font-bold text-gray-900">
             Plots & Floors

@@ -72,8 +72,8 @@ const FloorTable = ({ floors, setFloors }: any) => {
   }
 
   return (
-    <div className="px-6 pb-6 overflow-x-auto">
-      <table className="w-full border-collapse text-left">
+    <div className="px-4 sm:px-6 pb-6 overflow-x-auto w-full">
+      <table className="w-full min-w-max border-collapse text-left">
         <thead>
           <tr className="bg-[#FAFAFA] border-y border-[#E5E5E5]">
             <th className="py-3 px-4 text-sm font-semibold text-gray-600">
@@ -125,16 +125,18 @@ const FloorTable = ({ floors, setFloors }: any) => {
                     <option value="CANCELLED">Cancelled</option>
                   </select>
                 </td>
-                <td className="flex items-center gap-2 my-2">
-                  <AdminButton onClick={() => router.push(`/admin/plot/floors/${f.floor_id}/logs`)} icon={<Eye size={16} />} >
-                    View Logs
-                  </AdminButton>
-                  <DeleteButton
-                    onClick={() => handleDelete(f.floor_id)}
-                    icon={<Trash size={16} />}
-                  >
-                    Delete
-                  </DeleteButton>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <AdminButton onClick={() => router.push(`/admin/plot/floors/${f.floor_id}/logs`)} icon={<Eye size={16} />} >
+                      View Logs
+                    </AdminButton>
+                    <DeleteButton
+                      onClick={() => handleDelete(f.floor_id)}
+                      icon={<Trash size={16} />}
+                    >
+                      Delete
+                    </DeleteButton>
+                  </div>
                 </td>
               </tr>
             )
