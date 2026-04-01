@@ -43,32 +43,33 @@ export default function EditPlot() {
     showAddBroker,   setShowAddBroker,
     showAddCustomer, setShowAddCustomer,
     showCreateSale,  setShowCreateSale,
-    SOCIETY_ID,
+    society,
+    loadPlot,
   } = useEditPlotForm()
- 
+
   return (
     <>
       {/* ── Dialogs ── */}
       <AddBrokerDialog
         open={showAddBroker}
         onClose={() => setShowAddBroker(false)}
-        societyId={SOCIETY_ID}
+        societyId={society}
         onCreated={broker => {
           setBrokers(prev => [...prev, broker])
-          handleBrokerChange(broker)  // pass full object — state hasn't flushed yet
+          handleBrokerChange(broker)
         }}
       />
- 
+
       <AddCustomerDialog
         open={showAddCustomer}
         onClose={() => setShowAddCustomer(false)}
-        societyId={SOCIETY_ID}
+        societyId={society}
         onCreated={customer => {
           setCustomers(prev => [...prev, customer])
-          handleCustomerChange(customer)  // pass full object — state hasn't flushed yet
+          handleCustomerChange(customer)
         }}
       />
- 
+
       <CreateSaleDialog
         open={showCreateSale}
         onClose={() => setShowCreateSale(false)}
@@ -78,16 +79,20 @@ export default function EditPlot() {
         customerId={watch("customer_id")}
         brokers={brokers}
         customers={customers}
-        onCreated={sale => {
-          setValue("sale_id",            sale.sale_id)
-          setValue("sale_total_value",   sale.total_value || "")
-          setValue("selling_date",       sale.initiated_at?.split("T")[0] || "")
+        onCreated={async sale => {
+          // set basic sale fields
+          setValue("sale_id", sale.sale_id)
+          setValue("sale_total_value", sale.total_value || "")
+          setValue("selling_date", sale.initiated_at?.split("T")[0] || "")
           setValue("commission_percent", sale.commission_percent ?? "")
-          if (sale.broker_id)   handleBrokerChange(sale.broker_id)
+
+          if (sale.broker_id) handleBrokerChange(sale.broker_id)
           if (sale.customer_id) handleCustomerChange(sale.customer_id)
+
+          await loadPlot()
         }}
       />
- 
+
       {/* ── Form ── */}
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -104,7 +109,7 @@ export default function EditPlot() {
             Save Changes
           </button>
         </div>
- 
+
         {/* Price overview */}
         <div className="grid grid-cols-3 gap-4">
           <PriceBadge
@@ -112,14 +117,12 @@ export default function EditPlot() {
             amount={watchedFloorValue}
             variant="blue"
             sublabel="Listed price — Floor record"
-            tooltip="floor_value on the Floor model. Independent of any sale."
           />
           <PriceBadge
             label="Sale Value"
             amount={hasSale ? watchedSaleValue : null}
             variant={hasSale ? "green" : "neutral"}
             sublabel={hasSale ? "Agreed amount — Sale record" : "No sale created yet"}
-            tooltip="total_value on the Sale model. Set when a sale is created."
           />
           <PriceBadge
             label="Milestones Collected"
@@ -130,17 +133,16 @@ export default function EditPlot() {
                 ? `Over by ₹ ${(paymentsSum - saleValueNum).toLocaleString("en-IN")}`
                 : "Sum of all milestone amounts"
             }
-            tooltip="Running total of entered payment milestone amounts."
           />
         </div>
- 
+
         {/* Floor status */}
         <SectionCard title="FLOOR STATUS">
           <div className="flex flex-col gap-2 w-64">
             <span className="text-xs text-gray-500 font-semibold">AVAILABILITY STATUS</span>
             <select
               {...register("floor_status")}
-              className="h-11 rounded-lg border border-gray-300 px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-600"
+              className="h-11 rounded-lg border border-gray-300 px-3 text-sm font-medium"
             >
               <option value="AVAILABLE">Available</option>
               <option value="HOLD">Hold</option>
@@ -150,12 +152,12 @@ export default function EditPlot() {
             </select>
           </div>
         </SectionCard>
- 
+
         {/* Pricing */}
         <SectionCard title="FLOOR & PRICING">
           <PricingSection register={register} hasSale={hasSale} />
         </SectionCard>
- 
+
         {/* Broker */}
         <SectionCard title="BROKER INFORMATION">
           <BrokerSection
@@ -167,7 +169,7 @@ export default function EditPlot() {
             onAddNew={() => setShowAddBroker(true)}
           />
         </SectionCard>
- 
+
         {/* Customer */}
         <SectionCard title="CUSTOMER INFORMATION">
           <CustomerSection
@@ -179,7 +181,7 @@ export default function EditPlot() {
             onAddNew={() => setShowAddCustomer(true)}
           />
         </SectionCard>
- 
+
         {/* KYC */}
         <SectionCard title="CUSTOMER COMPLIANCE">
           <Controller
@@ -194,7 +196,7 @@ export default function EditPlot() {
             )}
           />
         </SectionCard>
- 
+
         {/* Floor details */}
         <SectionCard title="FLOOR DETAILS">
           <div className="grid grid-cols-2 gap-6">
@@ -202,7 +204,7 @@ export default function EditPlot() {
             <Field label="AREA (SQ FT)" {...register("area_sqft")} />
           </div>
         </SectionCard>
- 
+
         {/* Payment milestones */}
         <SectionCard title="PAYMENT MILESTONES">
           <MilestonesSection

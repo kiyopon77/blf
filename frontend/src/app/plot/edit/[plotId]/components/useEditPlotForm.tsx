@@ -12,13 +12,13 @@ import { getPlotDetail, updatePlot, updatePayment } from "@/services/plot"
 import { MILESTONE_ORDER, EditPlotFormValues } from "../types"
 import type { Customer } from "@/types/customer"
 import type { Broker } from "@/types/broker"
-
-const SOCIETY_ID = 1 // replace with value from auth context
+import { useAuth } from "@/context/AuthContext"
 
 export function useEditPlotForm() {
   const { plotId } = useParams()
   const router = useRouter()
   const { message } = App.useApp()
+  const { society } = useAuth()
 
   // ── Dropdown data ──────────────────────────────────────────────────────────
   const [brokers, setBrokers] = useState<Broker[]>([])
@@ -35,11 +35,11 @@ export function useEditPlotForm() {
   const { register, control, handleSubmit, reset, setValue, watch } =
     useForm<EditPlotFormValues>({
       defaultValues: {
-        plot_id:    null,
-        floor_id:   null,
-        broker_id:  null,
+        plot_id: null,
+        floor_id: null,
+        broker_id: null,
         customer_id: null,
-        sale_id:    null,
+        sale_id: null,
         floor_value: "",
         sale_total_value: "",
         selling_date: "",
@@ -59,10 +59,10 @@ export function useEditPlotForm() {
       },
     })
 
-  const watchedPayments   = useWatch({ control, name: "payments" })
-  const watchedSaleValue  = useWatch({ control, name: "sale_total_value" })
+  const watchedPayments = useWatch({ control, name: "payments" })
+  const watchedSaleValue = useWatch({ control, name: "sale_total_value" })
   const watchedFloorValue = useWatch({ control, name: "floor_value" })
-  const watchedSaleId     = useWatch({ control, name: "sale_id" })
+  const watchedSaleId = useWatch({ control, name: "sale_id" })
 
   const hasSale = !!watchedSaleId
 
@@ -71,7 +71,7 @@ export function useEditPlotForm() {
     return sum + (isNaN(amt) ? 0 : amt)
   }, 0)
 
-  const saleValueNum  = parseFloat(watchedSaleValue as string)
+  const saleValueNum = parseFloat(watchedSaleValue as string)
   const floorValueNum = parseFloat(watchedFloorValue as string)
   const sumExceedsSaleValue =
     !isNaN(saleValueNum) && saleValueNum > 0 && paymentsSum > saleValueNum
@@ -79,13 +79,13 @@ export function useEditPlotForm() {
   // ── Load dropdowns ─────────────────────────────────────────────────────────
   const loadBrokers = useCallback(async () => {
     setLoadingBrokers(true)
-    try { setBrokers(await getBrokers(SOCIETY_ID)) } catch { }
+    try { setBrokers(await getBrokers(society)) } catch { }
     finally { setLoadingBrokers(false) }
   }, [])
 
   const loadCustomers = useCallback(async () => {
     setLoadingCustomers(true)
-    try { setCustomers(await getCustomers(SOCIETY_ID)) } catch { }
+    try { setCustomers(await getCustomers(society)) } catch { }
     finally { setLoadingCustomers(false) }
   }, [])
 
@@ -95,49 +95,47 @@ export function useEditPlotForm() {
   }, [loadBrokers, loadCustomers])
 
   // ── Load plot detail ───────────────────────────────────────────────────────
-  useEffect(() => {
+  const loadPlot = useCallback(async () => {
     if (!plotId) return
-    const load = async () => {
-      try {
-        const [plotCode, floorNo] = (plotId as string).split("-")
-        const { plot, floor, sale, broker, customer, payments } =
-          await getPlotDetail(plotCode, Number(floorNo))
 
-        reset({
-          plot_id:     plot?.plot_id,
-          floor_id:    floor?.floor_id,
-          broker_id:   sale?.broker_id || null,
-          customer_id: sale?.customer_id || null,
-          sale_id:     sale?.sale_id || null,
-          floor_value: floor?.floor_value ?? "",
-          sale_total_value: sale?.total_value || "",
-          selling_date: sale?.initiated_at?.split("T")[0] || "",
-          commission_percent: sale?.commission_percent ?? "",
-          broker_name:  broker?.broker_name || "",
-          broker_phone: broker?.phone || "",
-          customer_name:    customer?.full_name || "",
-          customer_pan:     customer?.pan || "",
-          customer_phone:   customer?.phone || "",
-          customer_email:   customer?.email || "",
-          customer_address: customer?.address || "",
-          customer_kyc_status: customer?.kyc_status || "PENDING",
-          area_sqyd:    plot?.area_sqyd || "",
-          area_sqft:    plot?.area_sqft || "",
-          floor_status: floor?.status ?? "AVAILABLE",
-          payments: MILESTONE_ORDER.map(milestone => {
-            const existing = (payments || []).find((p: any) => p.milestone === milestone)
-            return existing
-              ? { ...existing, paid_at: existing.paid_at ? existing.paid_at.split("T")[0] : "" }
-              : { payment_id: null, milestone, amount: "", status: "PENDING", paid_at: "" }
-          }),
-        })
-      } catch (err) {
-        console.log(err)
-        message.error("Failed to load plot")
-      }
-    }
-    load()
+    const [plotCode, floorNo] = (plotId as string).split("-")
+    const { plot, floor, sale, broker, customer, payments } =
+      await getPlotDetail(plotCode, Number(floorNo))
+
+    reset({
+      plot_id: plot?.plot_id,
+      floor_id: floor?.floor_id,
+      broker_id: sale?.broker_id || null,
+      customer_id: sale?.customer_id || null,
+      sale_id: sale?.sale_id || null,
+      floor_value: floor?.floor_value ?? "",
+      sale_total_value: sale?.total_value || "",
+      selling_date: sale?.initiated_at?.split("T")[0] || "",
+      commission_percent: sale?.commission_percent ?? "",
+      broker_name: broker?.broker_name || "",
+      broker_phone: broker?.phone || "",
+      customer_name: customer?.full_name || "",
+      customer_pan: customer?.pan || "",
+      customer_phone: customer?.phone || "",
+      customer_email: customer?.email || "",
+      customer_address: customer?.address || "",
+      customer_kyc_status: customer?.kyc_status || "PENDING",
+      area_sqyd: plot?.area_sqyd || "",
+      area_sqft: plot?.area_sqft || "",
+      floor_status: floor?.status ?? "AVAILABLE",
+      payments: MILESTONE_ORDER.map(milestone => {
+        const existing = (payments || []).find((p: any) => p.milestone === milestone)
+        return existing
+          ? { ...existing, paid_at: existing.paid_at ? existing.paid_at.split("T")[0] : "" }
+          : { payment_id: null, milestone, amount: "", status: "PENDING", paid_at: "" }
+      }),
+    })
   }, [plotId, reset])
+
+
+  useEffect(() => {
+    loadPlot()
+  }, [loadPlot])
 
   // ── Selection handlers ─────────────────────────────────────────────────────
   //
@@ -148,8 +146,8 @@ export function useEditPlotForm() {
   //
   const handleBrokerChange = (brokerIdOrObject: number | Broker | null) => {
     if (!brokerIdOrObject) {
-      setValue("broker_id",    null)
-      setValue("broker_name",  "")
+      setValue("broker_id", null)
+      setValue("broker_name", "")
       setValue("broker_phone", "")
       return
     }
@@ -157,32 +155,32 @@ export function useEditPlotForm() {
       typeof brokerIdOrObject === "object"
         ? brokerIdOrObject
         : brokers.find(b => b.broker_id === brokerIdOrObject) ?? null
-    setValue("broker_id",    broker?.broker_id ?? null)
-    setValue("broker_name",  broker?.broker_name || "")
+    setValue("broker_id", broker?.broker_id ?? null)
+    setValue("broker_name", broker?.broker_name || "")
     setValue("broker_phone", broker?.phone || "")
   }
 
   const handleCustomerChange = (customerIdOrObject: number | Customer | null) => {
     if (!customerIdOrObject) {
-      setValue("customer_id",          null)
-      setValue("customer_name",        "")
-      setValue("customer_pan",         "")
-      setValue("customer_phone",       "")
-      setValue("customer_email",       "")
-      setValue("customer_address",     "")
-      setValue("customer_kyc_status",  "PENDING")
+      setValue("customer_id", null)
+      setValue("customer_name", "")
+      setValue("customer_pan", "")
+      setValue("customer_phone", "")
+      setValue("customer_email", "")
+      setValue("customer_address", "")
+      setValue("customer_kyc_status", "PENDING")
       return
     }
     const customer =
       typeof customerIdOrObject === "object"
         ? customerIdOrObject
         : customers.find(c => c.customer_id === customerIdOrObject) ?? null
-    setValue("customer_id",         customer?.customer_id ?? null)
-    setValue("customer_name",       customer?.full_name || "")
-    setValue("customer_pan",        customer?.pan || "")
-    setValue("customer_phone",      customer?.phone || "")
-    setValue("customer_email",      customer?.email || "")
-    setValue("customer_address",    customer?.address || "")
+    setValue("customer_id", customer?.customer_id ?? null)
+    setValue("customer_name", customer?.full_name || "")
+    setValue("customer_pan", customer?.pan || "")
+    setValue("customer_phone", customer?.phone || "")
+    setValue("customer_email", customer?.email || "")
+    setValue("customer_address", customer?.address || "")
     setValue("customer_kyc_status", customer?.kyc_status || "PENDING")
   }
 
@@ -216,9 +214,9 @@ export function useEditPlotForm() {
       if (data.customer_id) {
         requests.push(updateCustomer(data.customer_id, {
           full_name: data.customer_name,
-          phone:     data.customer_phone,
-          email:     data.customer_email,
-          address:   data.customer_address,
+          phone: data.customer_phone,
+          email: data.customer_email,
+          address: data.customer_address,
           kyc_status: data.customer_kyc_status,
         }))
         if (data.customer_pan) {
@@ -236,6 +234,7 @@ export function useEditPlotForm() {
 
       for (const payment of data.payments) {
         if (!payment.payment_id) continue
+
         requests.push(updatePayment(payment.payment_id, {
           status: payment.status,
           amount: payment.amount ? Number(payment.amount) : null,
@@ -278,10 +277,11 @@ export function useEditPlotForm() {
     handleBrokerChange,
     handleCustomerChange,
     // dialogs
-    showAddBroker,   setShowAddBroker,
+    showAddBroker, setShowAddBroker,
     showAddCustomer, setShowAddCustomer,
-    showCreateSale,  setShowCreateSale,
+    showCreateSale, setShowCreateSale,
     // constants
-    SOCIETY_ID,
+    society,
+    loadPlot
   }
 }
