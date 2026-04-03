@@ -6,8 +6,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    COOKIE_SECURE: bool = False
-    COOKIE_SAMESITE: str = "lax"
+    
+    # ✅ Change these for production
+    COOKIE_SECURE: bool = True        # was False
+    COOKIE_SAMESITE: str = "none"     # was "lax" — needed for cross-domain cookies
 
     AUTH_RATE_LIMIT_WINDOW_SECONDS: int = 60
     AUTH_LOGIN_MAX_ATTEMPTS: int = 8
@@ -15,10 +17,10 @@ class Settings(BaseSettings):
     AUTH_LOCKOUT_SECONDS: int = 300
 
     SECURITY_HEADERS_ENABLED: bool = True
-    HSTS_ENABLED: bool = False
+    HSTS_ENABLED: bool = True         # was False
     HSTS_MAX_AGE_SECONDS: int = 31536000
 
-    CORS_ALLOW_ORIGINS: str = "http://localhost,http://localhost:3000"
+    CORS_ALLOW_ORIGINS: str = "http://localhost,http://localhost:3000,https://blf-frontend.up.railway.app"
     ENABLE_TRUSTED_HOSTS: bool = False
     TRUSTED_HOSTS: str = "*"
 
