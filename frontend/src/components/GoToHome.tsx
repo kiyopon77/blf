@@ -1,4 +1,6 @@
+// components/GoToHome.tsx
 import Link from "next/link"
+// handles go to home functionality
 const GoToHome = () => {
   return (
     <div className="buttons">

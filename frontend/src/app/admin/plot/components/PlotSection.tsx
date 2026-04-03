@@ -1,21 +1,38 @@
-// components/PlotSection.tsx
+// app/admin/plot/components/PlotSection.tsx
 "use client"
 
 import { useEffect, useState } from "react"
-import { getPlotFloors } from "@/services/admin/floor"
+import { getPlotFloors, createFloor } from "@/services/admin/floor"
 import FloorTable from "./FloorTable"
+import AdminButton from "@/components/ui/AdminButton"
+import DeleteButton from "@/components/ui/DeleteButton"
+import { deletePlot } from "@/services/admin/plot"
+import { Edit, PlusIcon, Trash } from "lucide-react"
+import PlotEditModal from "./modals/PlotEditModal"
+import { sortByFloorNo } from "@/app/utils/sort"
+import AddButton from "@/components/ui/AddButton"
+import type { Plot } from "@/types/plot"
+import type { Floor } from "@/types/floor"
 
-const PlotSection = ({ plot }: any) => {
-  const [floors, setFloors] = useState([])
+interface Props {
+  plot: Plot
+  setPlots: React.Dispatch<React.SetStateAction<Plot[]>>
+}
+
+// handles plot section functionality
+const PlotSection = ({ plot, setPlots }: Props) => {
+  const [floors, setFloors] = useState<Floor[]>([])
   const [loading, setLoading] = useState(true)
+  const [creating, setCreating] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     const fetchFloors = async () => {
       try {
         const data = await getPlotFloors(plot.plot_id)
-        setFloors(data)
+        setFloors(sortByFloorNo(data))
       } catch (err) {
-        console.error(err)
       } finally {
         setLoading(false)
       }
@@ -24,42 +41,109 @@ const PlotSection = ({ plot }: any) => {
     fetchFloors()
   }, [plot.plot_id])
 
-  return (
-    <div className="border rounded-xl p-5 bg-white shadow-sm">
+  const getNextFloorNo = () => {
+    if (floors.length === 0) return 1
+    return Math.max(...floors.map((f) => f.floor_no)) + 1
+  }
 
-      {/* 🔥 Plot Header */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h2 className="text-xl font-semibold">
+  const handleAddFloor = async () => {
+    try {
+      setCreating(true)
+
+      const newFloor = await createFloor({
+        plot_id: plot.plot_id,
+        floor_no: getNextFloorNo(),
+      })
+
+      setFloors((prev) => [...prev, newFloor])
+    } catch (err) {
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      setDeleting(true)
+
+      await deletePlot(plot.plot_id)
+
+      // remove from UI
+      setPlots((prev) =>
+        prev.filter((p) => p.plot_id !== plot.plot_id)
+      )
+    } catch (err) {
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-lg border border-[#E5E5E5] shadow-sm overflow-hidden">
+
+      {/* Header */}
+      <div className="p-4 sm:p-6 pb-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full md:w-auto">
+          <h2 className="text-xl font-bold text-gray-900">
             {plot.plot_code}
           </h2>
-          <div className="flex gap-4 mt-2">
-            <div className="bg-gray-100 px-3 py-1 rounded-md text-sm font-medium">
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
               {plot.area_sqft || "-"} sqft
-            </div>
+            </span>
 
-            <div className="bg-gray-100 px-3 py-1 rounded-md text-sm font-medium">
+            <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
               {plot.area_sqyd || "-"} sqyd
-            </div>
+            </span>
 
-            <div className="bg-gray-100 px-3 py-1 rounded-md text-sm font-medium">
+            <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
               {plot.type || "-"}
-            </div>
+            </span>
           </div>
         </div>
 
-        {/* Optional actions */}
-        <button className="text-yellow-500 border px-3 py-1 rounded-md">
-          + Add Floor
-        </button>
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+
+          <AddButton
+            onClick={handleAddFloor}
+            icon={<PlusIcon size={16} />}
+            disabled={creating}
+          >
+            {creating ? "Adding..." : "Add Floor"}
+          </AddButton>
+
+          <AdminButton
+            onClick={() => setEditOpen(true)}
+            icon={<Edit size={16} />}
+          >
+            Edit
+          </AdminButton>
+
+          <DeleteButton
+            onClick={handleDelete}
+            icon={<Trash size={16} />}
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </DeleteButton>
+
+        </div>
       </div>
 
-      {/* Floors */}
+      {/* Table */}
       {loading ? (
-        <div className="text-center py-6">Loading floors...</div>
+        <div className="py-10 text-center text-gray-500">
+          Loading floors...
+        </div>
       ) : (
         <FloorTable floors={floors} setFloors={setFloors} />
       )}
+      <PlotEditModal
+        open={editOpen}
+        setOpen={setEditOpen}
+        plot={plot}
+        setPlots={setPlots}
+      />
     </div>
   )
 }

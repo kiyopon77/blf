@@ -1,25 +1,23 @@
-"use client"
+// app/admin/sales/components/SalesHeader.tsx
+import AdminButton from "@/components/ui/AdminButton"
+import { Plus } from "lucide-react"
 
-import { useState } from "react"
-import SaleCreateModal from "./modals/SaleCreateModal"
-
+// handles sales header functionality
 const SalesHeader = ({ onCreate }: any) => {
   return (
-    <div className="flex justify-between items-center mb-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800">Sales</h1>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
 
-        <p className="text-gray-500">
-          Manage all sales, deals and transactions
+      <div>
+        <h1 className="text-[28px] font-bold text-black">Sales</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Manage all sales, deals, and transactions
         </p>
       </div>
 
-      <button
-        className="border border-yellow-500 text-yellow-500 px-4 py-2 rounded-md"
-        onClick={onCreate}
-      >
-        + Create Sale
-      </button>
+      <AdminButton onClick={onCreate} icon={<Plus size={16} />} >
+        Create Sale
+      </AdminButton>
+
     </div>
   )
 }

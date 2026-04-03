@@ -7,6 +7,7 @@ SQFT_TO_SQYD = 1 / 9.0
 
 
 class PlotBase(BaseModel):
+    society_id: int
     plot_code: str
     area_sqyd: Optional[float] = None
     area_sqft: Optional[float] = None

@@ -1,3 +1,4 @@
+// app/login/page.tsx
 "use client"
 import { useAuth } from "@/context/AuthContext"
 import { useRouter } from "next/navigation"
@@ -5,16 +6,21 @@ import { useEffect } from "react"
 import Image from "next/image"
 import LoginBox from "./LoginBox"
 
+// handles login page functionality
 export default function LoginPage() {
-  const { accessToken, loading } = useAuth()
+  const { accessToken, loading, role } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (loading) return
-    if (accessToken) {
-      router.replace("/dashboard")
+    if (!accessToken) return
+    if (!role) return  // guard added
+    if (role === "admin") {
+      router.replace("/society")
+    } else if (role === "rm") {
+      router.replace("/rmdashboard")
     }
-  }, [accessToken, loading])
+  }, [accessToken, loading, role])  // add role here
 
   if (loading) return null
   if (accessToken) return null

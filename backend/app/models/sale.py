@@ -14,7 +14,7 @@ class Sale(Base):
     __tablename__ = "sales"
 
     sale_id = Column(Integer, primary_key=True, index=True)
-    floor_id = Column(Integer, ForeignKey("floors.floor_id"), unique=True, nullable=False)
+    floor_id = Column(Integer, ForeignKey("floors.floor_id"), nullable=False)
     broker_id = Column(Integer, ForeignKey("brokers.broker_id"), nullable=False)
     customer_id = Column(Integer, ForeignKey("customers.customer_id"), nullable=False)
     total_value = Column(Numeric(14, 2), nullable=False)

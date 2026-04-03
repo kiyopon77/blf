@@ -1,22 +1,28 @@
+// app/dashboard/page.tsx
 "use client"
-import Card from "./components/Card"
+import DashboardCard from "@/components/ui/DashboardCard"
 import PlotMatrix from "./PlotMatrix"
 import { getDashboard } from "@/services/dashboard"
 import { useState, useEffect } from "react"
 import { ThreeDot } from "react-loading-indicators"
+import { useAuth } from "@/context/AuthContext"
+import { useRouter } from "next/navigation"
 
+// handles dashboard functionality
 const Dashboard = () => {
   const [dashboard, setDashboard] = useState<any>(null)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
+  const {society} = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
+    if(!society) router.replace("/society")
     const loadDashboard = async () => {
-      const data = await getDashboard()
+      const data = await getDashboard(society)
       setDashboard(data)
     }
     loadDashboard()
   }, [])
-
   if (!dashboard) return <div className="h-screen w-screen flex items-center justify-center">
     <ThreeDot color="#D4A22A" size="medium" text="" textColor="" />
   </div>
@@ -62,7 +68,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-6 p-10 gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 p-4 md:p-10 gap-4 md:gap-8">
         {cards.map((card, index) => {
           const isActive = activeFilter === card.heading
 
@@ -79,7 +85,7 @@ const Dashboard = () => {
           ${isActive ? "scale-105 border-2 border-black rounded-2xl" : "hover:scale-105"}
         `}
             >
-              <Card
+              <DashboardCard
                 heading={card.heading}
                 value={card.value}
                 icon={card.icon}

@@ -1,3 +1,4 @@
+from app.models.society import Society
 from app.models.user import User
 from app.models.plot import Plot
 from app.models.floor import Floor

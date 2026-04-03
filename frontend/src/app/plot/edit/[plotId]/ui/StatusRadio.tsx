@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/ui/StatusRadio.tsx
 "use client"
 import { Radio } from "antd"
 
@@ -7,6 +8,7 @@ type Props = {
   onChange?: (val: string) => void
 }
 
+// handles status radio functionality
 const StatusRadio = ({ label, value, onChange }: Props) => {
   return (
     <div className="flex flex-col gap-2">

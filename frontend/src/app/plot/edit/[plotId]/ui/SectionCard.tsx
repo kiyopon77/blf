@@ -1,3 +1,4 @@
+// app/plot/edit/[plotId]/ui/SectionCard.tsx
 // components/SectionCard.tsx
 import React from "react"
 
@@ -6,6 +7,7 @@ type Props = {
   children: React.ReactNode
 }
 
+// handles section card functionality
 const SectionCard = ({ title, children }: Props) => {
   return (
     <div className="bg-white border border-gray-400 rounded-xl p-6">

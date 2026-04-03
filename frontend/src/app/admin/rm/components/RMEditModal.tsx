@@ -1,9 +1,11 @@
+// app/admin/rm/components/RMEditModal.tsx
 // components/RMEditModal.tsx
 "use client"
 
 import { useEffect, useState } from "react"
 import { updateRM } from "@/services/rm"
 
+// handles r m edit modal functionality
 const RMEditModal = ({ open, setOpen, rm, setRms }: any) => {
   const [form, setForm] = useState({
     name: "",
@@ -42,7 +44,6 @@ const RMEditModal = ({ open, setOpen, rm, setRms }: any) => {
 
       setOpen(false)
     } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }
@@ -50,7 +51,7 @@ const RMEditModal = ({ open, setOpen, rm, setRms }: any) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-[400px] p-6 shadow-xl">
+      <div className="bg-white rounded-xl w-[95%] sm:w-[400px] max-w-md p-6 shadow-xl">
         <h2 className="text-xl font-semibold mb-4">Edit RM</h2>
 
         <div className="flex flex-col gap-3">

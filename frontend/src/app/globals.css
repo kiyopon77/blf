@@ -18,3 +18,9 @@ body{
 .borderAmber{
   border-color: #D4A22A;
 }
+
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}

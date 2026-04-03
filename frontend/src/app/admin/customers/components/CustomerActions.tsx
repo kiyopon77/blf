@@ -1,7 +1,9 @@
+// app/admin/customers/components/CustomerActions.tsx
 // components/CustomerActions.tsx
-import { Eye, Pencil, Trash } from "lucide-react"
+import { Pencil, Trash } from "lucide-react"
 import { deleteCustomer } from "@/services/admin/customer"
 
+// handles customer actions functionality
 const CustomerActions = ({ c, setCustomers, onEdit }: any) => {
   const handleDelete = async () => {
     try {
@@ -10,15 +12,13 @@ const CustomerActions = ({ c, setCustomers, onEdit }: any) => {
       setCustomers((prev: any) =>
         prev.filter((x: any) => x.customer_id !== c.customer_id)
       )
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
     }
   }
 
   return (
-    <div className="flex gap-3">
-      <Eye className="text-yellow-500 cursor-pointer" size={18} />
-      <Pencil className="text-gray-600 cursor-pointer" size={18} onClick={() => onEdit(c)}/>
+    <div className="flex gap-3 justify-end">
+      <Pencil className="text-gray-600 cursor-pointer" size={18} onClick={() => onEdit(c)} />
       <Trash
         className="text-red-500 cursor-pointer"
         size={18}

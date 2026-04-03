@@ -5,7 +5,7 @@ from typing import Optional
 
 class UserRole(str, Enum):
     admin = "admin"
-    rm = "rm"              # changed from 'user'
+    rm = "rm"
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -20,7 +20,14 @@ class UserCreate(BaseModel):
     full_name: str
     email: EmailStr
     password: str
-    role: UserRole = UserRole.rm    # default is now rm
+    role: UserRole = UserRole.rm
+    society_id: Optional[int] = None    # ← added
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    is_active: Optional[bool] = None
+    society_id: Optional[int] = None
 
 class UserResponse(BaseModel):
     user_id: int
@@ -28,6 +35,7 @@ class UserResponse(BaseModel):
     email: str
     role: UserRole
     is_active: bool
+    society_id: Optional[int] = None    # ← added
     created_at: datetime
 
     class Config:

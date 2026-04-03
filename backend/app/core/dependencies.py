@@ -9,6 +9,34 @@ from typing import Optional
 
 bearer_scheme = HTTPBearer()
 
+
+def is_admin(user: User) -> bool:
+    return user.role == "admin"
+
+
+def get_effective_society_id(current_user: User, requested_society_id: Optional[int] = None) -> Optional[int]:
+    # Admin can query globally (None) or any selected society.
+    if is_admin(current_user):
+        return requested_society_id
+
+    # Non-admin users are always scoped to their own society.
+    if current_user.society_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not assigned to any society"
+        )
+    return current_user.society_id
+
+
+def ensure_society_access(current_user: User, target_society_id: Optional[int]) -> None:
+    if is_admin(current_user):
+        return
+    if current_user.society_id is None or target_society_id is None or current_user.society_id != target_society_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized for this society"
+        )
+
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: Session = Depends(get_db)

@@ -1,9 +1,11 @@
+// app/admin/rm/components/RMCreateModal.tsx
 // components/RMCreateModal.tsx
 "use client"
 
 import { useState } from "react"
 import { createRM } from "@/services/rm"
 
+// handles r m create modal functionality
 const RMCreateModal = ({ open, setOpen, setRms }: any) => {
   const [form, setForm] = useState({
     name: "",
@@ -30,7 +32,6 @@ const RMCreateModal = ({ open, setOpen, setRms }: any) => {
       setOpen(false)
       setForm({ name: "", email: "", phone: "" })
     } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }
@@ -38,7 +39,7 @@ const RMCreateModal = ({ open, setOpen, setRms }: any) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-100 p-6 shadow-xl">
+      <div className="bg-white rounded-xl w-[95%] sm:w-[400px] max-w-md p-6 shadow-xl">
         <h2 className="text-xl font-semibold mb-4">Create RM</h2>
 
         <div className="flex flex-col gap-3">

@@ -1,36 +1,49 @@
+// services/admin/customer.ts
 // lib/api/customer.ts
 import api from "@/lib/api"
+import type { Customer, CreateCustomerDTO, UpdateCustomerDTO } from "@/types/customer"
 
-export const getCustomers = async () => {
-  const res = await api.get("/customers")
+// GET
+export const getCustomers = async (
+  society_id?: number | null
+): Promise<Customer[]> => {
+  const res = await api.get<Customer[]>("/customers", {
+    params: { society_id },
+  })
   return res.data
 }
 
-export const deleteCustomer = async (id: number) => {
+// DELETE
+export const deleteCustomer = async (id: number): Promise<void> => {
   await api.delete(`/customers/${id}`)
 }
 
-export const createCustomer = async (data: {
-  full_name: string
-  pan: string
-  phone?: string
-  email?: string
-  address?: string
-}) => {
-  const res = await api.post("/customers", data)
+// CREATE
+export const createCustomer = async (
+  data: CreateCustomerDTO
+): Promise<Customer> => {
+  const res = await api.post<Customer>("/customers", data)
   return res.data
 }
 
+// UPDATE
 export const updateCustomer = async (
   id: number,
-  data: {
-    full_name?: string
-    phone?: string
-    email?: string
-    address?: string
-    kyc_status?: string
-  }
-) => {
-  const res = await api.put(`/customers/${id}`, data)
+  data: UpdateCustomerDTO
+): Promise<Customer> => {
+  const res = await api.put<Customer>(`/customers/${id}`, data)
+  return res.data
+}
+
+// UPDATE PAN
+// handles update customer pan functionality
+export const updateCustomerPan = async (
+  customerId: number,
+  pan: string
+): Promise<Customer> => {
+  const res = await api.patch<Customer>(
+    `/customers/${customerId}/pan`,
+    { pan }
+  )
   return res.data
 }

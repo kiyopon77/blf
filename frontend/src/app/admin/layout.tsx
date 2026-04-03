@@ -1,6 +1,8 @@
+// app/admin/layout.tsx
 import AdminSidebar from "@/components/AdminSidebar"
 import Navbar from "@/components/Navbar"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
+// handles admin page functionality
 export default function AdminPage({ children } : {children: React.ReactNode}) {
   return (
     <ProtectedRoute requireAdmin>

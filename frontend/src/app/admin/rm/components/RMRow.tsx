@@ -1,7 +1,8 @@
+// app/admin/rm/components/RMRow.tsx
 // components/RMRow.tsx
-import { RM } from "@/types/rm"
 import RMActions from "./RMActions"
 
+// handles r m row functionality
 const RMRow = ({ rm, setRms, onEdit}: any) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-IN", {

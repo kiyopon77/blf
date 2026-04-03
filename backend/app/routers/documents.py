@@ -6,8 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, require_admin
-from app.models.document import Document
+from app.core.dependencies import get_current_user, require_admin, ensure_society_access
+from app.models.document import Document, EntityType
+from app.models.sale import Sale
 from app.schemas.document import DocumentResponse
 from typing import List
 
@@ -17,26 +18,20 @@ UPLOAD_DIR = "/app/uploads"
 ALLOWED_TYPES = {"application/pdf", "image/jpeg", "image/png"}
 ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png"}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-IMAGE_QUALITY = 70                 # compression quality (0-100)
-IMAGE_MAX_WIDTH = 1920             # max width in pixels
+IMAGE_QUALITY = 70
+IMAGE_MAX_WIDTH = 1920
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 def compress_image(contents: bytes, ext: str) -> bytes:
     img = Image.open(io.BytesIO(contents))
-
-    # convert RGBA to RGB if needed (for jpg)
     if img.mode in ("RGBA", "P"):
         img = img.convert("RGB")
-
-    # resize if too wide
     if img.width > IMAGE_MAX_WIDTH:
         ratio = IMAGE_MAX_WIDTH / img.width
         new_height = int(img.height * ratio)
         img = img.resize((IMAGE_MAX_WIDTH, new_height), Image.LANCZOS)
-
-    # save compressed
     output = io.BytesIO()
     fmt = "JPEG" if ext in (".jpg", ".jpeg") else "PNG"
     img.save(output, format=fmt, quality=IMAGE_QUALITY, optimize=True)
@@ -47,19 +42,19 @@ def compress_image(contents: bytes, ext: str) -> bytes:
 @router.post("/upload", response_model=DocumentResponse)
 async def upload_document(
     label: str = Form(...),
-    entity_type: str = Form(...),
-    entity_id: int = Form(...),
+    entity: EntityType = Form(...),       # CUSTOMER or SALE
+    sale_id: int = Form(...),             # always required — links to sale
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     admin=Depends(require_admin)
 ):
-    if entity_type not in ("customer", "sale"):
-        raise HTTPException(status_code=400, detail="entity_type must be 'customer' or 'sale'")
+    sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
 
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail="Only PDF, JPG and PNG files allowed")
-
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail="Invalid file type")
 
@@ -67,11 +62,9 @@ async def upload_document(
     if len(contents) > MAX_FILE_SIZE:
         raise HTTPException(status_code=400, detail="File too large — max 10MB")
 
-    # compress images only (not PDFs)
     if ext in (".jpg", ".jpeg", ".png"):
         contents = compress_image(contents, ext)
 
-    # save file
     unique_name = f"{uuid.uuid4()}{ext}"
     file_path = os.path.join(UPLOAD_DIR, unique_name)
     with open(file_path, "wb") as f:
@@ -82,8 +75,8 @@ async def upload_document(
         file_name=file.filename,
         file_path=file_path,
         file_type=file.content_type,
-        entity_type=entity_type,
-        entity_id=entity_id
+        entity=entity,
+        sale_id=sale_id
     )
     db.add(doc)
     db.commit()
@@ -91,19 +84,35 @@ async def upload_document(
     return doc
 
 
-# ── List documents ──────────────────────────────────────
-@router.get("/{entity_type}/{entity_id}", response_model=List[DocumentResponse])
-def get_documents(
-    entity_type: str,
-    entity_id: int,
+# ── List by sale ────────────────────────────────────────
+@router.get("/sale/{sale_id}", response_model=List[DocumentResponse])
+def get_sale_documents(
+    sale_id: int,
     db: Session = Depends(get_db),
     user=Depends(get_current_user)
 ):
-    if entity_type not in ("customer", "sale"):
-        raise HTTPException(status_code=400, detail="entity_type must be 'customer' or 'sale'")
+    sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    ensure_society_access(user, sale.floor.plot.society_id)
+    return db.query(Document).filter(Document.sale_id == sale_id).all()
+
+
+# ── List by entity type ─────────────────────────────────
+@router.get("/sale/{sale_id}/{entity}", response_model=List[DocumentResponse])
+def get_documents_by_entity(
+    sale_id: int,
+    entity: EntityType,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    ensure_society_access(user, sale.floor.plot.society_id)
     return db.query(Document).filter(
-        Document.entity_type == entity_type,
-        Document.entity_id == entity_id
+        Document.sale_id == sale_id,
+        Document.entity == entity
     ).all()
 
 
@@ -117,6 +126,7 @@ def download_document(
     doc = db.query(Document).filter(Document.document_id == document_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
+    ensure_society_access(user, doc.sale.floor.plot.society_id)
     if not os.path.exists(doc.file_path):
         raise HTTPException(status_code=404, detail="File not found on server")
     return FileResponse(

@@ -1,3 +1,4 @@
+// app/plot/[plotId]/components/MilestoneCard.tsx
 import { Flex, Steps, ConfigProvider } from "antd"
 import type { StepsProps } from "antd"
 
@@ -23,6 +24,7 @@ const formatMilestone = (m: string) =>
     .replace(/\bAts\b/g, "ATS")
     .replace(/\bId\b/g, "ID")
 
+// handles milestone card functionality
 const MilestoneCard = ({ payments = [] }: { payments?: Payment[] }) => {
 
   const items: StepsProps["items"] = milestoneTimeline.map(m => {

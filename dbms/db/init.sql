@@ -31,7 +31,28 @@ CREATE TYPE milestone_status AS ENUM (
     'DONE'
 );
 
+CREATE TYPE kyc_status AS ENUM (
+    'PENDING',
+    'DONE'
+);
+
+CREATE TYPE entity_type AS ENUM (
+    'CUSTOMER',
+    'SALE'
+);
+
 CREATE TYPE user_role AS ENUM ('admin', 'rm');
+
+-- ==================================================
+-- SOCIETY (Managed by ADMIN)
+-- ==================================================
+
+CREATE TABLE society (
+    society_id SERIAL PRIMARY KEY,
+    society_name VARCHAR(100),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- ==================================================
 -- admin and user tables
@@ -39,6 +60,7 @@ CREATE TYPE user_role AS ENUM ('admin', 'rm');
 
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
+    society_id INT REFERENCES society(society_id),
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     hashed_password VARCHAR(255) NOT NULL,
@@ -53,6 +75,7 @@ CREATE TABLE users (
 
 CREATE TABLE brokers (
     broker_id SERIAL PRIMARY KEY,
+    society_id INT NOT NULL REFERENCES society(society_id),
     broker_name VARCHAR(100),
     phone VARCHAR(20) UNIQUE,
     user_id INT NOT NULL REFERENCES users(user_id),
@@ -65,6 +88,7 @@ CREATE TABLE brokers (
 
 CREATE TABLE plots (
     plot_id SERIAL PRIMARY KEY,
+    society_id INT NOT NULL REFERENCES society(society_id),
     plot_code VARCHAR(20) UNIQUE NOT NULL,  -- C1, C2, C3
     area_sqyd NUMERIC(10,2),
     area_sqft NUMERIC(10,2),
@@ -80,6 +104,7 @@ CREATE TABLE floors (
     floor_id SERIAL PRIMARY KEY,
     plot_id INT NOT NULL REFERENCES plots(plot_id) ON DELETE CASCADE,
     floor_no INT,
+    floor_value NUMERIC(14,2),
     status inventory_status DEFAULT 'AVAILABLE',
     active_sale_id INT,
     UNIQUE(plot_id, floor_no)
@@ -106,12 +131,13 @@ CREATE INDEX idx_floor_logs_floor ON floor_status_logs(floor_id);
 
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
+    society_id INT NOT NULL REFERENCES society(society_id),
     full_name VARCHAR(100),
     pan VARCHAR(20) UNIQUE,
     phone VARCHAR(20),
     email VARCHAR(100),
     address TEXT,
-    kyc_status VARCHAR(20) DEFAULT 'PENDING',
+    kyc_status kyc_status DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -121,7 +147,7 @@ CREATE TABLE customers (
 
 CREATE TABLE sales (
     sale_id SERIAL PRIMARY KEY,
-    floor_id INT UNIQUE NOT NULL REFERENCES floors(floor_id),
+    floor_id INT NOT NULL REFERENCES floors(floor_id),
     broker_id INT NOT NULL REFERENCES brokers(broker_id),
     customer_id INT NOT NULL REFERENCES customers(customer_id),
     total_value NUMERIC(14,2) NOT NULL,
@@ -160,12 +186,12 @@ CREATE TABLE documents (
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,
     file_type VARCHAR(50) NOT NULL,
-    entity_type VARCHAR(20) NOT NULL,  -- 'customer' or 'sale'
-    entity_id INT NOT NULL,
+    entity entity_type DEFAULT 'CUSTOMER',
+    sale_id INT NOT NULL REFERENCES sales(sale_id),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_documents_entity ON documents(entity_type, entity_id);
+CREATE INDEX idx_documents_entity ON documents(entity, sale_id);
 
 -- ==================================================
 -- BROKER PERFORMANCE VIEW (From Meeting 2)
@@ -187,6 +213,7 @@ GROUP BY b.broker_id, b.broker_name;
 
 CREATE VIEW global_inventory_master AS
 SELECT 
+    p.society_id,
     p.plot_code,
     f.floor_no,
     f.status AS inventory_status,
@@ -213,15 +240,3 @@ CREATE INDEX idx_sales_broker ON sales(broker_id);
 CREATE INDEX idx_sales_status ON sales(status);
 CREATE INDEX idx_payments_sale ON payments(sale_id);
 
-
--- ==================================================
--- DEFAULT ADMIN USER
--- ==================================================
-INSERT INTO users (full_name, email, hashed_password, role, is_active)
-VALUES (
-    'Admin',
-    'admin@blf.com',
-    '$2b$12$ytRFOrhRkVH2t2Qye1g.m.jH1diVJTqFbq2OWGfzEzPrdcCz6doZC',
-    'admin',
-    true
-);

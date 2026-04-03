@@ -1,5 +1,7 @@
+// app/not-found.tsx
 import GoToHome from "@/components/GoToHome"
 
+// handles not found functionality
 const NotFound = () => {
   return (
     <div className="w-screen h-screen gap-8 flex flex-col justify-center items-center">

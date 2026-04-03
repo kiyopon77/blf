@@ -1,7 +1,11 @@
+// services/plotMatrix.ts
 import api from "@/lib/api"
 
-export const getPlotMatrix = async () => {
-  const { data } = await api.get("/plots/matrix")
+// handles get plot matrix functionality
+export const getPlotMatrix = async (society_id?: number | null) => {
+  const { data } = await api.get("/plots/matrix", {
+    params: { society_id },
+  })
 
   const matrix = data.map((plot: any) => ({
     plot: plot.plot_code,
@@ -11,7 +15,12 @@ export const getPlotMatrix = async () => {
     floors: plot.floors.map((f: any) => ({
       floor: f.floor_no,
       floor_id: f.floor_id,
-      status: f.status.toLowerCase() as "available" | "sold" | "hold" | "cancelled" | "investor_unit",
+      status: f.status.toLowerCase() as
+        | "available"
+        | "sold"
+        | "hold"
+        | "cancelled"
+        | "investor_unit",
       active_sale_id: f.active_sale_id ?? null,
       sale_status: f.sale_status ?? null,
       broker_name: f.broker_name ?? null,
