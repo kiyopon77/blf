@@ -50,7 +50,14 @@ def get_current_user(
             detail="Invalid or expired token"
         )
 
-    user_id = int(payload.get("sub"))
+    sub = payload.get("sub")
+    if not sub or not str(sub).isdigit():
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload"
+        )
+
+    user_id = int(sub)
     user = get_user_by_id(db, user_id)
 
     if not user or not user.is_active:

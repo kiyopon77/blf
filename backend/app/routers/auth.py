@@ -14,7 +14,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 def _client_ip(request: Request) -> str:
     forwarded_for = request.headers.get("x-forwarded-for")
-    if forwarded_for:
+    if settings.TRUST_X_FORWARDED_FOR and forwarded_for:
         return forwarded_for.split(",")[0].strip()
     return request.client.host if request.client else "unknown"
 
@@ -122,7 +122,20 @@ def refresh_token(
             detail="Invalid or expired refresh token"
         )
 
-    user_id = int(payload.get("sub"))
+    sub = payload.get("sub")
+    if not sub or not str(sub).isdigit():
+        auth_guard.register_failure(
+            throttle_key,
+            window_seconds=settings.AUTH_RATE_LIMIT_WINDOW_SECONDS,
+            max_attempts=settings.AUTH_REFRESH_MAX_ATTEMPTS,
+            lockout_seconds=settings.AUTH_LOCKOUT_SECONDS,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload"
+        )
+
+    user_id = int(sub)
     user = get_user_by_id(db, user_id)
 
     if not user or not user.is_active:
@@ -212,8 +225,6 @@ def list_users(
 ):
     from app.models.user import User
     return db.query(User).all()
-
-from app.schemas.user import LoginRequest, TokenResponse, UserCreate, UserResponse, UserUpdate
 
 # ── Update User (Admin only) ────────────────────────────
 @router.put("/users/{user_id}", response_model=UserResponse)
