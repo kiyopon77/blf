@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     HSTS_ENABLED: bool = True         # was False
     HSTS_MAX_AGE_SECONDS: int = 31536000
 
-    CORS_ALLOW_ORIGINS: str = "http://localhost,http://localhost:3000,https://blf-frontend.up.railway.app"
+    CORS_ALLOW_ORIGINS: str = "http://localhost,http://localhost:3000,https://frontend-production-09e6.up.railway.app/login"
     TRUST_X_FORWARDED_FOR: bool = False
     ENABLE_TRUSTED_HOSTS: bool = False
     TRUSTED_HOSTS: str = "*"
