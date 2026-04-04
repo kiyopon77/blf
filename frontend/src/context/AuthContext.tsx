@@ -1,7 +1,6 @@
 // context/AuthContext.tsx
 "use client"
 import { createContext, useContext, useEffect, useState } from "react"
-import axios from "axios"
 import api, { setAccessToken } from "@/lib/api"
 
 interface AuthContextType {
@@ -39,11 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const { data } = await axios.post(
-          "http://localhost:8000/api/auth/refresh",
-          {},
-          { withCredentials: true }
-        )
+        const { data } = await api.post("/auth/refresh")
 
         setAccessToken(data.access_token)
         setAccessTokenState(data.access_token)
