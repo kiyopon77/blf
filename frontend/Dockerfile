@@ -23,6 +23,9 @@ FROM node:${NODE_VERSION} AS builder
 
 WORKDIR /app
 
+ARG NEXT_PUBLIC_API_URL
+RUN echo $NEXT_PUBLIC_API_URL
+
 # Copy node_modules from deps
 COPY --from=deps /app/node_modules ./node_modules
 
