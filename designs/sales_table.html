@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Management - Premium Real Estate Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            black: '#000000',
+                            gold: '#D4A22A',
+                            goldHover: '#c49320',
+                            lightBg: '#FAFAFA',
+                            border: '#E5E5E5',
+                        },
+                        status: {
+                            soldBg: '#ECFDF5',
+                            soldText: '#065F46',
+                            holdBg: '#FFFBEB',
+                            holdText: '#92400E',
+                            availBg: '#F0FDF4',
+                            availText: '#166534',
+                            cancelBg: '#F3F4F6',
+                            cancelText: '#374151',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for subtle interactions */
+        .action-icon {
+            transition: all 0.15s ease-in-out;
+        }
+        .row-group .extra-actions {
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        .row-group:hover .extra-actions {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-[#F8F9FA] font-sans text-gray-900 antialiased selection:bg-brand-gold selection:text-white">
+
+    <!-- Top Navigation -->
+    <nav class="bg-brand-black text-white h-16 flex items-center justify-between px-6" name="top-navigation">
+        <div class="flex items-center space-x-4">
+            <div class="w-8 h-8 rounded bg-brand-gold flex items-center justify-center font-bold text-black">
+                R
+            </div>
+            <span class="font-semibold tracking-wide text-sm">REALTY<span class="text-brand-gold">CORP</span></span>
+        </div>
+        <div class="flex items-center space-x-6 text-sm text-gray-300">
+            <a href="#" class="hover:text-white transition-colors">Dashboard</a>
+            <a href="#" class="text-white font-medium border-b-2 border-brand-gold pb-5 mt-5">Sales</a>
+            <a href="#" class="hover:text-white transition-colors">Properties</a>
+            <a href="#" class="hover:text-white transition-colors">Clients</a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=bell-icon&icon_set=tabler&color=%23FFFFFF" alt="Notifications" class="w-5 h-5 opacity-80 cursor-pointer hover:opacity-100">
+            <div class="w-8 h-8 rounded-full bg-gray-700 overflow-hidden border border-gray-600">
+                <img src="https://api.designfast.io/v1/photo_library/findone?desc=professional+headshot+man&w=100&h=100&orientation=squarish" alt="Profile" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-[1400px] mx-auto py-8 px-6 lg:px-8" name="main-content">
+        
+        <!-- Page Header -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between mb-8" name="page-header">
+            <div>
+                <h1 class="text-[28px] font-bold text-brand-black leading-tight">Sales</h1>
+                <p class="text-sm text-gray-500 mt-1">Manage all sales, deals, and transactions</p>
+            </div>
+            <div class="mt-4 sm:mt-0">
+                <button class="flex items-center space-x-2 border border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-white px-5 py-2.5 rounded text-sm font-medium transition-colors duration-200">
+                    <img src="https://api.designfast.io/v1/svg_generator/findone?desc=plus-icon&icon_set=tabler&color=currentColor" alt="Add" class="w-4 h-4">
+                    <span>Create Sale</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Top Controls -->
+        <div class="flex flex-col sm:flex-row items-center justify-between mb-4 space-y-3 sm:space-y-0" name="top-controls">
+            <!-- Search -->
+            <div class="relative w-full sm:w-96">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <img src="https://api.designfast.io/v1/svg_generator/findone?desc=search-icon&icon_set=tabler&color=%239CA3AF" alt="Search" class="w-4 h-4">
+                </div>
+                <input type="text" placeholder="Search sales, brokers, customers..." class="block w-full pl-10 pr-3 py-2 border border-brand-border rounded-md leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-brand-gold focus:border-brand-gold sm:text-sm transition-colors">
+            </div>
+
+            <!-- Filters -->
+            <div class="flex items-center space-x-3 w-full sm:w-auto">
+                <div class="relative">
+                    <select class="appearance-none bg-white border border-brand-border rounded-md pl-3 pr-8 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-gold focus:border-brand-gold cursor-pointer">
+                        <option>All Statuses</option>
+                        <option>Sold</option>
+                        <option>Hold</option>
+                        <option>Available</option>
+                        <option>Cancelled</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                        <img src="https://api.designfast.io/v1/svg_generator/findone?desc=chevron-down&icon_set=tabler&color=%239CA3AF" alt="Dropdown" class="w-4 h-4">
+                    </div>
+                </div>
+                
+                <button class="flex items-center space-x-2 bg-white border border-brand-border text-gray-700 hover:bg-gray-50 px-3 py-2 rounded-md text-sm transition-colors">
+                    <img src="https://api.designfast.io/v1/svg_generator/findone?desc=calendar-icon&icon_set=tabler&color=%236B7280" alt="Date" class="w-4 h-4">
+                    <span>Any Date</span>
+                </button>
+
+                <button class="flex items-center space-x-2 bg-white border border-brand-border text-gray-700 hover:bg-gray-50 px-3 py-2 rounded-md text-sm transition-colors ml-auto sm:ml-0">
+                    <img src="https://api.designfast.io/v1/svg_generator/findone?desc=download-icon&icon_set=tabler&color=%236B7280" alt="Export" class="w-4 h-4">
+                    <span>Export</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="bg-white border border-brand-border rounded-lg shadow-sm overflow-hidden" name="table-container">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" name="sales-table">
+                    <thead>
+                        <tr class="bg-brand-lightBg border-b border-brand-border text-xs text-gray-500 uppercase tracking-wider font-semibold">
+                            <th class="px-6 py-4">Sale ID</th>
+                            <th class="px-6 py-4">Floor</th>
+                            <th class="px-6 py-4">Broker</th>
+                            <th class="px-6 py-4">Customer</th>
+                            <th class="px-6 py-4 text-right">Value</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Created</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-brand-border">
+                        <!-- Row 1: Sold -->
+                        <tr class="row-group hover:bg-[#F9FAFB] cursor-pointer transition-colors duration-150 h-[52px]">
+                            <td class="px-6 py-3 font-semibold text-brand-black">ID-1042</td>
+                            <td class="px-6 py-3 text-gray-600">Floor 4</td>
+                            <td class="px-6 py-3 text-gray-700">Aman Gupta</td>
+                            <td class="px-6 py-3 text-gray-700">Ramesh Patel</td>
+                            <td class="px-6 py-3 text-right font-semibold text-brand-black">₹ 7,51,500</td>
+                            <td class="px-6 py-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-status-soldBg text-status-soldText">
+                                    SOLD
+                                </span>
+                            </td>
+                            <td class="px-6 py-3 text-gray-500">12 Oct 2023</td>
+                            <td class="px-6 py-3 text-right">
+                                <div class="flex items-center justify-end space-x-3">
+                                    <div class="extra-actions flex items-center space-x-3">
+                                        <button class="text-gray-400 hover:text-red-500 action-icon" title="Delete">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=trash-icon&icon_set=tabler&color=currentColor" alt="Delete" class="w-4 h-4">
+                                        </button>
+                                        <button class="text-gray-400 hover:text-brand-gold action-icon" title="Edit">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=pencil-icon&icon_set=tabler&color=currentColor" alt="Edit" class="w-4 h-4">
+                                        </button>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-brand-gold action-icon" title="View">
+                                        <img src="https://api.designfast.io/v1/svg_generator/findone?desc=eye-icon&icon_set=tabler&color=currentColor" alt="View" class="w-4 h-4">
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 2: Hold -->
+                        <tr class="row-group hover:bg-[#F9FAFB] cursor-pointer transition-colors duration-150 h-[52px]">
+                            <td class="px-6 py-3 font-semibold text-brand-black">ID-1043</td>
+                            <td class="px-6 py-3 text-gray-600">Floor 2</td>
+                            <td class="px-6 py-3 text-gray-700">Neha Sharma</td>
+                            <td class="px-6 py-3 text-gray-700">Priya Singh</td>
+                            <td class="px-6 py-3 text-right font-semibold text-brand-black">₹ 4,20,000</td>
+                            <td class="px-6 py-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-status-holdBg text-status-holdText">
+                                    HOLD
+                                </span>
+                            </td>
+                            <td class="px-6 py-3 text-gray-500">14 Oct 2023</td>
+                            <td class="px-6 py-3 text-right">
+                                <div class="flex items-center justify-end space-x-3">
+                                    <div class="extra-actions flex items-center space-x-3">
+                                        <button class="text-gray-400 hover:text-red-500 action-icon" title="Delete">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=trash-icon&icon_set=tabler&color=currentColor" alt="Delete" class="w-4 h-4">
+                                        </button>
+                                        <button class="text-gray-400 hover:text-brand-gold action-icon" title="Edit">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=pencil-icon&icon_set=tabler&color=currentColor" alt="Edit" class="w-4 h-4">
+                                        </button>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-brand-gold action-icon" title="View">
+                                        <img src="https://api.designfast.io/v1/svg_generator/findone?desc=eye-icon&icon_set=tabler&color=currentColor" alt="View" class="w-4 h-4">
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 3: Available -->
+                        <tr class="row-group hover:bg-[#F9FAFB] cursor-pointer transition-colors duration-150 h-[52px]">
+                            <td class="px-6 py-3 font-semibold text-brand-black">ID-1044</td>
+                            <td class="px-6 py-3 text-gray-600">Floor 1</td>
+                            <td class="px-6 py-3 text-gray-400 italic">Direct</td>
+                            <td class="px-6 py-3 text-gray-400 italic">None yet</td>
+                            <td class="px-6 py-3 text-right font-semibold text-brand-black">₹ 3,10,000</td>
+                            <td class="px-6 py-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-status-availBg text-status-availText">
+                                    AVAILABLE
+                                </span>
+                            </td>
+                            <td class="px-6 py-3 text-gray-500">18 Oct 2023</td>
+                            <td class="px-6 py-3 text-right">
+                                <div class="flex items-center justify-end space-x-3">
+                                    <div class="extra-actions flex items-center space-x-3">
+                                        <button class="text-gray-400 hover:text-red-500 action-icon" title="Delete">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=trash-icon&icon_set=tabler&color=currentColor" alt="Delete" class="w-4 h-4">
+                                        </button>
+                                        <button class="text-gray-400 hover:text-brand-gold action-icon" title="Edit">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=pencil-icon&icon_set=tabler&color=currentColor" alt="Edit" class="w-4 h-4">
+                                        </button>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-brand-gold action-icon" title="View">
+                                        <img src="https://api.designfast.io/v1/svg_generator/findone?desc=eye-icon&icon_set=tabler&color=currentColor" alt="View" class="w-4 h-4">
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 4: Cancelled -->
+                        <tr class="row-group hover:bg-[#F9FAFB] cursor-pointer transition-colors duration-150 h-[52px]">
+                            <td class="px-6 py-3 font-semibold text-brand-black">ID-1045</td>
+                            <td class="px-6 py-3 text-gray-600">Floor 6</td>
+                            <td class="px-6 py-3 text-gray-700">Karan Johar</td>
+                            <td class="px-6 py-3 text-gray-700">Sonia Bajaj</td>
+                            <td class="px-6 py-3 text-right font-semibold text-brand-black">₹ 12,50,000</td>
+                            <td class="px-6 py-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-status-cancelBg text-status-cancelText">
+                                    CANCELLED
+                                </span>
+                            </td>
+                            <td class="px-6 py-3 text-gray-500">20 Oct 2023</td>
+                            <td class="px-6 py-3 text-right">
+                                <div class="flex items-center justify-end space-x-3">
+                                    <div class="extra-actions flex items-center space-x-3">
+                                        <button class="text-gray-400 hover:text-red-500 action-icon" title="Delete">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=trash-icon&icon_set=tabler&color=currentColor" alt="Delete" class="w-4 h-4">
+                                        </button>
+                                        <button class="text-gray-400 hover:text-brand-gold action-icon" title="Edit">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=pencil-icon&icon_set=tabler&color=currentColor" alt="Edit" class="w-4 h-4">
+                                        </button>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-brand-gold action-icon" title="View">
+                                        <img src="https://api.designfast.io/v1/svg_generator/findone?desc=eye-icon&icon_set=tabler&color=currentColor" alt="View" class="w-4 h-4">
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Row 5: Sold -->
+                        <tr class="row-group hover:bg-[#F9FAFB] cursor-pointer transition-colors duration-150 h-[52px]">
+                            <td class="px-6 py-3 font-semibold text-brand-black">ID-1046</td>
+                            <td class="px-6 py-3 text-gray-600">Floor 3</td>
+                            <td class="px-6 py-3 text-gray-700">Aman Gupta</td>
+                            <td class="px-6 py-3 text-gray-700">Vikram Singh</td>
+                            <td class="px-6 py-3 text-right font-semibold text-brand-black">₹ 8,95,000</td>
+                            <td class="px-6 py-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-status-soldBg text-status-soldText">
+                                    SOLD
+                                </span>
+                            </td>
+                            <td class="px-6 py-3 text-gray-500">21 Oct 2023</td>
+                            <td class="px-6 py-3 text-right">
+                                <div class="flex items-center justify-end space-x-3">
+                                    <div class="extra-actions flex items-center space-x-3">
+                                        <button class="text-gray-400 hover:text-red-500 action-icon" title="Delete">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=trash-icon&icon_set=tabler&color=currentColor" alt="Delete" class="w-4 h-4">
+                                        </button>
+                                        <button class="text-gray-400 hover:text-brand-gold action-icon" title="Edit">
+                                            <img src="https://api.designfast.io/v1/svg_generator/findone?desc=pencil-icon&icon_set=tabler&color=currentColor" alt="Edit" class="w-4 h-4">
+                                        </button>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-brand-gold action-icon" title="View">
+                                        <img src="https://api.designfast.io/v1/svg_generator/findone?desc=eye-icon&icon_set=tabler&color=currentColor" alt="View" class="w-4 h-4">
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination Placeholder -->
+            <div class="bg-white px-6 py-3 border-t border-brand-border flex items-center justify-between sm:px-6">
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span class="font-medium">97</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-brand-border bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Previous</span>
+                                <img src="https://api.designfast.io/v1/svg_generator/findone?desc=chevron-left&icon_set=tabler&color=%236B7280" class="h-4 w-4" alt="Prev">
+                            </button>
+                            <button class="relative inline-flex items-center px-4 py-2 border border-brand-border bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">1</button>
+                            <button class="relative inline-flex items-center px-4 py-2 border border-brand-border bg-gray-50 text-sm font-medium text-brand-gold">2</button>
+                            <button class="relative inline-flex items-center px-4 py-2 border border-brand-border bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">3</button>
+                            <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-brand-border bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Next</span>
+                                <img src="https://api.designfast.io/v1/svg_generator/findone?desc=chevron-right&icon_set=tabler&color=%236B7280" class="h-4 w-4" alt="Next">
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
