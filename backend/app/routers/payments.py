@@ -11,19 +11,37 @@ router = APIRouter(prefix="/payments", tags=["Payments"])
 
 @router.put("/{payment_id}", response_model=PaymentResponse)
 def update_payment(payment_id: int, data: PaymentUpdate, db: Session = Depends(get_db), user=Depends(get_current_user)):
+
     payment = db.query(Payment).filter(Payment.payment_id == payment_id).first()
     if not payment:
         raise HTTPException(status_code=404, detail="Payment not found")
+
     ensure_society_access(user, payment.sale.floor.plot.society_id)
 
-    payment.status = data.status
-    payment.amount = data.amount
+    if data.total_amount is not None:
+        payment.total_amount = data.total_amount
 
-    # auto set paid_at when marked DONE
-    if data.status == MilestoneStatus.DONE:
-        payment.paid_at = data.paid_at or datetime.utcnow()
+    if data.paid_amount is not None:
+        payment.paid_amount = data.paid_amount
+
+    if data.due_date is not None:
+        payment.due_date = data.due_date
+
+    
+    if payment.total_amount and payment.paid_amount:
+        if payment.paid_amount >= payment.total_amount:
+            payment.status = MilestoneStatus.DONE
+            payment.paid_at = data.paid_at or datetime.utcnow()
+        else:
+            payment.status = MilestoneStatus.PENDING
+            payment.paid_at = None
     else:
-        payment.paid_at = None
+        # fallback manual override
+        payment.status = data.status
+        if data.status == MilestoneStatus.DONE:
+            payment.paid_at = data.paid_at or datetime.utcnow()
+        else:
+            payment.paid_at = None
 
     db.commit()
     db.refresh(payment)

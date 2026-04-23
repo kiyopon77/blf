@@ -18,7 +18,7 @@ class Sale(Base):
     broker_id = Column(Integer, ForeignKey("brokers.broker_id"), nullable=False)
     customer_id = Column(Integer, ForeignKey("customers.customer_id"), nullable=False)
     total_value = Column(Numeric(14, 2), nullable=False)
-    commission_percent = Column(Numeric(5, 2))
+    commission_amount = Column(Numeric(14, 2))
     status = Column(Enum(SaleStatus, name="sale_status"), default=SaleStatus.HOLD)
     initiated_at = Column(TIMESTAMP, server_default=func.now())
 

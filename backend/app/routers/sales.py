@@ -60,7 +60,7 @@ def get_floor_code_info_with_sales(
             broker_id=sale.broker_id,
             customer_id=sale.customer_id,
             total_value=float(sale.total_value),
-            commission_percent=float(sale.commission_percent) if sale.commission_percent is not None else None,
+            commission_amount=float(sale.commission_amount) if sale.commission_amount is not None else None,
             status=sale.status,
             initiated_at=sale.initiated_at,
         )
@@ -77,7 +77,7 @@ def get_sale(sale_id: int, db: Session = Depends(get_db), user=Depends(get_curre
     return SaleDetailResponse(
         sale_id=sale.sale_id,
         total_value=float(sale.total_value),
-        commission_percent=float(sale.commission_percent) if sale.commission_percent else None,
+        commission_amount=float(sale.commission_amount) if sale.commission_amount else None,
         status=sale.status,
         initiated_at=sale.initiated_at,
         broker_name=sale.broker.broker_name,
@@ -97,11 +97,13 @@ def get_sale(sale_id: int, db: Session = Depends(get_db), user=Depends(get_curre
 
 @router.post("", response_model=SaleResponse, status_code=status.HTTP_201_CREATED)
 def create_sale(data: SaleCreate, db: Session = Depends(get_db), user=Depends(get_current_user)):
-    # check floor is available
+
     floor = db.query(Floor).filter(Floor.floor_id == data.floor_id).first()
     if not floor:
         raise HTTPException(status_code=404, detail="Floor not found")
+
     ensure_society_access(user, floor.plot.society_id)
+
     if floor.status != InventoryStatus.AVAILABLE:
         raise HTTPException(status_code=400, detail=f"Floor is not available — current status: {floor.status}")
 
@@ -114,22 +116,27 @@ def create_sale(data: SaleCreate, db: Session = Depends(get_db), user=Depends(ge
         raise HTTPException(status_code=404, detail="Customer not found")
 
     if broker.society_id != floor.plot.society_id or customer.society_id != floor.plot.society_id:
-        raise HTTPException(status_code=400, detail="Broker/Customer must belong to the same society as floor")
+        raise HTTPException(status_code=400, detail="Broker/Customer must belong to same society")
+    
+    if floor.active_sale_id is not None:
+        raise HTTPException(status_code=400, detail="Floor already has an active sale")
 
-    # create sale
+    # ✅ create sale
     sale = Sale(**data.model_dump())
     db.add(sale)
-    db.flush()  # get sale_id without committing
+    db.flush()
 
-    # update floor status to HOLD
+    # ✅ update floor
     floor.status = InventoryStatus.HOLD
     floor.active_sale_id = sale.sale_id
 
-    # auto create all 6 milestone payment records
+    # ✅ NEW payment structure
     for milestone in MilestoneType:
         payment = Payment(
             sale_id=sale.sale_id,
             milestone=milestone,
+            total_amount=0,
+            paid_amount=0,
             status=MilestoneStatus.PENDING
         )
         db.add(payment)

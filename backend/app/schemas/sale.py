@@ -9,7 +9,7 @@ class SaleCreate(BaseModel):
     broker_id: int
     customer_id: int
     total_value: float
-    commission_percent: Optional[float] = None
+    commission_amount: Optional[float] = None
 
 class SaleStatusUpdate(BaseModel):
     status: SaleStatus
@@ -20,7 +20,7 @@ class SaleResponse(BaseModel):
     broker_id: int
     customer_id: int
     total_value: float
-    commission_percent: Optional[float] = None
+    commission_amount: Optional[float] = None
     status: SaleStatus
     initiated_at: datetime
 
@@ -38,7 +38,7 @@ class FloorInfoResponse(BaseModel):
 class SaleDetailResponse(BaseModel):
     sale_id: int
     total_value: float
-    commission_percent: Optional[float] = None
+    commission_amount: Optional[float] = None
     status: SaleStatus
     initiated_at: datetime
 
@@ -65,11 +65,11 @@ class FloorCodeSaleResponse(BaseModel):
     broker_id: int
     customer_id: int
     total_value: float
-    commission_percent: Optional[float] = None
+    commission_amount: Optional[float] = None
     status: SaleStatus
     initiated_at: datetime
         
 class SaleUpdate(BaseModel):
     total_value: Optional[float] = None
     initiated_at: Optional[datetime] = None
-    commission_percent: Optional[float] = None
+    commission_amount: Optional[float] = None
