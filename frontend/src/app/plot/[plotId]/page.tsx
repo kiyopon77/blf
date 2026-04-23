@@ -78,12 +78,6 @@ export default function Plot() {
             <span className={`py-2 px-5 rounded-3xl text-white ${statusColor}`}>
               {statusLabel.replace("_", " ")}
             </span>
-            <button
-              onClick={() => router.push(`/plot/edit/${plotId}`)}
-              className="py-2 px-5 rounded-3xl border border-gray-300 text-gray-700 hover:bg-gray-100 hover:cursor-pointer transition-colors font-medium"
-            >
-              Edit
-            </button>
           </div>
         </div>
 
@@ -124,6 +118,14 @@ export default function Plot() {
             <DocumentsCard entityType="SALE" saleId={sale.sale_id} />
           )}
         </div>
+      </div>
+      <div className="flex justify-center mt-8">
+        <button
+          onClick={() => router.push(`/plot/edit/${plotId}`)}
+          className="py-3 px-8 rounded-3xl bg-black text-white hover:bg-gray-800 transition-colors font-medium"
+        >
+          Edit Plot
+        </button>
       </div>
     </div>
   )
