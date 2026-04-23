@@ -15,6 +15,7 @@ class Customer(Base):
     address = Column(Text)
     kyc_status = Column(String(20), default="PENDING")
     created_at = Column(TIMESTAMP, server_default=func.now())
+    coapplicants = relationship("CoApplicant", back_populates="customer")
 
     society = relationship("Society", back_populates="customers")
     sales = relationship("Sale", back_populates="customer")
