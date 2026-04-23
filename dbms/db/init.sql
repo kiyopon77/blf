@@ -102,7 +102,7 @@ CREATE TABLE plots (
     area_sqyd NUMERIC(10,2),
     area_sqft NUMERIC(10,2),
     type CHAR(1),
-    file_path VARCHAR(500),
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -116,6 +116,7 @@ CREATE TABLE floors (
     floor_no INT,
     floor_value NUMERIC(14,2),
     status inventory_status DEFAULT 'AVAILABLE',
+    file_path VARCHAR(500),
     active_sale_id INT,
     UNIQUE(plot_id, floor_no)
 );
