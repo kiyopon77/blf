@@ -84,9 +84,8 @@ CREATE TABLE brokers (
     society_id INT NOT NULL REFERENCES society(society_id),
     broker_name VARCHAR(100),
     phone VARCHAR(20) UNIQUE,
-    pan VARCHAR(20) UNIQUE,
+    company_name VARCHAR(50),
     email VARCHAR(100),
-    address TEXT,
     kyc_status kyc_status DEFAULT 'PENDING',
     user_id INT NOT NULL REFERENCES users(user_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
