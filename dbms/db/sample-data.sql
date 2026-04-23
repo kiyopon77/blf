@@ -24,13 +24,13 @@ VALUES (
 -- 2. BROKERS
 -- ==================================================
 
-INSERT INTO brokers (broker_id, society_id, broker_name, phone, user_id)
+INSERT INTO brokers (broker_id, society_id, broker_name, phone, pan, email, address, kyc_status, user_id)
 VALUES
-    (1, 1, 'Goldy',         '9811100001', 1),
-    (2, 1, 'Rajesh Verma',   '9811100002', 1),
-    (3, 1, 'Sunita Brokers', '9811100003', 1),
-    (4, 1, 'Deepak Arora',   '9811100004', 1),
-    (5, 1, 'Meena Estates',  '9811100005', 1);
+    (1, 1, 'Goldy',         '9811100001', 'ABCPG1234A', 'goldy@broker.com',          '12, MG Road, Delhi',            'PENDING',  1),
+    (2, 1, 'Rajesh Verma',  '9811100002', 'BCDPV5678B', 'rajesh.verma@broker.com',   '45, Lajpat Nagar, Delhi',       'DONE',     1),
+    (3, 1, 'Sunita Brokers','9811100003', 'CDEPS9012C', 'sunita.brokers@broker.com', '78, Sector 14, Gurgaon',        'PENDING',  1),
+    (4, 1, 'Deepak Arora',  '9811100004', 'DEFPA3456D', 'deepak.arora@broker.com',   '23, Rohini Sector 7, Delhi',    'DONE',     1),
+    (5, 1, 'Meena Estates', '9811100005', 'EFGPE7890E', 'meena.estates@broker.com',  '56, Vasant Kunj, New Delhi',    'PENDING',  1);
 
 -- ==================================================
 -- 3. CUSTOMERS
@@ -128,13 +128,13 @@ UPDATE floors SET active_sale_id = sale_id FROM sales WHERE floors.floor_id = sa
 -- 8. PAYMENTS
 -- ==================================================
 
-INSERT INTO payments (sale_id, milestone, amount, status, paid_at)
+INSERT INTO payments (sale_id, milestone, mratio, amount, status, paid_at)
 VALUES
-    (1, 'TOKEN', 100000.00, 'DONE', '2024-01-10 10:00:00'),
-    (1, 'ATS', 500000.00, 'DONE', '2024-02-01 11:00:00'),
-    (5, 'TOKEN', 100000.00, 'DONE', '2024-03-05 09:30:00'),
-    (22, 'TOKEN', 1000000.00, 'DONE', '2024-06-15 14:00:00'),  
-    (8, 'TOKEN', 100000.00, 'DONE', '2024-07-01 10:00:00'); 
+    (1, 'TOKEN', '30:10:60',   100000.00, 'DONE', '2024-01-10 10:00:00'),
+    (1, 'ATS',      '30:70',   500000.00, 'DONE', '2024-02-01 11:00:00'),
+    (5, 'TOKEN', '30:10:60',   100000.00, 'DONE', '2024-03-05 09:30:00'),
+    (22,'TOKEN',    '40:60',  1000000.00, 'DONE', '2024-06-15 14:00:00'),  
+    (8, 'TOKEN',    '40:60',   100000.00, 'DONE', '2024-07-01 10:00:00'); 
 
 -- ==================================================
 -- 9. LOGS
