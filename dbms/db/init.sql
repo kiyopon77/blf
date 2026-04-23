@@ -157,7 +157,7 @@ CREATE TABLE customers (
 
 CREATE TABLE coapplicant (
     coapplicant_id SERIAL PRIMARY KEY,
-    customer_id INT NOT NULL REFERENCES customer(customer_id),
+    customer_id INT NOT NULL REFERENCES customers(customer_id),
     full_name VARCHAR(100),
     pan VARCHAR(20) UNIQUE,
     phone VARCHAR(20),
@@ -197,7 +197,7 @@ CREATE TABLE payments (
     sale_id INT NOT NULL REFERENCES sales(sale_id) ON DELETE CASCADE,
     milestone milestone_type NOT NULL,
     mratio milestone_ratio,
-    total_amount NUMERIC(14,2);
+    total_amount NUMERIC(14,2),
     paid_amount NUMERIC(14,2),
     status milestone_status DEFAULT 'PENDING',
     paid_at TIMESTAMP,
@@ -214,7 +214,7 @@ CREATE TABLE documents (
     label VARCHAR(100) NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,
-    file_type VARCHAR(50) NOT NULL,
+    file_type VARCHAR(100) NOT NULL,
     entity entity_type DEFAULT 'CUSTOMER',
     sale_id INT NOT NULL REFERENCES sales(sale_id),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
