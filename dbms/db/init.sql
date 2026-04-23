@@ -102,6 +102,7 @@ CREATE TABLE plots (
     area_sqyd NUMERIC(10,2),
     area_sqft NUMERIC(10,2),
     type CHAR(1),
+    file_path VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
