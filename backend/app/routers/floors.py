@@ -10,9 +10,11 @@ from app.models.user import User
 from app.schemas.floor import FloorCreate, FloorStatusUpdate, FloorResponse, FloorUpdate
 from app.schemas.floor_log import FloorLogResponse
 from typing import List, Optional
+import os
 
 router = APIRouter(prefix="/floors", tags=["Floors"])
 
+UPLOAD_BASE = "/app/uploads"
 
 @router.get("", response_model=List[FloorResponse])
 def get_floors(
@@ -39,9 +41,32 @@ def get_floor(floor_id: int, db: Session = Depends(get_db), user=Depends(get_cur
 @router.post("", response_model=FloorResponse, status_code=status.HTTP_201_CREATED)
 def create_floor(data: FloorCreate, db: Session = Depends(get_db), admin=Depends(require_admin)):
     floor = Floor(**data.model_dump())
+
     db.add(floor)
     db.commit()
     db.refresh(floor)
+
+    # ✅ Create folder: uploads/{plot_id}
+    plot_folder = os.path.join(UPLOAD_BASE, str(floor.plot_id))
+    os.makedirs(plot_folder, exist_ok=True)
+
+    # ✅ RELATIVE path (stored in DB)
+    relative_path = f"uploads/{floor.plot_id}/{floor.floor_id}.txt"
+
+    # ✅ FULL path (used by server)
+    full_path = os.path.join("/app", relative_path)
+
+    # ✅ Create file
+    with open(full_path, "w") as f:
+        f.write(f"Floor ID: {floor.floor_id}\n")
+        f.write(f"Plot ID: {floor.plot_id}\n")
+        f.write(f"Floor No: {floor.floor_no}\n")
+
+    # ✅ Save relative path
+    floor.file_path = relative_path
+    db.commit()
+    db.refresh(floor)
+
     return floor
 
 
