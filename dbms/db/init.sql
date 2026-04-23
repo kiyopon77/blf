@@ -152,6 +152,22 @@ CREATE TABLE customers (
 );
 
 -- ==================================================
+-- COAPPLICANT (KYC)
+-- ==================================================
+
+CREATE TABLE coapplicant (
+    coapplicant_id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL REFERENCES customer(customer_id),
+    full_name VARCHAR(100),
+    pan VARCHAR(20) UNIQUE,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    address TEXT,
+    kyc_status kyc_status DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ==================================================
 -- SALES (Transaction Control)
 -- ==================================================
 
@@ -161,7 +177,7 @@ CREATE TABLE sales (
     broker_id INT NOT NULL REFERENCES brokers(broker_id),
     customer_id INT NOT NULL REFERENCES customers(customer_id),
     total_value NUMERIC(14,2) NOT NULL,
-    commission_percent NUMERIC(5,2),
+    commission_amount NUMERIC(14,2),
     status sale_status DEFAULT 'HOLD',
     initiated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -181,9 +197,11 @@ CREATE TABLE payments (
     sale_id INT NOT NULL REFERENCES sales(sale_id) ON DELETE CASCADE,
     milestone milestone_type NOT NULL,
     mratio milestone_ratio,
-    amount NUMERIC(14,2),
+    total_amount NUMERIC(14,2);
+    paid_amount NUMERIC(14,2),
     status milestone_status DEFAULT 'PENDING',
     paid_at TIMESTAMP,
+    due_date TIMESTAMP,
     UNIQUE(sale_id, milestone)
 );
 
