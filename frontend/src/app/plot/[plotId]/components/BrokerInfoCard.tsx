@@ -14,7 +14,7 @@ const BrokerInfoCard = ({
         <span className="text-gray-700 font-extrabold">Broker Information</span>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="flex flex-col">
-            <span className="text-gray-600">Broker Name</span>
+            <span className="text-gray-600">Channel Partner</span>
             <span className="font-extrabold text-xl">{broker ?? "—"}</span>
           </div>
           <div className="flex flex-col">

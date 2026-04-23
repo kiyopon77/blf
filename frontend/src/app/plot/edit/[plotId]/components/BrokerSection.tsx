@@ -29,7 +29,7 @@ export function BrokerSection({
     <div className="grid grid-cols-2 gap-6">
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500 font-semibold">BROKER NAME</span>
+          <span className="text-xs text-gray-500 font-semibold">CHANNEL PARTNER</span>
           {!isLocked && (
             <button
               type="button"

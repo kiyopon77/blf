@@ -74,7 +74,7 @@ const BrokerCreateModal = ({ open, setOpen, setBrokers }: any) => {
 
           {/* Name */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-600">Broker Name</label>
+            <label className="text-sm text-gray-600">Channel Partner</label>
             <input
               name="broker_name"
               value={form.broker_name}
