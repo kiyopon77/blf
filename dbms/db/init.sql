@@ -26,6 +26,12 @@ CREATE TYPE milestone_type AS ENUM (
     'POSSESSION'
 );
 
+CREATE TYPE milestone_ratio AS ENUM (
+    '30:10:60',
+    '30:70',
+    '40:60'
+);
+
 CREATE TYPE milestone_status AS ENUM (
     'PENDING',
     'DONE'
@@ -78,6 +84,10 @@ CREATE TABLE brokers (
     society_id INT NOT NULL REFERENCES society(society_id),
     broker_name VARCHAR(100),
     phone VARCHAR(20) UNIQUE,
+    pan VARCHAR(20) UNIQUE,
+    email VARCHAR(100),
+    address TEXT,
+    kyc_status kyc_status DEFAULT 'PENDING',
     user_id INT NOT NULL REFERENCES users(user_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -170,6 +180,7 @@ CREATE TABLE payments (
     payment_id SERIAL PRIMARY KEY,
     sale_id INT NOT NULL REFERENCES sales(sale_id) ON DELETE CASCADE,
     milestone milestone_type NOT NULL,
+    mratio milestone_ratio,
     amount NUMERIC(14,2),
     status milestone_status DEFAULT 'PENDING',
     paid_at TIMESTAMP,
