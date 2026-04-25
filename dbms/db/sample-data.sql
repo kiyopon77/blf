@@ -24,13 +24,13 @@ VALUES (
 -- 2. BROKERS
 -- ==================================================
 
-INSERT INTO brokers (broker_id, society_id, broker_name, phone, pan, email, address, kyc_status, user_id)
+INSERT INTO brokers (broker_id, society_id, broker_name, phone, company_name, email, address, kyc_status, user_id)
 VALUES
-    (1, 1, 'Goldy',         '9811100001', 'ABCPG1234A', 'goldy@broker.com',          '12, MG Road, Delhi',            'PENDING',  1),
-    (2, 1, 'Rajesh Verma',  '9811100002', 'BCDPV5678B', 'rajesh.verma@broker.com',   '45, Lajpat Nagar, Delhi',       'DONE',     1),
-    (3, 1, 'Sunita Brokers','9811100003', 'CDEPS9012C', 'sunita.brokers@broker.com', '78, Sector 14, Gurgaon',        'PENDING',  1),
-    (4, 1, 'Deepak Arora',  '9811100004', 'DEFPA3456D', 'deepak.arora@broker.com',   '23, Rohini Sector 7, Delhi',    'DONE',     1),
-    (5, 1, 'Meena Estates', '9811100005', 'EFGPE7890E', 'meena.estates@broker.com',  '56, Vasant Kunj, New Delhi',    'PENDING',  1);
+    (1, 1, 'Goldy',         '9811100001', 'Goldy Pvt, Ltd.', 'goldy@broker.com',          '12, MG Road, Delhi',            'PENDING',  1),
+    (2, 1, 'Rajesh Verma',  '9811100002', 'Rajesh & Sons',   'rajesh.verma@broker.com',   '45, Lajpat Nagar, Delhi',       'DONE',     1),
+    (3, 1, 'Sunita Brokers','9811100003', 'Sunita Brokers',  'sunita.brokers@broker.com', '78, Sector 14, Gurgaon',        'PENDING',  1),
+    (4, 1, 'Deepak Arora',  '9811100004', 'Deepak RE',       'deepak.arora@broker.com',   '23, Rohini Sector 7, Delhi',    'DONE',     1),
+    (5, 1, 'Meena Estates', '9811100005', 'Meena Estates',   'meena.estates@broker.com',  '56, Vasant Kunj, New Delhi',    'PENDING',  1);
 
 -- ==================================================
 -- 3. CUSTOMERS
