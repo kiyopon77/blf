@@ -9,6 +9,7 @@ from app.models.floor_log import FloorStatusLog
 from app.models.user import User
 from app.schemas.floor import FloorCreate, FloorStatusUpdate, FloorResponse, FloorUpdate
 from app.schemas.floor_log import FloorLogResponse
+from app.schemas.floor import FloorNoteResponse, FloorNoteUpdate
 from typing import List, Optional
 import os
 
@@ -61,6 +62,7 @@ def create_floor(data: FloorCreate, db: Session = Depends(get_db), admin=Depends
         f.write(f"Floor ID: {floor.floor_id}\n")
         f.write(f"Plot ID: {floor.plot_id}\n")
         f.write(f"Floor No: {floor.floor_no}\n")
+        f.write("Add your notes here...\n")
 
     #  Save relative path
     floor.file_path = relative_path
@@ -116,6 +118,35 @@ def update_floor_status(
     db.commit()
     db.refresh(floor)
     return floor
+
+@router.get("/{floor_id}/notes", response_model=FloorNoteResponse)
+def get_floor_notes(
+    floor_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    floor = db.query(Floor).filter(Floor.floor_id == floor_id).first()
+    if not floor:
+        raise HTTPException(status_code=404, detail="Floor not found")
+
+    ensure_society_access(user, floor.plot.society_id)
+
+    if not floor.file_path:
+        raise HTTPException(status_code=404, detail="No note file found")
+
+    full_path = os.path.join("/app", floor.file_path)
+
+    if not os.path.exists(full_path):
+        raise HTTPException(status_code=404, detail="File does not exist")
+
+    with open(full_path, "r") as f:
+        content = f.read()
+
+    return FloorNoteResponse(
+        floor_id=floor_id,
+        content=content
+    )
+
 
 
 @router.get("/{floor_id}/logs", response_model=List[FloorLogResponse])

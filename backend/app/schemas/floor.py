@@ -30,8 +30,13 @@ class FloorResponse(BaseModel):
     status: InventoryStatus
     active_sale_id: Optional[int] = None
 
-    # ✅ ADD THIS
-    file_path: Optional[str] = None
-
     class Config:
         from_attributes = True
+
+class FloorNoteResponse(BaseModel):
+    floor_id: int
+    content: str
+
+
+class FloorNoteUpdate(BaseModel):
+    content: str
