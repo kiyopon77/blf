@@ -14,6 +14,7 @@ export interface Floor {
 export interface CreateFloorDTO {
   plot_id: number
   floor_no: number
+  floor_value?: number | null
 }
 
 export interface UpdateFloorStatusDTO {

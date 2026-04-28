@@ -7,8 +7,9 @@ import FloorTable from "./FloorTable"
 import AdminButton from "@/components/ui/AdminButton"
 import DeleteButton from "@/components/ui/DeleteButton"
 import { deletePlot } from "@/services/admin/plot"
-import { Edit, PlusIcon, Trash } from "lucide-react"
+import { Edit, PlusIcon, Trash, Copy } from "lucide-react"
 import PlotEditModal from "./modals/PlotEditModal"
+import PlotDuplicateModal from "./modals/PlotDuplicateModal"
 import { sortByFloorNo } from "@/app/utils/sort"
 import AddButton from "@/components/ui/AddButton"
 import type { Plot } from "@/types/plot"
@@ -25,6 +26,7 @@ const PlotSection = ({ plot, setPlots }: Props) => {
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [duplicateOpen, setDuplicateOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
@@ -114,6 +116,13 @@ const PlotSection = ({ plot, setPlots }: Props) => {
           </AddButton>
 
           <AdminButton
+            onClick={() => setDuplicateOpen(true)}
+            icon={<Copy size={16} />}
+          >
+            Duplicate
+          </AdminButton>
+
+          <AdminButton
             onClick={() => setEditOpen(true)}
             icon={<Edit size={16} />}
           >
@@ -142,6 +151,13 @@ const PlotSection = ({ plot, setPlots }: Props) => {
         open={editOpen}
         setOpen={setEditOpen}
         plot={plot}
+        setPlots={setPlots}
+      />
+      <PlotDuplicateModal
+        open={duplicateOpen}
+        setOpen={setDuplicateOpen}
+        originalPlot={plot}
+        originalFloors={floors}
         setPlots={setPlots}
       />
     </div>
