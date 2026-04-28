@@ -13,7 +13,8 @@ import { getPlotDetail } from "@/services/plot"
 import { ThreeDot } from "react-loading-indicators"
 import type { SaleDetail } from "@/types/sales"
 import type { Plot } from "@/types/plot"
-import type { Floor, FloorStatus } from "@/types/floor"
+import type { Floor, FloorStatus, FloorNoteResponse } from "@/types/floor"
+import NotesCard from "./components/NotesCard"
 import type { Broker } from "@/types/broker"
 import type { Customer } from "@/types/customer"
 import type { Payment } from "@/types/payment"
@@ -25,6 +26,7 @@ type PlotDetailResponse = {
   broker?: Broker
   customer?: Customer
   payments: Payment[]
+  notes?: FloorNoteResponse | null
 }
 
 // handles plot functionality
@@ -50,7 +52,7 @@ export default function Plot() {
     )
   }
 
-  const { sale, plot, floor: floorData, broker, customer } = data
+  const { sale, plot, floor: floorData, broker, customer, notes } = data
 
   const statusColors: Record<FloorStatus, string> = {
     AVAILABLE: "bg-green-600",
@@ -117,6 +119,7 @@ export default function Plot() {
           {sale && (
             <DocumentsCard entityType="SALE" saleId={sale.sale_id} />
           )}
+          <NotesCard notes={notes} />
         </div>
       </div>
       <div className="flex justify-center mt-8">

@@ -29,3 +29,8 @@ export interface FloorLog {
   new_status?: FloorStatus | null
   changed_at: string
 }
+
+export interface FloorNoteResponse {
+  floor_id: number
+  content: string
+}
