@@ -21,6 +21,11 @@ export interface UpdateFloorStatusDTO {
   status: FloorStatus
 }
 
+export interface UpdateFloorDTO {
+  floor_no?: number | null
+  floor_value?: number | null
+}
+
 export interface FloorLog {
   log_id: number
   floor_id: number

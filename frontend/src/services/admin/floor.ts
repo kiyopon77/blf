@@ -5,6 +5,7 @@ import type {
   CreateFloorDTO,
   FloorLog,
   FloorStatus,
+  UpdateFloorDTO,
 } from "@/types/floor"
 
 // GET ALL FLOORS
@@ -36,6 +37,15 @@ export const updateFloorStatus = async (
   status: FloorStatus
 ): Promise<Floor> => {
   const res = await api.put<Floor>(`/floors/${id}/status`, { status })
+  return res.data
+}
+
+// UPDATE FLOOR DETAILS
+export const updateFloor = async (
+  id: number,
+  data: UpdateFloorDTO
+): Promise<Floor> => {
+  const res = await api.put<Floor>(`/floors/${id}`, data)
   return res.data
 }
 

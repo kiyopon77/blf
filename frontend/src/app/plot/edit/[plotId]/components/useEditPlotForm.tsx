@@ -8,7 +8,7 @@ import { updateCustomerPan, getCustomers, updateCustomer } from "@/services/admi
 import type { KYCStatus } from "@/types/customer"
 import { updateSale } from "@/services/admin/sales"
 import { getBrokers, updateBroker } from "@/services/admin/broker"
-import { updateFloorStatus } from "@/services/admin/floor"
+import { updateFloorStatus, updateFloor } from "@/services/admin/floor"
 import { getPlotDetail, updatePlot, updatePayment } from "@/services/plot"
 
 import { MILESTONE_ORDER, EditPlotFormValues } from "../types"
@@ -212,6 +212,9 @@ export function useEditPlotForm() {
 
       if (data.floor_id) {
         requests.push(updateFloorStatus(data.floor_id, data.floor_status))
+        requests.push(updateFloor(data.floor_id, {
+          floor_value: data.floor_value ? Number(data.floor_value) : null
+        }))
       }
 
       if (data.broker_id) {
