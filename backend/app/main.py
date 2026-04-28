@@ -14,6 +14,7 @@ from app.routers import payments
 from app.routers import dashboard
 from app.routers import documents
 from app.routers import society
+from app.routers import coapplicant
 
 import app.models
 
@@ -70,6 +71,7 @@ app.include_router(sales.router)
 app.include_router(payments.router)
 app.include_router(dashboard.router)
 app.include_router(documents.router)
+app.include_router(coapplicant.router)
 
 @app.get("/")
 def root():
