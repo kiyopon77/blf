@@ -147,6 +147,35 @@ def get_floor_notes(
         content=content
     )
 
+@router.put("/{floor_id}/notes", response_model=FloorNoteResponse)
+def update_floor_notes(
+    floor_id: int,
+    data: FloorNoteUpdate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+):
+    floor = db.query(Floor).filter(Floor.floor_id == floor_id).first()
+    if not floor:
+        raise HTTPException(status_code=404, detail="Floor not found")
+
+    ensure_society_access(user, floor.plot.society_id)
+
+    if not floor.file_path:
+        raise HTTPException(status_code=404, detail="No note file found")
+
+    full_path = os.path.join("/app", floor.file_path)
+
+    if not os.path.exists(full_path):
+        raise HTTPException(status_code=404, detail="File does not exist")
+
+    # ✍️ overwrite file content
+    with open(full_path, "w") as f:
+        f.write(data.content)
+
+    return FloorNoteResponse(
+        floor_id=floor_id,
+        content=data.content
+    )
 
 
 @router.get("/{floor_id}/logs", response_model=List[FloorLogResponse])
