@@ -6,7 +6,7 @@ export type Sale = {
   broker_id: number
   customer_id: number
   total_value: number
-  commission_percent: number | null
+  commission_amount: number | null
   status: SaleStatus
   initiated_at: string
 }
@@ -16,12 +16,12 @@ export type CreateSaleDTO = {
   broker_id: number
   customer_id: number
   total_value: number
-  commission_percent?: number | null
+  commission_amount?: number | null
 }
 
 export type UpdateSaleDTO = {
   total_value?: number | null
-  commission_percent?: number | null
+  commission_amount?: number | null
   initiated_at?: string | null
 }
 

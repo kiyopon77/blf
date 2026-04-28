@@ -16,7 +16,7 @@ export interface EditPlotFormValues {
   floor_value: string
   sale_total_value: string
   selling_date: string
-  commission_percent: string
+  commission_amount: string
   broker_name: string
   broker_phone: string
   customer_name: string

@@ -2,10 +2,7 @@
 import { SaleDetail } from "@/types/sales"
  // handles summary bar functionality
 export default function SummaryBar({ sale }: { sale: SaleDetail }) {
-  const commission =
-    sale.commission_percent != null
-      ? (sale.total_value * sale.commission_percent) / 100
-      : null
+  const commission = sale.commission_amount != null ? sale.commission_amount : null
 
   return (
     <div className="bg-white p-5 md:px-9 md:py-6 rounded-xl border border-gray-400">
@@ -48,7 +45,7 @@ export default function SummaryBar({ sale }: { sale: SaleDetail }) {
             <span className="text-gray-500 text-sm">Commission</span>
             <span className="font-bold text-lg">
               {commission != null
-                ? `₹ ${commission.toLocaleString("en-IN")} (${sale.commission_percent}%)`
+                ? `₹ ${Math.round(commission).toLocaleString("en-IN")}`
                 : "—"}
             </span>
           </div>

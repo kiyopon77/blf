@@ -28,7 +28,7 @@ type FormState = {
   customer_id: string
   customer_name: string
   total_value: string
-  commission_percent: string
+  commission_amount: string
 }
 
 // handles sale create modal functionality
@@ -47,7 +47,7 @@ export default function SaleCreateModal({ onClose, onSuccess }: Props) {
     customer_id: "",
     customer_name: "",
     total_value: "",
-    commission_percent: "",
+    commission_amount: "",
   })
 
   const [loading, setLoading] = useState(false)
@@ -103,8 +103,8 @@ export default function SaleCreateModal({ onClose, onSuccess }: Props) {
         broker_id: Number(form.broker_id),
         customer_id: Number(form.customer_id),
         total_value: Number(form.total_value),
-        commission_percent: form.commission_percent
-          ? Number(form.commission_percent)
+        commission_amount: form.commission_amount
+          ? Number(form.commission_amount)
           : undefined,
       })
 
@@ -236,13 +236,14 @@ export default function SaleCreateModal({ onClose, onSuccess }: Props) {
 
           {/* Commission */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-600">Commission (%)</label>
+            <label className="text-sm text-gray-600">Commission Amount (₹)</label>
             <input
-              value={form.commission_percent}
+               type="number"
+              value={form.commission_amount}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  commission_percent: e.target.value,
+                  commission_amount: e.target.value,
                 })
               }
               className="border border-gray-300 rounded-md p-2 text-sm"

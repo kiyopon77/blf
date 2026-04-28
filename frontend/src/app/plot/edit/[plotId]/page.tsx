@@ -90,7 +90,7 @@ export default function EditPlot() {
           setValue("sale_id", sale.sale_id)
           setValue("sale_total_value", sale.total_value || "")
           setValue("selling_date", sale.initiated_at?.split("T")[0] || "")
-          setValue("commission_percent", sale.commission_percent ?? "")
+          setValue("commission_amount", sale.commission_amount ?? "")
 
           if (sale.broker_id) handleBrokerChange(sale.broker_id)
           if (sale.customer_id) handleCustomerChange(sale.customer_id)

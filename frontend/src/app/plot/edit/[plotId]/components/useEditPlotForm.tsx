@@ -50,7 +50,7 @@ export function useEditPlotForm() {
         floor_value: "",
         sale_total_value: "",
         selling_date: "",
-        commission_percent: "",
+        commission_amount: "",
         broker_name: "",
         broker_phone: "",
         customer_name: "",
@@ -121,7 +121,7 @@ export function useEditPlotForm() {
       floor_value: floor?.floor_value ?? "",
       sale_total_value: sale?.total_value || "",
       selling_date: sale?.initiated_at?.split("T")[0] || "",
-      commission_percent: sale?.commission_percent ?? "",
+      commission_amount: sale?.commission_amount ?? "",
       broker_name: broker?.broker_name || "",
       broker_phone: broker?.phone || "",
       customer_name: customer?.full_name || "",
@@ -237,7 +237,7 @@ export function useEditPlotForm() {
       if (data.sale_id) {
         requests.push(updateSale(data.sale_id, {
           total_value: data.sale_total_value ? Number(data.sale_total_value) : null,
-          commission_percent: data.commission_percent ? Number(data.commission_percent) : null,
+          commission_amount: data.commission_amount ? Number(data.commission_amount) : null,
           initiated_at: data.selling_date ? new Date(data.selling_date).toISOString() : null,
         }))
       }
