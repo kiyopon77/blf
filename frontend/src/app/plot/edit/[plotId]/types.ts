@@ -29,6 +29,7 @@ export interface EditPlotFormValues {
   area_sqft: string
   floor_status: "AVAILABLE" | "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR_UNIT"
   payments: PaymentRow[]
+  floor_notes: string
 }
 
 export const MILESTONE_ORDER = [

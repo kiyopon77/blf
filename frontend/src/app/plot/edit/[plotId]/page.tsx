@@ -233,6 +233,18 @@ export default function EditPlot() {
             onCreateSale={() => setShowCreateSale(true)}
           />
         </SectionCard>
+
+        {/* Floor Notes */}
+        <SectionCard title="FLOOR NOTES">
+          <div className="flex flex-col gap-2 w-full">
+            <span className="text-xs text-gray-500 font-semibold">NOTES</span>
+            <textarea
+              {...register("floor_notes")}
+              className="min-h-[120px] rounded-lg border border-gray-300 p-3 text-sm font-medium resize-y"
+              placeholder="Add any notes related to this floor..."
+            />
+          </div>
+        </SectionCard>
       </form>
     </>
   )

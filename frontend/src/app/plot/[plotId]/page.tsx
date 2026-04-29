@@ -119,7 +119,7 @@ export default function Plot() {
           {sale && (
             <DocumentsCard entityType="SALE" saleId={sale.sale_id} />
           )}
-          <NotesCard notes={notes} />
+          <NotesCard notes={notes} floorId={floorData?.floor_id} />
         </div>
       </div>
       <div className="flex justify-center mt-8">

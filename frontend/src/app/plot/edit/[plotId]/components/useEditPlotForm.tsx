@@ -8,7 +8,7 @@ import { updateCustomerPan, getCustomers, updateCustomer } from "@/services/admi
 import type { KYCStatus } from "@/types/customer"
 import { updateSale } from "@/services/admin/sales"
 import { getBrokers, updateBroker } from "@/services/admin/broker"
-import { updateFloorStatus, updateFloor } from "@/services/admin/floor"
+import { updateFloorStatus, updateFloor, getFloorNotes, updateFloorNotes } from "@/services/admin/floor"
 import { getPlotDetail, updatePlot, updatePayment } from "@/services/plot"
 
 import { MILESTONE_ORDER, EditPlotFormValues } from "../types"
@@ -63,6 +63,7 @@ export function useEditPlotForm() {
         area_sqft: "",
         floor_status: "AVAILABLE",
         payments: [],
+        floor_notes: "",
       },
     })
 
@@ -112,6 +113,16 @@ export function useEditPlotForm() {
     setInitialBrokerId(sale?.broker_id || null)
     setInitialCustomerId(sale?.customer_id || null)
 
+    let floorNotes = ""
+    if (floor?.floor_id) {
+      try {
+        const notesRes = await getFloorNotes(floor.floor_id)
+        floorNotes = notesRes.content || ""
+      } catch (e) {
+        // ignore if not found
+      }
+    }
+
     reset({
       plot_id: plot?.plot_id,
       floor_id: floor?.floor_id,
@@ -139,6 +150,7 @@ export function useEditPlotForm() {
           ? { ...existing, paid_at: existing.paid_at ? existing.paid_at.split("T")[0] : "" }
           : { payment_id: null, milestone, amount: "", status: "PENDING", paid_at: "" }
       }),
+      floor_notes: floorNotes,
     })
   }, [plotId, reset])
 
@@ -215,6 +227,7 @@ export function useEditPlotForm() {
         requests.push(updateFloor(data.floor_id, {
           floor_value: data.floor_value ? Number(data.floor_value) : null
         }))
+        requests.push(updateFloorNotes(data.floor_id, data.floor_notes || ""))
       }
 
       if (data.broker_id) {
