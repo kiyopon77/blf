@@ -37,7 +37,11 @@ export default function Plot() {
   const router = useRouter()
   const { plotId } = useParams() as { plotId: string }
   const [data, setData] = useState<PlotDetailResponse | null>(null)
-  const [category, floor] = useMemo(() => plotId.split("-"), [plotId])
+  const [category, floor] = useMemo(() => {
+    const idx = plotId.lastIndexOf("-")
+    if (idx === -1) return [plotId, ""]
+    return [plotId.slice(0, idx), plotId.slice(idx + 1)]
+  }, [plotId])
 
   useEffect(() => {
     const load = async () => {

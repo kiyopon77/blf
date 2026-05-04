@@ -120,7 +120,11 @@ export function useEditPlotForm() {
   const loadPlot = useCallback(async () => {
     if (!plotId) return
 
-    const [plotCode, floorNo] = (plotId as string).split("-")
+    const p = plotId as string
+    const idx = p.lastIndexOf("-")
+    const plotCode = idx === -1 ? p : p.slice(0, idx)
+    const floorNo = idx === -1 ? "" : p.slice(idx + 1)
+
     const { plot, floor, sale, broker, customer, payments } =
       await getPlotDetail(plotCode, Number(floorNo))
 
