@@ -14,6 +14,10 @@ export type Payment = {
   sale_id: number
   milestone: PaymentMilestone
   amount?: number
+  total_amount?: number | null
+  paid_amount?: number | null
+  mratio?: string | null
   status: PaymentStatus
-  paid_at?: string
+  paid_at?: string | null
+  due_date?: string | null
 }

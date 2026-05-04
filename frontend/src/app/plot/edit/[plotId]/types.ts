@@ -2,7 +2,8 @@
 interface PaymentRow {
   payment_id: number | null
   milestone: string
-  amount: string
+  total_amount: string
+  paid_amount: string
   status: "PENDING" | "DONE"
   paid_at: string
 }

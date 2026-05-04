@@ -61,6 +61,8 @@ export const updatePayment = async (
   payload: {
     status: "DONE" | "PENDING"
     amount?: number | null
+    total_amount?: number | null
+    paid_amount?: number | null
     paid_at?: string | null
   }
 ) => {

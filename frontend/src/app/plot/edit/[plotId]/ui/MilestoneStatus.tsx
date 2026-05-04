@@ -57,9 +57,9 @@ const MilestoneSection = ({ control, register, setValue, floorValue }: Props) =>
       if (cfg[key] === null) {
         // Token / ATS
         const val = key === "TOKEN" ? tokenAmt : atsAmt
-        setValue(`payments.${index}.amount`, val > 0 ? String(val) : "")
+        setValue(`payments.${index}.total_amount`, val > 0 ? String(val) : "")
       } else {
-        setValue(`payments.${index}.amount`, String(Math.round((cfg[key] as number) * floorValue)))
+        setValue(`payments.${index}.total_amount`, String(Math.round((cfg[key] as number) * floorValue)))
       }
     })
   }
@@ -133,8 +133,9 @@ const MilestoneSection = ({ control, register, setValue, floorValue }: Props) =>
       {/* Table header */}
       <div className="grid grid-cols-12 gap-4 px-4 pb-1 border-b border-gray-200">
         <span className="col-span-3 text-xs font-semibold text-gray-400">MILESTONE</span>
-        <span className="col-span-3 text-xs font-semibold text-gray-400">AMOUNT (₹)</span>
-        <span className="col-span-3 text-xs font-semibold text-gray-400">PAID ON</span>
+        <span className="col-span-2 text-xs font-semibold text-gray-400">TOTAL AMT (₹)</span>
+        <span className="col-span-2 text-xs font-semibold text-gray-400">PAID AMT (₹)</span>
+        <span className="col-span-2 text-xs font-semibold text-gray-400">PAID ON</span>
         <span className="col-span-3 text-xs font-semibold text-gray-400">STATUS</span>
       </div>
 
@@ -157,15 +158,23 @@ const MilestoneSection = ({ control, register, setValue, floorValue }: Props) =>
               </div>
               <span className="text-sm font-semibold text-gray-800">{milestone?.label}</span>
             </div>
-            <div className="col-span-3">
+            <div className="col-span-2">
               <input
-                {...register(`payments.${index}.amount`)}
+                {...register(`payments.${index}.total_amount`)}
                 type="number"
                 placeholder="—"
                 className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               />
             </div>
-            <div className="col-span-3">
+            <div className="col-span-2">
+              <input
+                {...register(`payments.${index}.paid_amount`)}
+                type="number"
+                placeholder="—"
+                className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+              />
+            </div>
+            <div className="col-span-2">
               <input
                 {...register(`payments.${index}.paid_at`)}
                 type="date"

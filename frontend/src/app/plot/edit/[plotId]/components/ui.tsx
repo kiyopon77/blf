@@ -28,7 +28,7 @@ export function ReadOnlyField({
 
 // ─── PriceBadge ───────────────────────────────────────────────────────────────
 
-type PriceBadgeVariant = "green" | "blue" | "red" | "neutral"
+type PriceBadgeVariant = "green" | "blue" | "red" | "neutral" | "purple" | "yellow"
 
 const BADGE_STYLES: Record<
   PriceBadgeVariant,
@@ -57,6 +57,18 @@ const BADGE_STYLES: Record<
     label:   "text-gray-500",
     value:   "text-gray-800",
     dot:     "bg-gray-400",
+  },
+  purple: {
+    wrapper: "bg-purple-50 border-purple-200",
+    label:   "text-purple-700",
+    value:   "text-purple-900",
+    dot:     "bg-purple-500",
+  },
+  yellow: {
+    wrapper: "bg-yellow-50 border-yellow-200",
+    label:   "text-yellow-700",
+    value:   "text-yellow-900",
+    dot:     "bg-yellow-500",
   },
 }
 

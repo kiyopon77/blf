@@ -33,6 +33,8 @@ export function useEditPlotForm() {
   // ── Initial Assignments for Locking ────────────────────────────────────────
   const [initialBrokerId, setInitialBrokerId] = useState<number | null>(null)
   const [initialCustomerId, setInitialCustomerId] = useState<number | null>(null)
+  const [totalPaidAmount, setTotalPaidAmount] = useState<number | null>(null)
+  const [paymentPlanRatio, setPaymentPlanRatio] = useState<string | null>(null)
 
   // ── Dialog visibility ──────────────────────────────────────────────────────
   const [showAddBroker, setShowAddBroker] = useState(false)
@@ -76,7 +78,7 @@ export function useEditPlotForm() {
   const hasSale = !!watchedSaleId
 
   const paymentsSum = (watchedPayments || []).reduce((sum: number, p: any) => {
-    const amt = parseFloat(p?.amount)
+    const amt = parseFloat(p?.total_amount)
     return sum + (isNaN(amt) ? 0 : amt)
   }, 0)
 
@@ -130,6 +132,8 @@ export function useEditPlotForm() {
 
     setInitialBrokerId(sale?.broker_id || null)
     setInitialCustomerId(sale?.customer_id || null)
+    setTotalPaidAmount(sale?.total_paid_amount ?? null)
+    setPaymentPlanRatio(payments?.find((p: any) => p.mratio)?.mratio ?? null)
 
     let floorNotes = ""
     if (floor?.floor_id) {
@@ -165,8 +169,8 @@ export function useEditPlotForm() {
       payments: MILESTONE_ORDER.map(milestone => {
         const existing = (payments || []).find((p: any) => p.milestone === milestone)
         return existing
-          ? { ...existing, paid_at: existing.paid_at ? existing.paid_at.split("T")[0] : "" }
-          : { payment_id: null, milestone, amount: "", status: "PENDING", paid_at: "" }
+          ? { ...existing, total_amount: existing.total_amount ?? existing.amount ?? "", paid_amount: existing.paid_amount ?? "", paid_at: existing.paid_at ? existing.paid_at.split("T")[0] : "" }
+          : { payment_id: null, milestone, total_amount: "", paid_amount: "", status: "PENDING", paid_at: "" }
       }),
       floor_notes: floorNotes,
     })
@@ -281,7 +285,8 @@ export function useEditPlotForm() {
 
         requests.push(updatePayment(payment.payment_id, {
           status: payment.status,
-          amount: payment.amount ? Number(payment.amount) : null,
+          total_amount: payment.total_amount ? Number(payment.total_amount) : null,
+          paid_amount: payment.paid_amount ? Number(payment.paid_amount) : null,
           paid_at: payment.paid_at ? new Date(payment.paid_at).toISOString() : null,
         }))
       }
@@ -312,6 +317,8 @@ export function useEditPlotForm() {
     sumExceedsSaleValue,
     watchedFloorValue,
     watchedSaleValue,
+    totalPaidAmount,
+    paymentPlanRatio,
     // dropdowns
     brokers,
     customers,
@@ -333,3 +340,4 @@ export function useEditPlotForm() {
     setCoApplicants
   }
 }
+
