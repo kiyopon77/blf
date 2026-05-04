@@ -2,14 +2,14 @@
 import { useState } from "react"
 import { FloorNoteResponse } from "@/types/floor"
 import { updateFloorNotes } from "@/services/admin/floor"
-import { App } from "antd"
+import { message } from "antd"
 
 const NotesCard = ({ notes, floorId }: { notes?: FloorNoteResponse | null, floorId?: number }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [content, setContent] = useState(notes?.content || "")
   const [currentNotes, setCurrentNotes] = useState(notes?.content || "")
   const [isSaving, setIsSaving] = useState(false)
-  const { message } = App.useApp()
+  // const { message } = App.useApp()
 
   const handleSave = async () => {
     if (!floorId) return
