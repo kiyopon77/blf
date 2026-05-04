@@ -7,7 +7,8 @@ from app.models.payment import MilestoneType, MilestoneStatus, MilestoneRatio
 class PaymentUpdate(BaseModel):
     paid_amount: Optional[float] = None
     total_amount: Optional[float] = None
-    status: MilestoneStatus
+    mratio: Optional[MilestoneRatio] = None
+    status: Optional[MilestoneStatus] = None
     paid_at: Optional[datetime] = None
     due_date: Optional[datetime] = None
 

@@ -3,6 +3,18 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 from app.models.sale import SaleStatus
+from app.models.payment import MilestoneType, MilestoneStatus, MilestoneRatio
+from app.schemas.payment import PaymentResponse
+
+class SalePaymentInput(BaseModel):
+    milestone: MilestoneType
+    total_amount: Optional[float] = None
+    paid_amount: Optional[float] = None
+    mratio: Optional[MilestoneRatio] = None
+    status: Optional[MilestoneStatus] = None
+    paid_at: Optional[datetime] = None
+    due_date: Optional[datetime] = None
+
 
 class SaleCreate(BaseModel):
     floor_id: int
@@ -10,6 +22,7 @@ class SaleCreate(BaseModel):
     customer_id: int
     total_value: float
     commission_amount: Optional[float] = None
+    payments: Optional[list[SalePaymentInput]] = None
 
 class SaleStatusUpdate(BaseModel):
     status: SaleStatus
@@ -49,6 +62,9 @@ class SaleDetailResponse(BaseModel):
     floor_no: int
     plot_code: str
     floor: FloorInfoResponse
+    payments: list[PaymentResponse]
+    total_paid_amount: float
+    total_amount: float
 
     class Config:
         from_attributes = True

@@ -27,6 +27,9 @@ def update_payment(payment_id: int, data: PaymentUpdate, db: Session = Depends(g
     if data.due_date is not None:
         payment.due_date = data.due_date
 
+    if data.mratio is not None:
+        payment.mratio = data.mratio
+
     
     if payment.total_amount and payment.paid_amount:
         if payment.paid_amount >= payment.total_amount:
@@ -36,12 +39,13 @@ def update_payment(payment_id: int, data: PaymentUpdate, db: Session = Depends(g
             payment.status = MilestoneStatus.PENDING
             payment.paid_at = None
     else:
-        # fallback manual override
-        payment.status = data.status
-        if data.status == MilestoneStatus.DONE:
-            payment.paid_at = data.paid_at or datetime.utcnow()
-        else:
-            payment.paid_at = None
+        # fallback manual override when status is provided
+        if data.status is not None:
+            payment.status = data.status
+            if data.status == MilestoneStatus.DONE:
+                payment.paid_at = data.paid_at or datetime.utcnow()
+            else:
+                payment.paid_at = None
 
     db.commit()
     db.refresh(payment)

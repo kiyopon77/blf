@@ -11,6 +11,7 @@ from app.models.customer import Customer
 from app.schemas.sale import SaleCreate, SaleStatusUpdate, SaleResponse, SaleDetailResponse, SaleUpdate, FloorInfoResponse, FloorCodeSaleResponse
 from app.schemas.payment import PaymentResponse
 from typing import List, Optional
+from datetime import datetime
 
 router = APIRouter(prefix="/sales", tags=["Sales"])
 
@@ -74,6 +75,8 @@ def get_sale(sale_id: int, db: Session = Depends(get_db), user=Depends(get_curre
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
     ensure_society_access(user, sale.floor.plot.society_id)
+    total_paid_amount = sum(float(p.paid_amount or 0) for p in sale.payments)
+    total_amount = sum(float(p.total_amount or 0) for p in sale.payments)
     return SaleDetailResponse(
         sale_id=sale.sale_id,
         total_value=float(sale.total_value),
@@ -91,7 +94,10 @@ def get_sale(sale_id: int, db: Session = Depends(get_db), user=Depends(get_curre
             floor_no=sale.floor.floor_no,
             status=sale.floor.status.value,
             active_sale_id=sale.floor.active_sale_id
-        )
+        ),
+        payments=sale.payments,
+        total_paid_amount=total_paid_amount,
+        total_amount=total_amount
     )
 
 
@@ -122,7 +128,7 @@ def create_sale(data: SaleCreate, db: Session = Depends(get_db), user=Depends(ge
         raise HTTPException(status_code=400, detail="Floor already has an active sale")
 
     # ✅ create sale
-    sale = Sale(**data.model_dump())
+    sale = Sale(**data.model_dump(exclude={"payments"}))
     db.add(sale)
     db.flush()
 
@@ -131,6 +137,7 @@ def create_sale(data: SaleCreate, db: Session = Depends(get_db), user=Depends(ge
     floor.active_sale_id = sale.sale_id
 
     # ✅ NEW payment structure
+    payments_by_milestone = {}
     for milestone in MilestoneType:
         payment = Payment(
             sale_id=sale.sale_id,
@@ -140,6 +147,43 @@ def create_sale(data: SaleCreate, db: Session = Depends(get_db), user=Depends(ge
             status=MilestoneStatus.PENDING
         )
         db.add(payment)
+        payments_by_milestone[milestone] = payment
+
+    if data.payments:
+        for payload in data.payments:
+            payment = payments_by_milestone.get(payload.milestone)
+            if not payment:
+                continue
+
+            if payload.total_amount is not None:
+                payment.total_amount = payload.total_amount
+
+            if payload.paid_amount is not None:
+                payment.paid_amount = payload.paid_amount
+
+            if payload.mratio is not None:
+                payment.mratio = payload.mratio
+
+            if payload.due_date is not None:
+                payment.due_date = payload.due_date
+
+            if payload.paid_at is not None:
+                payment.paid_at = payload.paid_at
+
+            if payment.total_amount is not None and payment.paid_amount is not None:
+                if payment.paid_amount >= payment.total_amount:
+                    payment.status = MilestoneStatus.DONE
+                    if payment.paid_at is None:
+                        payment.paid_at = datetime.utcnow()
+                else:
+                    payment.status = MilestoneStatus.PENDING
+                    payment.paid_at = None
+            elif payload.status is not None:
+                payment.status = payload.status
+                if payload.status == MilestoneStatus.DONE:
+                    payment.paid_at = payload.paid_at or datetime.utcnow()
+                else:
+                    payment.paid_at = None
 
     db.commit()
     db.refresh(sale)
