@@ -1,7 +1,7 @@
 // app/plot/edit/[plotId]/ui/MilestoneStatus.tsx
 "use client"
 import { useFieldArray, UseFormRegister, UseFormSetValue, Control, useWatch } from "react-hook-form"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const MILESTONES = [
   { key: "TOKEN", label: "Token" },
@@ -31,15 +31,33 @@ interface Props {
   register: UseFormRegister<any>
   setValue: UseFormSetValue<any>
   floorValue: number | null
+  paymentPlanRatio?: string | null
 }
 
 // handles milestone section functionality
-const MilestoneSection = ({ control, register, setValue, floorValue }: Props) => {
+const MilestoneSection = ({ control, register, setValue, floorValue, paymentPlanRatio }: Props) => {
   const { fields } = useFieldArray({ control, name: "payments" })
   const payments = useWatch({ control, name: "payments" })
 
   const [activePreset, setActivePreset] = useState<string | null>(null)
   const [tokenInput, setTokenInput] = useState<string>("")
+
+  useEffect(() => {
+    if (paymentPlanRatio && Object.keys(PRESETS).includes(paymentPlanRatio)) {
+      if (!activePreset) {
+        setActivePreset(paymentPlanRatio)
+      }
+    }
+  }, [paymentPlanRatio, activePreset])
+
+  useEffect(() => {
+    if (activePreset && !tokenInput) {
+      const tokenPayment = payments?.find((p: any) => p.milestone === "TOKEN")
+      if (tokenPayment?.total_amount) {
+        setTokenInput(String(tokenPayment.total_amount))
+      }
+    }
+  }, [activePreset, tokenInput, payments])
 
   const applyPreset = (preset: string | null, token?: string) => {
     const tStr = token ?? tokenInput
@@ -142,13 +160,12 @@ const MilestoneSection = ({ control, register, setValue, floorValue }: Props) =>
       {fields.map((field, index) => {
         const isDone = payments?.[index]?.status === "DONE"
         const milestone = MILESTONES.find(m => m.key === (field as any).milestone)
-        const isZeroed = activePreset && PRESETS[activePreset][(field as any).milestone] === 0
         return (
           <div
             key={field.id}
             className={`grid grid-cols-12 gap-4 items-center rounded-xl px-4 py-3 border transition-all ${
               isDone ? "bg-green-50 border-green-200" : "bg-white border-gray-200"
-            } ${isZeroed ? "opacity-40" : ""}`}
+            }`}
           >
             <div className="col-span-3 flex items-center gap-3">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${

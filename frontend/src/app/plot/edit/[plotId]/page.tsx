@@ -288,6 +288,7 @@ export default function EditPlot() {
             floorValueNum={floorValueNum}
             sumExceedsSaleValue={sumExceedsSaleValue}
             onCreateSale={() => setShowCreateSale(true)}
+            paymentPlanRatio={paymentPlanRatio}
           />
         </SectionCard>
 
