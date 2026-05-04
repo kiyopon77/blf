@@ -1,6 +1,7 @@
 // app/plot/edit/[plotId]/page.tsx
 "use client"
 
+import { useState } from "react"
 import { Controller } from "react-hook-form"
 
 import SectionCard from "./ui/SectionCard"
@@ -17,6 +18,10 @@ import { MilestonesSection } from "./components/MilestoneSection"
 import { AddBrokerDialog } from "./components/AddBrokerDialog"
 import { AddCustomerDialog } from "./components/AddCustomerDialog"
 import { CreateSaleDialog } from "./components/CreateSaleDialog"
+import { CoApplicantSection } from "./components/CoApplicantSection"
+import AddCoApplicantModal from "@/app/admin/customers/components/modals/AddCoApplicantModal"
+import { deleteCoApplicant } from "@/services/admin/coapplicant"
+import { App } from "antd"
 
 // handles edit plot functionality
 export default function EditPlot() {
@@ -51,7 +56,30 @@ export default function EditPlot() {
     initialBrokerId,
     initialCustomerId,
     isSubmitting,
+    coApplicants,
+    setCoApplicants,
   } = useEditPlotForm()
+
+  const [showAddCoApplicant, setShowAddCoApplicant] = useState(false)
+  const { modal, message } = App.useApp()
+
+  const handleDeleteCoApplicant = (caId: number) => {
+    modal.confirm({
+      title: "Delete Co-Applicant",
+      content: "Are you sure you want to delete this co-applicant?",
+      okText: "Delete",
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await deleteCoApplicant(caId)
+          setCoApplicants(prev => prev.filter(ca => ca.coapplicant_id !== caId))
+          message.success("Co-applicant deleted")
+        } catch (e) {
+          message.error("Failed to delete co-applicant")
+        }
+      }
+    })
+  }
 
   return (
     <>
@@ -74,6 +102,13 @@ export default function EditPlot() {
           setCustomers(prev => [...prev, customer])
           handleCustomerChange(customer)
         }}
+      />
+
+      <AddCoApplicantModal
+        open={showAddCoApplicant}
+        onClose={() => setShowAddCoApplicant(false)}
+        customerId={watch("customer_id")!}
+        onCreated={ca => setCoApplicants(prev => [...prev, ca])}
       />
 
       <CreateSaleDialog
@@ -193,6 +228,16 @@ export default function EditPlot() {
             onCustomerChange={handleCustomerChange}
             onAddNew={() => setShowAddCustomer(true)}
             isLocked={!!initialCustomerId}
+          />
+        </SectionCard>
+
+        {/* Co-Applicants */}
+        <SectionCard title="CO-APPLICANTS">
+          <CoApplicantSection
+            coApplicants={coApplicants}
+            customerId={watch("customer_id")}
+            onAddNew={() => setShowAddCoApplicant(true)}
+            onDelete={handleDeleteCoApplicant}
           />
         </SectionCard>
 

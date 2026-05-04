@@ -8,6 +8,7 @@ import { updateCustomerPan, getCustomers, updateCustomer } from "@/services/admi
 import type { KYCStatus } from "@/types/customer"
 import { updateSale } from "@/services/admin/sales"
 import { getBrokers, updateBroker } from "@/services/admin/broker"
+import { getCoApplicantsByCustomer } from "@/services/admin/coapplicant"
 import { updateFloorStatus, updateFloor, getFloorNotes, updateFloorNotes } from "@/services/admin/floor"
 import { getPlotDetail, updatePlot, updatePayment } from "@/services/plot"
 
@@ -101,6 +102,19 @@ export function useEditPlotForm() {
     loadBrokers()
     loadCustomers()
   }, [loadBrokers, loadCustomers])
+
+  const watchedCustomerId = useWatch({ control, name: "customer_id" })
+  const [coApplicants, setCoApplicants] = useState<any[]>([])
+
+  useEffect(() => {
+    if (watchedCustomerId) {
+      getCoApplicantsByCustomer(watchedCustomerId)
+        .then(setCoApplicants)
+        .catch(() => setCoApplicants([]))
+    } else {
+      setCoApplicants([])
+    }
+  }, [watchedCustomerId])
 
   // ── Load plot detail ───────────────────────────────────────────────────────
   const loadPlot = useCallback(async () => {
@@ -310,6 +324,8 @@ export function useEditPlotForm() {
     society,
     loadPlot,
     initialBrokerId,
-    initialCustomerId
+    initialCustomerId,
+    coApplicants,
+    setCoApplicants
   }
 }

@@ -29,3 +29,33 @@ export interface UpdateCustomerDTO{
   address?: string | null
   kyc_status?: KYCStatus | null
 }
+
+export interface CoApplicantResponse {
+  coapplicant_id: number
+  customer_id: number
+  full_name: string
+  pan?: string | null
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  kyc_status: KYCStatus
+}
+
+export interface CoApplicantCreate {
+  customer_id: number
+  full_name: string
+  pan?: string | null
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+}
+
+export interface CoApplicantUpdate {
+  full_name?: string | null
+  pan?: string | null
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  kyc_status?: KYCStatus | null
+}
+

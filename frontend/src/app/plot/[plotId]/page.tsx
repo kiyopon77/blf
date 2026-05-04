@@ -10,11 +10,13 @@ import PaymentInfoCard from "./components/PaymentInfoCard"
 import ValueCard from "./components/ValueCard"
 import DocumentsCard from "./components/DocumentsCard"
 import { getPlotDetail } from "@/services/plot"
+import { getCoApplicantsByCustomer } from "@/services/admin/coapplicant"
 import { ThreeDot } from "react-loading-indicators"
 import type { SaleDetail } from "@/types/sales"
 import type { Plot } from "@/types/plot"
 import type { Floor, FloorStatus, FloorNoteResponse } from "@/types/floor"
 import NotesCard from "./components/NotesCard"
+import CoApplicantCard from "./components/CoApplicantCard"
 import type { Broker } from "@/types/broker"
 import type { Customer } from "@/types/customer"
 import type { Payment } from "@/types/payment"
@@ -27,6 +29,7 @@ type PlotDetailResponse = {
   customer?: Customer
   payments: Payment[]
   notes?: FloorNoteResponse | null
+  coApplicants?: any[]
 }
 
 // handles plot functionality
@@ -39,7 +42,16 @@ export default function Plot() {
   useEffect(() => {
     const load = async () => {
       const res: PlotDetailResponse = await getPlotDetail(category, Number(floor))
-      setData(res)
+      let coApplicants: any[] = []
+      const customerId = res.customer?.customer_id || res.sale?.customer_id
+      if (customerId) {
+        try {
+          coApplicants = await getCoApplicantsByCustomer(customerId)
+        } catch (e) {
+          console.error("Failed to load co-applicants", e)
+        }
+      }
+      setData({ ...res, coApplicants })
     }
     load()
   }, [category, floor])
@@ -52,7 +64,7 @@ export default function Plot() {
     )
   }
 
-  const { sale, plot, floor: floorData, broker, customer, notes } = data
+  const { sale, plot, floor: floorData, broker, customer, notes, coApplicants } = data
 
   const statusColors: Record<FloorStatus, string> = {
     AVAILABLE: "bg-green-600",
@@ -115,6 +127,9 @@ export default function Plot() {
             email={customer?.email ?? undefined}
             address={customer?.address ?? undefined}
           />
+          {coApplicants && coApplicants.length > 0 && (
+            <CoApplicantCard coApplicants={coApplicants} />
+          )}
           <MilestoneCard payments={data?.payments} />
           {sale && (
             <DocumentsCard entityType="SALE" saleId={sale.sale_id} />
