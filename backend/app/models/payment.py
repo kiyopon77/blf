@@ -37,7 +37,14 @@ class Payment(Base):
     total_amount = Column(Numeric(14, 2))
     paid_amount = Column(Numeric(14, 2), default=0)
 
-    mratio = Column(Enum(MilestoneRatio, name="milestone_ratio"), nullable=True)
+    mratio = Column(
+        Enum(
+            MilestoneRatio,
+            name="milestone_ratio",
+            values_callable=lambda enums: [e.value for e in enums],
+        ),
+        nullable=True,
+    )
 
     status = Column(Enum(MilestoneStatus, name="milestone_status"), default=MilestoneStatus.PENDING)
 
