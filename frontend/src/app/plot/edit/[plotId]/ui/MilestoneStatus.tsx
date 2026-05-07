@@ -1,7 +1,7 @@
 // app/plot/edit/[plotId]/ui/MilestoneStatus.tsx
 "use client"
 import { useFieldArray, UseFormRegister, UseFormSetValue, Control, useWatch } from "react-hook-form"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const MILESTONES = [
   { key: "TOKEN", label: "Token" },
@@ -31,15 +31,33 @@ interface Props {
   register: UseFormRegister<any>
   setValue: UseFormSetValue<any>
   floorValue: number | null
+  paymentPlanRatio?: string | null
 }
 
 // handles milestone section functionality
-const MilestoneSection = ({ control, register, setValue, floorValue }: Props) => {
+const MilestoneSection = ({ control, register, setValue, floorValue, paymentPlanRatio }: Props) => {
   const { fields } = useFieldArray({ control, name: "payments" })
   const payments = useWatch({ control, name: "payments" })
 
   const [activePreset, setActivePreset] = useState<string | null>(null)
   const [tokenInput, setTokenInput] = useState<string>("")
+
+  useEffect(() => {
+    if (paymentPlanRatio && Object.keys(PRESETS).includes(paymentPlanRatio)) {
+      if (!activePreset) {
+        setActivePreset(paymentPlanRatio)
+      }
+    }
+  }, [paymentPlanRatio, activePreset])
+
+  useEffect(() => {
+    if (activePreset && !tokenInput) {
+      const tokenPayment = payments?.find((p: any) => p.milestone === "TOKEN")
+      if (tokenPayment?.total_amount) {
+        setTokenInput(String(tokenPayment.total_amount))
+      }
+    }
+  }, [activePreset, tokenInput, payments])
 
   const applyPreset = (preset: string | null, token?: string) => {
     const tStr = token ?? tokenInput
@@ -57,9 +75,9 @@ const MilestoneSection = ({ control, register, setValue, floorValue }: Props) =>
       if (cfg[key] === null) {
         // Token / ATS
         const val = key === "TOKEN" ? tokenAmt : atsAmt
-        setValue(`payments.${index}.amount`, val > 0 ? String(val) : "")
+        setValue(`payments.${index}.total_amount`, val > 0 ? String(val) : "")
       } else {
-        setValue(`payments.${index}.amount`, String(Math.round((cfg[key] as number) * floorValue)))
+        setValue(`payments.${index}.total_amount`, String(Math.round((cfg[key] as number) * floorValue)))
       }
     })
   }
@@ -133,21 +151,21 @@ const MilestoneSection = ({ control, register, setValue, floorValue }: Props) =>
       {/* Table header */}
       <div className="grid grid-cols-12 gap-4 px-4 pb-1 border-b border-gray-200">
         <span className="col-span-3 text-xs font-semibold text-gray-400">MILESTONE</span>
-        <span className="col-span-3 text-xs font-semibold text-gray-400">AMOUNT (₹)</span>
-        <span className="col-span-3 text-xs font-semibold text-gray-400">PAID ON</span>
+        <span className="col-span-2 text-xs font-semibold text-gray-400">TOTAL AMT (₹)</span>
+        <span className="col-span-2 text-xs font-semibold text-gray-400">PAID AMT (₹)</span>
+        <span className="col-span-2 text-xs font-semibold text-gray-400">PAID ON</span>
         <span className="col-span-3 text-xs font-semibold text-gray-400">STATUS</span>
       </div>
 
       {fields.map((field, index) => {
         const isDone = payments?.[index]?.status === "DONE"
         const milestone = MILESTONES.find(m => m.key === (field as any).milestone)
-        const isZeroed = activePreset && PRESETS[activePreset][(field as any).milestone] === 0
         return (
           <div
             key={field.id}
             className={`grid grid-cols-12 gap-4 items-center rounded-xl px-4 py-3 border transition-all ${
               isDone ? "bg-green-50 border-green-200" : "bg-white border-gray-200"
-            } ${isZeroed ? "opacity-40" : ""}`}
+            }`}
           >
             <div className="col-span-3 flex items-center gap-3">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
@@ -157,15 +175,23 @@ const MilestoneSection = ({ control, register, setValue, floorValue }: Props) =>
               </div>
               <span className="text-sm font-semibold text-gray-800">{milestone?.label}</span>
             </div>
-            <div className="col-span-3">
+            <div className="col-span-2">
               <input
-                {...register(`payments.${index}.amount`)}
+                {...register(`payments.${index}.total_amount`)}
                 type="number"
                 placeholder="—"
                 className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               />
             </div>
-            <div className="col-span-3">
+            <div className="col-span-2">
+              <input
+                {...register(`payments.${index}.paid_amount`)}
+                type="number"
+                placeholder="—"
+                className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+              />
+            </div>
+            <div className="col-span-2">
               <input
                 {...register(`payments.${index}.paid_at`)}
                 type="date"

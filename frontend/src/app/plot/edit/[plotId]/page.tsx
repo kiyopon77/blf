@@ -58,6 +58,8 @@ export default function EditPlot() {
     isSubmitting,
     coApplicants,
     setCoApplicants,
+    totalPaidAmount,
+    paymentPlanRatio,
   } = useEditPlotForm()
 
   const [showAddCoApplicant, setShowAddCoApplicant] = useState(false)
@@ -158,7 +160,7 @@ export default function EditPlot() {
         </div>
 
         {/* Price overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <PriceBadge
             label="Floor Base Value"
             amount={watchedFloorValue}
@@ -169,17 +171,27 @@ export default function EditPlot() {
             label="Sale Value"
             amount={hasSale ? watchedSaleValue : null}
             variant={hasSale ? "green" : "neutral"}
-            sublabel={hasSale ? "Agreed amount — Sale record" : "No sale created yet"}
+            sublabel={
+              hasSale
+                ? `Agreed amount${paymentPlanRatio ? ` (Plan: ${paymentPlanRatio})` : ""}`
+                : "No sale created yet"
+            }
           />
           <PriceBadge
-            label="Milestones Collected"
-            amount={paymentsSum > 0 ? paymentsSum : null}
-            variant={sumExceedsSaleValue ? "red" : "neutral"}
-            sublabel={
-              sumExceedsSaleValue
-                ? `Over by ₹ ${(paymentsSum - saleValueNum).toLocaleString("en-IN")}`
-                : "Sum of all milestone amounts"
+            label="Total Paid Amount"
+            amount={totalPaidAmount}
+            variant="purple"
+            sublabel="Amount collected so far"
+          />
+          <PriceBadge
+            label="Pending Amount"
+            amount={
+              hasSale && watchedSaleValue && totalPaidAmount != null
+                ? Number(watchedSaleValue) - totalPaidAmount
+                : null
             }
+            variant={(hasSale && watchedSaleValue && totalPaidAmount != null && Number(watchedSaleValue) - totalPaidAmount > 0) ? "yellow" : "neutral"}
+            sublabel="Difference between agreed and paid"
           />
         </div>
 
@@ -276,6 +288,7 @@ export default function EditPlot() {
             floorValueNum={floorValueNum}
             sumExceedsSaleValue={sumExceedsSaleValue}
             onCreateSale={() => setShowCreateSale(true)}
+            paymentPlanRatio={paymentPlanRatio}
           />
         </SectionCard>
 

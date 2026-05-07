@@ -31,6 +31,8 @@ export type SaleDetail = Sale & {
   customer_kyc_status: "PENDING" | "DONE"
   floor_no: number
   plot_code: string
+  total_paid_amount: number
+  total_amount: number
 }
 
 export type SaleStatus = Exclude<UnitStatus, "AVAILABLE">

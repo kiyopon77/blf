@@ -109,6 +109,8 @@ export default function Plot() {
             date={sale?.initiated_at}
             area_sqyd={plot?.area_sqyd}
             area_sqft={plot?.area_sqft}
+            paidAmount={sale?.total_paid_amount}
+            mratio={data?.payments?.find(p => p.mratio)?.mratio}
           />
           <BrokerInfoCard
             broker={broker?.broker_name ?? sale?.broker_name}
