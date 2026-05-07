@@ -12,19 +12,58 @@ from app.schemas.floor_log import FloorLogResponse
 from app.schemas.floor import FloorNoteResponse, FloorNoteUpdate
 from typing import List, Optional
 import os
+import boto3
+from botocore.exceptions import ClientError
 
 router = APIRouter(prefix="/floors", tags=["Floors"])
 
-# Volume mounted at /data — write files directly here, NO subdirectories
-DATA_DIR = "/data"
+# ── S3 / Railway Bucket ─────────────────────────────────
+def get_s3_client():
+    return boto3.client(
+        "s3",
+        endpoint_url=os.environ["RAILWAY_BUCKET_ENDPOINT_URL"],
+        aws_access_key_id=os.environ["RAILWAY_BUCKET_ACCESS_KEY_ID"],
+        aws_secret_access_key=os.environ["RAILWAY_BUCKET_SECRET_ACCESS_KEY"],
+        region_name=os.environ.get("RAILWAY_BUCKET_REGION", "auto"),
+    )
+
+BUCKET_NAME = os.environ.get("RAILWAY_BUCKET_NAME", "efficient-toybox-44h-7jms")
 
 
-def _get_note_paths(plot_id: int, floor_id: int):
-    """Returns (relative_path, full_path) for a floor note file."""
-    filename = f"floor_{plot_id}_{floor_id}.txt"
-    full_path = os.path.join(DATA_DIR, filename)
-    return filename, full_path
+def _get_note_key(plot_id: int, floor_id: int) -> str:
+    """S3 object key for a floor note."""
+    return f"floors/{plot_id}_{floor_id}.txt"
 
+
+def _default_note_content(floor) -> str:
+    return (
+        f"Floor ID: {floor.floor_id}\n"
+        f"Plot ID: {floor.plot_id}\n"
+        f"Floor No: {floor.floor_no}\n"
+        "Add your notes here...\n"
+    )
+
+
+def _upload_note(s3, key: str, content: str):
+    s3.put_object(
+        Bucket=BUCKET_NAME,
+        Key=key,
+        Body=content.encode("utf-8"),
+        ContentType="text/plain",
+    )
+
+
+def _download_note(s3, key: str) -> Optional[str]:
+    try:
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=key)
+        return response["Body"].read().decode("utf-8")
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchKey":
+            return None
+        raise
+
+
+# ── Routes ──────────────────────────────────────────────
 
 @router.get("", response_model=List[FloorResponse])
 def get_floors(
@@ -55,15 +94,11 @@ def create_floor(data: FloorCreate, db: Session = Depends(get_db), admin=Depends
     db.commit()
     db.refresh(floor)
 
-    relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
+    s3 = get_s3_client()
+    key = _get_note_key(floor.plot_id, floor.floor_id)
+    _upload_note(s3, key, _default_note_content(floor))
 
-    with open(full_path, "w") as f:
-        f.write(f"Floor ID: {floor.floor_id}\n")
-        f.write(f"Plot ID: {floor.plot_id}\n")
-        f.write(f"Floor No: {floor.floor_no}\n")
-        f.write("Add your notes here...\n")
-
-    floor.file_path = relative_path
+    floor.file_path = key
     db.commit()
     db.refresh(floor)
 
@@ -129,23 +164,20 @@ def get_floor_notes(
 
     ensure_society_access(user, floor.plot.society_id)
 
-    relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
+    s3 = get_s3_client()
+    key = _get_note_key(floor.plot_id, floor.floor_id)
 
-    # Auto-create file if missing (handles existing floors migrated from old system)
-    if not os.path.exists(full_path):
-        with open(full_path, "w") as f:
-            f.write(f"Floor ID: {floor.floor_id}\n")
-            f.write(f"Plot ID: {floor.plot_id}\n")
-            f.write(f"Floor No: {floor.floor_no}\n")
-            f.write("Add your notes here...\n")
+    content = _download_note(s3, key)
 
-    # Always keep DB in sync with correct path
-    if floor.file_path != relative_path:
-        floor.file_path = relative_path
+    # Auto-create if doesn't exist (existing floors)
+    if content is None:
+        content = _default_note_content(floor)
+        _upload_note(s3, key, content)
+
+    # Keep DB in sync
+    if floor.file_path != key:
+        floor.file_path = key
         db.commit()
-
-    with open(full_path, "r") as f:
-        content = f.read()
 
     return FloorNoteResponse(floor_id=floor_id, content=content)
 
@@ -163,15 +195,14 @@ def update_floor_notes(
 
     ensure_society_access(user, floor.plot.society_id)
 
-    relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
+    s3 = get_s3_client()
+    key = _get_note_key(floor.plot_id, floor.floor_id)
+    _upload_note(s3, key, data.content)
 
     # Keep DB in sync
-    if floor.file_path != relative_path:
-        floor.file_path = relative_path
+    if floor.file_path != key:
+        floor.file_path = key
         db.commit()
-
-    with open(full_path, "w") as f:
-        f.write(data.content)
 
     return FloorNoteResponse(floor_id=floor_id, content=data.content)
 
@@ -222,6 +253,14 @@ def delete_floor(
     has_sale_history = db.query(Sale).filter(Sale.floor_id == floor_id).first()
     if has_sale_history:
         raise HTTPException(status_code=400, detail="Cannot delete floor with existing sale history")
+
+    # Delete note from bucket
+    try:
+        s3 = get_s3_client()
+        key = _get_note_key(floor.plot_id, floor.floor_id)
+        s3.delete_object(Bucket=BUCKET_NAME, Key=key)
+    except Exception:
+        pass  # Don't fail delete if file cleanup fails
 
     db.delete(floor)
     db.commit()

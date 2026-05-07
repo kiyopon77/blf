@@ -1,7 +1,9 @@
 import os
 import uuid
+import boto3
+from botocore.exceptions import ClientError
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -13,8 +15,17 @@ from app.schemas.document import DocumentResponse
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
-# Volume mounted at /data — write files directly here, NO subdirectories
-DATA_DIR = "/data"
+BUCKET_NAME = os.environ.get("RAILWAY_BUCKET_NAME", "efficient-toybox-44h-7jms")
+
+
+def get_s3_client():
+    return boto3.client(
+        "s3",
+        endpoint_url=os.environ["RAILWAY_BUCKET_ENDPOINT_URL"],
+        aws_access_key_id=os.environ["RAILWAY_BUCKET_ACCESS_KEY_ID"],
+        aws_secret_access_key=os.environ["RAILWAY_BUCKET_SECRET_ACCESS_KEY"],
+        region_name=os.environ.get("RAILWAY_BUCKET_REGION", "auto"),
+    )
 
 
 # ── Upload ──────────────────────────────────────────────
@@ -36,22 +47,25 @@ async def upload_document(
     floor_id = floor.floor_id
 
     ext = os.path.splitext(file.filename)[1].lower()
-    unique_name = f"doc_{plot_id}_{floor_id}_{uuid.uuid4()}{ext}"
+    unique_name = f"{uuid.uuid4()}{ext}"
 
-    # Write directly to /data/ — no subdirectories
-    full_path = os.path.join(DATA_DIR, unique_name)
-
-    # Relative path stored in DB
-    relative_path = unique_name
+    # S3 key: documents/{plot_id}/{floor_id}/{uuid}.ext
+    s3_key = f"documents/{plot_id}/{floor_id}/{unique_name}"
 
     contents = await file.read()
-    with open(full_path, "wb") as f:
-        f.write(contents)
+
+    s3 = get_s3_client()
+    s3.put_object(
+        Bucket=BUCKET_NAME,
+        Key=s3_key,
+        Body=contents,
+        ContentType=file.content_type or "application/octet-stream",
+    )
 
     doc = Document(
         label=label,
         file_name=file.filename,
-        file_path=relative_path,
+        file_path=s3_key,          # store S3 key in DB
         file_type=file.content_type or "application/octet-stream",
         entity=entity,
         sale_id=sale_id
@@ -113,15 +127,18 @@ def download_document(
 
     ensure_society_access(user, doc.sale.floor.plot.society_id)
 
-    full_path = os.path.join(DATA_DIR, doc.file_path)
+    s3 = get_s3_client()
+    try:
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=doc.file_path)
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchKey":
+            raise HTTPException(status_code=404, detail="File not found in storage")
+        raise
 
-    if not os.path.exists(full_path):
-        raise HTTPException(status_code=404, detail="File not found on server")
-
-    return FileResponse(
-        path=full_path,
-        filename=doc.file_name,
-        media_type=doc.file_type
+    return StreamingResponse(
+        content=response["Body"].iter_chunks(),
+        media_type=doc.file_type,
+        headers={"Content-Disposition": f"attachment; filename={doc.file_name}"}
     )
 
 
@@ -136,10 +153,11 @@ def delete_document(
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    full_path = os.path.join(DATA_DIR, doc.file_path)
-
-    if os.path.exists(full_path):
-        os.remove(full_path)
+    s3 = get_s3_client()
+    try:
+        s3.delete_object(Bucket=BUCKET_NAME, Key=doc.file_path)
+    except Exception:
+        pass  # Don't fail delete if file cleanup fails
 
     db.delete(doc)
     db.commit()
