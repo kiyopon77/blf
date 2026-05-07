@@ -3,6 +3,8 @@
 type Payment = {
   milestone: string
   amount?: number
+  total_amount?: number | null
+  paid_amount?: number | null
   status: "DONE" | "PENDING"
 }
 
@@ -60,13 +62,20 @@ const PaymentInfoCard = ({ payments = [] }: { payments?: Payment[] }) => {
               >
                 <span className="text-xs font-bold text-green-700">{formatMilestone(m)}</span>
                 <span className={`font-bold text-lg ${isDone ? "text-gray-800" : "text-gray-400"}`}>
-                  {payment?.amount != null
-                    ? `₹ ${payment.amount.toLocaleString("en-IN")}`
-                    : "—"}
+                  {payment?.total_amount != null
+                    ? `₹ ${payment.total_amount.toLocaleString("en-IN")}`
+                    : payment?.amount != null
+                      ? `₹ ${payment.amount.toLocaleString("en-IN")}`
+                      : "—"}
                 </span>
-                <span className={`text-xs font-semibold ${isDone ? "text-green-600" : "text-red-400"}`}>
-                  {payment?.status ?? "PENDING"}
-                </span>
+                <div className="flex flex-col gap-0.5 mt-1">
+                  <span className={`text-xs font-semibold ${isDone ? "text-green-600" : "text-red-400"}`}>
+                    Status: {payment?.status ?? "PENDING"}
+                  </span>
+                  <span className={`text-xs font-semibold ${payment?.paid_amount ? "text-purple-600" : "text-gray-400"}`}>
+                    Paid: {payment?.paid_amount != null ? `₹ ${payment.paid_amount.toLocaleString("en-IN")}` : "₹ 0"}
+                  </span>
+                </div>
               </div>
             )
           })}

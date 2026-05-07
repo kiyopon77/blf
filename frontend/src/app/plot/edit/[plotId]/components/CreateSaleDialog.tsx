@@ -36,7 +36,7 @@ export function CreateSaleDialog({
     broker_id: brokerId,
     customer_id: customerId,
     total_value: "",
-    commission_percent: "",
+    commission_amount: "",
   })
 
   // Pre-fill from existing form selections when dialog opens
@@ -63,13 +63,13 @@ export function CreateSaleDialog({
         broker_id: form.broker_id!,
         customer_id: form.customer_id!,
         total_value: parseFloat(form.total_value),
-        commission_percent: form.commission_percent
-          ? parseFloat(form.commission_percent)
+        commission_amount: form.commission_amount
+          ? parseFloat(form.commission_amount)
           : undefined,
       })
       message.success("Sale created — payment milestones unlocked!")
       onCreated(sale)
-      setForm({ broker_id: null, customer_id: null, total_value: "", commission_percent: "" })
+      setForm({ broker_id: null, customer_id: null, total_value: "", commission_amount: "" })
       onClose()
     } catch {
       message.error("Failed to create sale")
@@ -162,17 +162,16 @@ export function CreateSaleDialog({
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-semibold text-gray-500">COMMISSION %</label>
+            <label className="text-xs font-semibold text-gray-500">COMMISSION AMOUNT (₹)</label>
             <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">₹</span>
               <input
-                className="h-10 w-full rounded-lg border border-gray-300 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
-                placeholder="0.0"
+                className="h-10 w-full rounded-lg border border-gray-300 pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                placeholder="0"
                 type="number"
-                step="0.01"
-                value={form.commission_percent}
-                onChange={e => setForm(f => ({ ...f, commission_percent: e.target.value }))}
+                value={form.commission_amount}
+                onChange={e => setForm(f => ({ ...f, commission_amount: e.target.value }))}
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">%</span>
             </div>
           </div>
         </div>

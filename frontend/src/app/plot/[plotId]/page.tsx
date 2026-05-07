@@ -10,10 +10,13 @@ import PaymentInfoCard from "./components/PaymentInfoCard"
 import ValueCard from "./components/ValueCard"
 import DocumentsCard from "./components/DocumentsCard"
 import { getPlotDetail } from "@/services/plot"
+import { getCoApplicantsByCustomer } from "@/services/admin/coapplicant"
 import { ThreeDot } from "react-loading-indicators"
 import type { SaleDetail } from "@/types/sales"
 import type { Plot } from "@/types/plot"
-import type { Floor, FloorStatus } from "@/types/floor"
+import type { Floor, FloorStatus, FloorNoteResponse } from "@/types/floor"
+import NotesCard from "./components/NotesCard"
+import CoApplicantCard from "./components/CoApplicantCard"
 import type { Broker } from "@/types/broker"
 import type { Customer } from "@/types/customer"
 import type { Payment } from "@/types/payment"
@@ -25,6 +28,8 @@ type PlotDetailResponse = {
   broker?: Broker
   customer?: Customer
   payments: Payment[]
+  notes?: FloorNoteResponse | null
+  coApplicants?: any[]
 }
 
 // handles plot functionality
@@ -32,12 +37,25 @@ export default function Plot() {
   const router = useRouter()
   const { plotId } = useParams() as { plotId: string }
   const [data, setData] = useState<PlotDetailResponse | null>(null)
-  const [category, floor] = useMemo(() => plotId.split("-"), [plotId])
+  const [category, floor] = useMemo(() => {
+    const idx = plotId.lastIndexOf("-")
+    if (idx === -1) return [plotId, ""]
+    return [plotId.slice(0, idx), plotId.slice(idx + 1)]
+  }, [plotId])
 
   useEffect(() => {
     const load = async () => {
       const res: PlotDetailResponse = await getPlotDetail(category, Number(floor))
-      setData(res)
+      let coApplicants: any[] = []
+      const customerId = res.customer?.customer_id || res.sale?.customer_id
+      if (customerId) {
+        try {
+          coApplicants = await getCoApplicantsByCustomer(customerId)
+        } catch (e) {
+          console.error("Failed to load co-applicants", e)
+        }
+      }
+      setData({ ...res, coApplicants })
     }
     load()
   }, [category, floor])
@@ -50,7 +68,7 @@ export default function Plot() {
     )
   }
 
-  const { sale, plot, floor: floorData, broker, customer } = data
+  const { sale, plot, floor: floorData, broker, customer, notes, coApplicants } = data
 
   const statusColors: Record<FloorStatus, string> = {
     AVAILABLE: "bg-green-600",
@@ -78,12 +96,6 @@ export default function Plot() {
             <span className={`py-2 px-5 rounded-3xl text-white ${statusColor}`}>
               {statusLabel.replace("_", " ")}
             </span>
-            <button
-              onClick={() => router.push(`/plot/edit/${plotId}`)}
-              className="py-2 px-5 rounded-3xl border border-gray-300 text-gray-700 hover:bg-gray-100 hover:cursor-pointer transition-colors font-medium"
-            >
-              Edit
-            </button>
           </div>
         </div>
 
@@ -97,6 +109,8 @@ export default function Plot() {
             date={sale?.initiated_at}
             area_sqyd={plot?.area_sqyd}
             area_sqft={plot?.area_sqft}
+            paidAmount={sale?.total_paid_amount}
+            mratio={data?.payments?.find(p => p.mratio)?.mratio}
           />
           <BrokerInfoCard
             broker={broker?.broker_name ?? sale?.broker_name}
@@ -119,11 +133,23 @@ export default function Plot() {
             email={customer?.email ?? undefined}
             address={customer?.address ?? undefined}
           />
+          {coApplicants && coApplicants.length > 0 && (
+            <CoApplicantCard coApplicants={coApplicants} />
+          )}
           <MilestoneCard payments={data?.payments} />
           {sale && (
             <DocumentsCard entityType="SALE" saleId={sale.sale_id} />
           )}
+          <NotesCard notes={notes} floorId={floorData?.floor_id} />
         </div>
+      </div>
+      <div className="flex justify-center mt-8">
+        <button
+          onClick={() => router.push(`/plot/edit/${plotId}`)}
+          className="py-3 px-8 rounded-3xl bg-black text-white hover:bg-gray-800 transition-colors font-medium"
+        >
+          Edit Plot
+        </button>
       </div>
     </div>
   )

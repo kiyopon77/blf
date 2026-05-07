@@ -82,17 +82,16 @@ export function PricingSection({ register, hasSale }: Props) {
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-semibold">COMMISSION %</span>
+            <span className="text-xs text-gray-500 font-semibold">COMMISSION AMOUNT (₹)</span>
             <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">₹</span>
               <input
-                {...register("commission_percent")}
+                {...register("commission_amount")}
                 type="number"
-                step="0.01"
                 disabled={!hasSale}
-                className="h-11 w-full rounded-lg border border-green-300 bg-white pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                placeholder="0.0"
+                className="h-11 w-full rounded-lg border border-green-300 bg-white pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                placeholder="0"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">%</span>
             </div>
           </div>
           <div className="flex flex-col gap-1">

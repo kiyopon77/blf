@@ -35,7 +35,17 @@ export const getPlotDetail = async (plotCode: string, floorNo: number) => {
     sale = { ...saleDetail, broker_id: brokerId, customer_id: customerId }
   }
 
-  return { plot, floor, sale, broker, customer, payments }
+  let notes = null
+  try {
+    const { data: notesData } = await api.get(`/floors/${floor.floor_id}/notes`)
+    notes = notesData
+  } catch (err: any) {
+    if (err.response?.status !== 404) {
+      console.error("Error fetching notes:", err)
+    }
+  }
+
+  return { plot, floor, sale, broker, customer, payments, notes }
 }
 
 export const updatePlot = async (
@@ -51,6 +61,8 @@ export const updatePayment = async (
   payload: {
     status: "DONE" | "PENDING"
     amount?: number | null
+    total_amount?: number | null
+    paid_amount?: number | null
     paid_at?: string | null
   }
 ) => {

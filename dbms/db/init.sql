@@ -26,6 +26,12 @@ CREATE TYPE milestone_type AS ENUM (
     'POSSESSION'
 );
 
+CREATE TYPE milestone_ratio AS ENUM (
+    '30:10:60',
+    '30:70',
+    '40:60'
+);
+
 CREATE TYPE milestone_status AS ENUM (
     'PENDING',
     'DONE'
@@ -78,6 +84,10 @@ CREATE TABLE brokers (
     society_id INT NOT NULL REFERENCES society(society_id),
     broker_name VARCHAR(100),
     phone VARCHAR(20) UNIQUE,
+    company_name VARCHAR(50),
+    email VARCHAR(100),
+    address TEXT,
+    kyc_status kyc_status DEFAULT 'PENDING',
     user_id INT NOT NULL REFERENCES users(user_id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -93,6 +103,7 @@ CREATE TABLE plots (
     area_sqyd NUMERIC(10,2),
     area_sqft NUMERIC(10,2),
     type CHAR(1),
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -106,6 +117,7 @@ CREATE TABLE floors (
     floor_no INT,
     floor_value NUMERIC(14,2),
     status inventory_status DEFAULT 'AVAILABLE',
+    file_path VARCHAR(500),
     active_sale_id INT,
     UNIQUE(plot_id, floor_no)
 );
@@ -142,6 +154,22 @@ CREATE TABLE customers (
 );
 
 -- ==================================================
+-- COAPPLICANT (KYC)
+-- ==================================================
+
+CREATE TABLE coapplicant (
+    coapplicant_id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL REFERENCES customers(customer_id),
+    full_name VARCHAR(100),
+    pan VARCHAR(20) UNIQUE,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    address TEXT,
+    kyc_status kyc_status DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ==================================================
 -- SALES (Transaction Control)
 -- ==================================================
 
@@ -151,7 +179,7 @@ CREATE TABLE sales (
     broker_id INT NOT NULL REFERENCES brokers(broker_id),
     customer_id INT NOT NULL REFERENCES customers(customer_id),
     total_value NUMERIC(14,2) NOT NULL,
-    commission_percent NUMERIC(5,2),
+    commission_amount NUMERIC(14,2),
     status sale_status DEFAULT 'HOLD',
     initiated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -170,9 +198,12 @@ CREATE TABLE payments (
     payment_id SERIAL PRIMARY KEY,
     sale_id INT NOT NULL REFERENCES sales(sale_id) ON DELETE CASCADE,
     milestone milestone_type NOT NULL,
-    amount NUMERIC(14,2),
+    mratio milestone_ratio,
+    total_amount NUMERIC(14,2),
+    paid_amount NUMERIC(14,2),
     status milestone_status DEFAULT 'PENDING',
     paid_at TIMESTAMP,
+    due_date TIMESTAMP,
     UNIQUE(sale_id, milestone)
 );
 
@@ -185,7 +216,7 @@ CREATE TABLE documents (
     label VARCHAR(100) NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,
-    file_type VARCHAR(50) NOT NULL,
+    file_type VARCHAR(100) NOT NULL,
     entity entity_type DEFAULT 'CUSTOMER',
     sale_id INT NOT NULL REFERENCES sales(sale_id),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

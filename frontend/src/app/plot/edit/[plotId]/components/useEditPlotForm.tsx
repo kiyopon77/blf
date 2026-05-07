@@ -8,7 +8,8 @@ import { updateCustomerPan, getCustomers, updateCustomer } from "@/services/admi
 import type { KYCStatus } from "@/types/customer"
 import { updateSale } from "@/services/admin/sales"
 import { getBrokers, updateBroker } from "@/services/admin/broker"
-import { updateFloorStatus } from "@/services/admin/floor"
+import { getCoApplicantsByCustomer } from "@/services/admin/coapplicant"
+import { updateFloorStatus, updateFloor, getFloorNotes, updateFloorNotes } from "@/services/admin/floor"
 import { getPlotDetail, updatePlot, updatePayment } from "@/services/plot"
 
 import { MILESTONE_ORDER, EditPlotFormValues } from "../types"
@@ -32,6 +33,8 @@ export function useEditPlotForm() {
   // ── Initial Assignments for Locking ────────────────────────────────────────
   const [initialBrokerId, setInitialBrokerId] = useState<number | null>(null)
   const [initialCustomerId, setInitialCustomerId] = useState<number | null>(null)
+  const [totalPaidAmount, setTotalPaidAmount] = useState<number | null>(null)
+  const [paymentPlanRatio, setPaymentPlanRatio] = useState<string | null>(null)
 
   // ── Dialog visibility ──────────────────────────────────────────────────────
   const [showAddBroker, setShowAddBroker] = useState(false)
@@ -50,7 +53,7 @@ export function useEditPlotForm() {
         floor_value: "",
         sale_total_value: "",
         selling_date: "",
-        commission_percent: "",
+        commission_amount: "",
         broker_name: "",
         broker_phone: "",
         customer_name: "",
@@ -63,6 +66,7 @@ export function useEditPlotForm() {
         area_sqft: "",
         floor_status: "AVAILABLE",
         payments: [],
+        floor_notes: "",
       },
     })
 
@@ -74,7 +78,7 @@ export function useEditPlotForm() {
   const hasSale = !!watchedSaleId
 
   const paymentsSum = (watchedPayments || []).reduce((sum: number, p: any) => {
-    const amt = parseFloat(p?.amount)
+    const amt = parseFloat(p?.total_amount)
     return sum + (isNaN(amt) ? 0 : amt)
   }, 0)
 
@@ -101,16 +105,45 @@ export function useEditPlotForm() {
     loadCustomers()
   }, [loadBrokers, loadCustomers])
 
+  const watchedCustomerId = useWatch({ control, name: "customer_id" })
+  const [coApplicants, setCoApplicants] = useState<any[]>([])
+
+  useEffect(() => {
+    if (watchedCustomerId) {
+      getCoApplicantsByCustomer(watchedCustomerId)
+        .then(setCoApplicants)
+        .catch(() => setCoApplicants([]))
+    } else {
+      setCoApplicants([])
+    }
+  }, [watchedCustomerId])
+
   // ── Load plot detail ───────────────────────────────────────────────────────
   const loadPlot = useCallback(async () => {
     if (!plotId) return
 
-    const [plotCode, floorNo] = (plotId as string).split("-")
+    const p = plotId as string
+    const idx = p.lastIndexOf("-")
+    const plotCode = idx === -1 ? p : p.slice(0, idx)
+    const floorNo = idx === -1 ? "" : p.slice(idx + 1)
+
     const { plot, floor, sale, broker, customer, payments } =
       await getPlotDetail(plotCode, Number(floorNo))
 
     setInitialBrokerId(sale?.broker_id || null)
     setInitialCustomerId(sale?.customer_id || null)
+    setTotalPaidAmount(sale?.total_paid_amount ?? null)
+    setPaymentPlanRatio(payments?.find((p: any) => p.mratio)?.mratio ?? null)
+
+    let floorNotes = ""
+    if (floor?.floor_id) {
+      try {
+        const notesRes = await getFloorNotes(floor.floor_id)
+        floorNotes = notesRes.content || ""
+      } catch (e) {
+        // ignore if not found
+      }
+    }
 
     reset({
       plot_id: plot?.plot_id,
@@ -121,7 +154,7 @@ export function useEditPlotForm() {
       floor_value: floor?.floor_value ?? "",
       sale_total_value: sale?.total_value || "",
       selling_date: sale?.initiated_at?.split("T")[0] || "",
-      commission_percent: sale?.commission_percent ?? "",
+      commission_amount: sale?.commission_amount ?? "",
       broker_name: broker?.broker_name || "",
       broker_phone: broker?.phone || "",
       customer_name: customer?.full_name || "",
@@ -136,9 +169,10 @@ export function useEditPlotForm() {
       payments: MILESTONE_ORDER.map(milestone => {
         const existing = (payments || []).find((p: any) => p.milestone === milestone)
         return existing
-          ? { ...existing, paid_at: existing.paid_at ? existing.paid_at.split("T")[0] : "" }
-          : { payment_id: null, milestone, amount: "", status: "PENDING", paid_at: "" }
+          ? { ...existing, total_amount: existing.total_amount ?? existing.amount ?? "", paid_amount: existing.paid_amount ?? "", paid_at: existing.paid_at ? existing.paid_at.split("T")[0] : "" }
+          : { payment_id: null, milestone, total_amount: "", paid_amount: "", status: "PENDING", paid_at: "" }
       }),
+      floor_notes: floorNotes,
     })
   }, [plotId, reset])
 
@@ -212,6 +246,10 @@ export function useEditPlotForm() {
 
       if (data.floor_id) {
         requests.push(updateFloorStatus(data.floor_id, data.floor_status))
+        requests.push(updateFloor(data.floor_id, {
+          floor_value: data.floor_value ? Number(data.floor_value) : null
+        }))
+        requests.push(updateFloorNotes(data.floor_id, data.floor_notes || ""))
       }
 
       if (data.broker_id) {
@@ -237,7 +275,7 @@ export function useEditPlotForm() {
       if (data.sale_id) {
         requests.push(updateSale(data.sale_id, {
           total_value: data.sale_total_value ? Number(data.sale_total_value) : null,
-          commission_percent: data.commission_percent ? Number(data.commission_percent) : null,
+          commission_amount: data.commission_amount ? Number(data.commission_amount) : null,
           initiated_at: data.selling_date ? new Date(data.selling_date).toISOString() : null,
         }))
       }
@@ -247,7 +285,8 @@ export function useEditPlotForm() {
 
         requests.push(updatePayment(payment.payment_id, {
           status: payment.status,
-          amount: payment.amount ? Number(payment.amount) : null,
+          total_amount: payment.total_amount ? Number(payment.total_amount) : null,
+          paid_amount: payment.paid_amount ? Number(payment.paid_amount) : null,
           paid_at: payment.paid_at ? new Date(payment.paid_at).toISOString() : null,
         }))
       }
@@ -278,6 +317,8 @@ export function useEditPlotForm() {
     sumExceedsSaleValue,
     watchedFloorValue,
     watchedSaleValue,
+    totalPaidAmount,
+    paymentPlanRatio,
     // dropdowns
     brokers,
     customers,
@@ -294,6 +335,9 @@ export function useEditPlotForm() {
     society,
     loadPlot,
     initialBrokerId,
-    initialCustomerId
+    initialCustomerId,
+    coApplicants,
+    setCoApplicants
   }
 }
+

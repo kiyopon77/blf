@@ -5,6 +5,8 @@ import type {
   CreateFloorDTO,
   FloorLog,
   FloorStatus,
+  UpdateFloorDTO,
+  FloorNoteResponse,
 } from "@/types/floor"
 
 // GET ALL FLOORS
@@ -39,6 +41,15 @@ export const updateFloorStatus = async (
   return res.data
 }
 
+// UPDATE FLOOR DETAILS
+export const updateFloor = async (
+  id: number,
+  data: UpdateFloorDTO
+): Promise<Floor> => {
+  const res = await api.put<Floor>(`/floors/${id}`, data)
+  return res.data
+}
+
 // GET FLOORS OF A PLOT
 export const getPlotFloors = async (
   plotId: number
@@ -53,5 +64,22 @@ export const getFloorLogs = async (
   floorId: number
 ): Promise<FloorLog[]> => {
   const res = await api.get<FloorLog[]>(`/floors/${floorId}/logs`)
+  return res.data
+}
+
+// GET FLOOR NOTES
+export const getFloorNotes = async (
+  floorId: number
+): Promise<FloorNoteResponse> => {
+  const res = await api.get<FloorNoteResponse>(`/floors/${floorId}/notes`)
+  return res.data
+}
+
+// UPDATE FLOOR NOTES
+export const updateFloorNotes = async (
+  floorId: number,
+  content: string
+): Promise<FloorNoteResponse> => {
+  const res = await api.put<FloorNoteResponse>(`/floors/${floorId}/notes`, { content })
   return res.data
 }

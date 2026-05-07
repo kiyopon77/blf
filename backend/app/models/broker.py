@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP
+from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -10,6 +10,11 @@ class Broker(Base):
     society_id = Column(Integer, ForeignKey("society.society_id"), nullable=False)
     broker_name = Column(String(100), nullable=True)
     phone = Column(String(20), unique=True)
+
+    company_name = Column(String(50), nullable=True)
+    email = Column(String(100), nullable=True)
+    kyc_status = Column(Enum("PENDING", "DONE", name="kyc_status"), default="PENDING")
+
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
 

@@ -33,6 +33,13 @@ def get_broker(broker_id: int, db: Session = Depends(get_db), user=Depends(get_c
 
 @router.post("", response_model=BrokerResponse, status_code=status.HTTP_201_CREATED)
 def create_broker(data: BrokerCreate, db: Session = Depends(get_db), admin=Depends(require_admin)):
+
+    #  Prevent duplicate phone
+    if data.phone:
+        existing = db.query(Broker).filter(Broker.phone == data.phone).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Phone already exists")
+
     broker = Broker(**data.model_dump())
     db.add(broker)
     db.commit()
@@ -48,12 +55,22 @@ def update_broker(broker_id: int, data: BrokerUpdate, db: Session = Depends(get_
 
     update_data = data.model_dump(exclude_none=True)
 
-    # prevent user_id being set to null
+    #  prevent user_id null
     if "user_id" in update_data and update_data["user_id"] is None:
         raise HTTPException(status_code=400, detail="user_id cannot be null")
 
+    #  prevent duplicate phone
+    if "phone" in update_data:
+        existing = db.query(Broker).filter(
+            Broker.phone == update_data["phone"],
+            Broker.broker_id != broker_id
+        ).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Phone already exists")
+
     for key, value in update_data.items():
         setattr(broker, key, value)
+
     db.commit()
     db.refresh(broker)
     return broker

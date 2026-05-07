@@ -17,6 +17,7 @@ interface Props {
   floorValueNum: number
   sumExceedsSaleValue: boolean
   onCreateSale: () => void
+  paymentPlanRatio?: string | null
 }
 
 // handles milestones section functionality
@@ -30,6 +31,7 @@ export function MilestonesSection({
   floorValueNum,
   sumExceedsSaleValue,
   onCreateSale,
+  paymentPlanRatio,
 }: Props) {
   if (!hasSale) {
     return (
@@ -96,6 +98,7 @@ export function MilestonesSection({
         register={register}
         setValue={setValue}
         floorValue={isNaN(saleValueNum) ? null : saleValueNum}
+        paymentPlanRatio={paymentPlanRatio}
       />
     </>
   )

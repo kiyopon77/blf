@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Enum, ForeignKey, Numeric, UniqueConstraint
+from sqlalchemy import Column, Integer, Enum, ForeignKey, Numeric, UniqueConstraint, String
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 import enum
@@ -19,7 +19,7 @@ class Floor(Base):
     floor_value = Column(Numeric(14, 2), nullable=True)
     status = Column(Enum(InventoryStatus, name="inventory_status"), default=InventoryStatus.AVAILABLE)
     active_sale_id = Column(Integer, ForeignKey("sales.sale_id"), nullable=True)
-
+    file_path = Column(String(500), nullable=True)
     plot = relationship("Plot", back_populates="floors")
     sale = relationship(
         "Sale",

@@ -35,7 +35,7 @@ export function AddBrokerDialog({
 
   const handleSubmit = async () => {
     if (!form.broker_name.trim()) {
-      message.error("Broker name is required")
+      message.error("Channel Partner is required")
       return
     }
 
@@ -74,11 +74,11 @@ export function AddBrokerDialog({
       <div className="flex flex-col gap-4 py-2">
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-gray-500">
-            BROKER NAME <span className="text-red-500">*</span>
+            CHANNEL PARTNER <span className="text-red-500">*</span>
           </label>
           <input
             className="h-10 rounded-lg border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
-            placeholder="Enter broker name"
+            placeholder="Enter channel partner"
             value={form.broker_name}
             onChange={(e) =>
               setForm((f) => ({ ...f, broker_name: e.target.value }))

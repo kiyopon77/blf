@@ -2,7 +2,8 @@
 interface PaymentRow {
   payment_id: number | null
   milestone: string
-  amount: string
+  total_amount: string
+  paid_amount: string
   status: "PENDING" | "DONE"
   paid_at: string
 }
@@ -16,7 +17,7 @@ export interface EditPlotFormValues {
   floor_value: string
   sale_total_value: string
   selling_date: string
-  commission_percent: string
+  commission_amount: string
   broker_name: string
   broker_phone: string
   customer_name: string
@@ -29,6 +30,7 @@ export interface EditPlotFormValues {
   area_sqft: string
   floor_status: "AVAILABLE" | "HOLD" | "SOLD" | "CANCELLED" | "INVESTOR_UNIT"
   payments: PaymentRow[]
+  floor_notes: string
 }
 
 export const MILESTONE_ORDER = [

@@ -14,10 +14,16 @@ export interface Floor {
 export interface CreateFloorDTO {
   plot_id: number
   floor_no: number
+  floor_value?: number | null
 }
 
 export interface UpdateFloorStatusDTO {
   status: FloorStatus
+}
+
+export interface UpdateFloorDTO {
+  floor_no?: number | null
+  floor_value?: number | null
 }
 
 export interface FloorLog {
@@ -28,4 +34,9 @@ export interface FloorLog {
   old_status?: FloorStatus | null
   new_status?: FloorStatus | null
   changed_at: string
+}
+
+export interface FloorNoteResponse {
+  floor_id: number
+  content: string
 }

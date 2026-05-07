@@ -17,7 +17,7 @@ interface Props {
 
 type FormState = {
   total_value: string
-  commission_percent: string
+  commission_amount: string
   status: SaleStatus
 }
 
@@ -28,7 +28,7 @@ const SaleEditModal = ({ sale, open, setOpen, onSuccess }: Props) => {
 
   const [form, setForm] = useState<FormState>({
     total_value: sale.total_value.toString(),
-    commission_percent: sale.commission_percent?.toString() || "",
+    commission_amount: sale.commission_amount?.toString() || "",
     status: sale.status,
   })
 
@@ -42,8 +42,8 @@ const SaleEditModal = ({ sale, open, setOpen, onSuccess }: Props) => {
     try {
       await updateSale(sale.sale_id, {
         total_value: Number(form.total_value),
-        commission_percent: form.commission_percent
-          ? Number(form.commission_percent)
+        commission_amount: form.commission_amount
+          ? Number(form.commission_amount)
           : undefined,
       })
 
@@ -96,14 +96,14 @@ const SaleEditModal = ({ sale, open, setOpen, onSuccess }: Props) => {
 
           {/* Commission */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-gray-600">Commission (%)</label>
+            <label className="text-sm text-gray-600">Commission Amount (₹)</label>
             <input
               type="number"
-              value={form.commission_percent}
+              value={form.commission_amount}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  commission_percent: e.target.value,
+                  commission_amount: e.target.value,
                 })
               }
               className="border border-gray-300 rounded-md p-2 text-sm"

@@ -1,86 +1,81 @@
 import os
 import uuid
-from PIL import Image
-import io
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+from typing import List
+
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_admin, ensure_society_access
 from app.models.document import Document, EntityType
 from app.models.sale import Sale
 from app.schemas.document import DocumentResponse
-from typing import List
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
-UPLOAD_DIR = "/app/uploads"
-ALLOWED_TYPES = {"application/pdf", "image/jpeg", "image/png"}
-ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png"}
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-IMAGE_QUALITY = 70
-IMAGE_MAX_WIDTH = 1920
+# ✅ Base directory
+UPLOAD_BASE = "/app/uploads/documents"
+BASE_DIR = "/app"
 
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-
-def compress_image(contents: bytes, ext: str) -> bytes:
-    img = Image.open(io.BytesIO(contents))
-    if img.mode in ("RGBA", "P"):
-        img = img.convert("RGB")
-    if img.width > IMAGE_MAX_WIDTH:
-        ratio = IMAGE_MAX_WIDTH / img.width
-        new_height = int(img.height * ratio)
-        img = img.resize((IMAGE_MAX_WIDTH, new_height), Image.LANCZOS)
-    output = io.BytesIO()
-    fmt = "JPEG" if ext in (".jpg", ".jpeg") else "PNG"
-    img.save(output, format=fmt, quality=IMAGE_QUALITY, optimize=True)
-    return output.getvalue()
+# Ensure base folder exists
+os.makedirs(UPLOAD_BASE, exist_ok=True)
 
 
 # ── Upload ──────────────────────────────────────────────
 @router.post("/upload", response_model=DocumentResponse)
 async def upload_document(
     label: str = Form(...),
-    entity: EntityType = Form(...),       # CUSTOMER or SALE
-    sale_id: int = Form(...),             # always required — links to sale
+    entity: EntityType = Form(...),
+    sale_id: int = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     admin=Depends(require_admin)
 ):
+    # ✅ Validate sale
     sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
 
+    # ✅ Extract hierarchy
+    floor = sale.floor
+    plot_id = floor.plot_id
+    floor_id = floor.floor_id
+
+    # ✅ Create folder structure
+    folder_path = os.path.join(UPLOAD_BASE, str(plot_id), str(floor_id))
+    os.makedirs(folder_path, exist_ok=True)
+
+    # ✅ Get extension (supports ALL file types)
     ext = os.path.splitext(file.filename)[1].lower()
-    if ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail="Only PDF, JPG and PNG files allowed")
-    if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(status_code=400, detail="Invalid file type")
 
-    contents = await file.read()
-    if len(contents) > MAX_FILE_SIZE:
-        raise HTTPException(status_code=400, detail="File too large — max 10MB")
-
-    if ext in (".jpg", ".jpeg", ".png"):
-        contents = compress_image(contents, ext)
-
+    # ✅ Unique filename
     unique_name = f"{uuid.uuid4()}{ext}"
-    file_path = os.path.join(UPLOAD_DIR, unique_name)
-    with open(file_path, "wb") as f:
+
+    # ✅ Relative path (store in DB)
+    relative_path = f"uploads/documents/{plot_id}/{floor_id}/{unique_name}"
+
+    # ✅ Full path (server use)
+    full_path = os.path.join(BASE_DIR, relative_path)
+
+    # ✅ Save file
+    contents = await file.read()
+    with open(full_path, "wb") as f:
         f.write(contents)
 
+    # ✅ Save in DB
     doc = Document(
         label=label,
         file_name=file.filename,
-        file_path=file_path,
-        file_type=file.content_type,
+        file_path=relative_path,
+        file_type=file.content_type or "application/octet-stream",
         entity=entity,
         sale_id=sale_id
     )
+
     db.add(doc)
     db.commit()
     db.refresh(doc)
+
     return doc
 
 
@@ -94,7 +89,9 @@ def get_sale_documents(
     sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
+
     ensure_society_access(user, sale.floor.plot.society_id)
+
     return db.query(Document).filter(Document.sale_id == sale_id).all()
 
 
@@ -109,7 +106,9 @@ def get_documents_by_entity(
     sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
+
     ensure_society_access(user, sale.floor.plot.society_id)
+
     return db.query(Document).filter(
         Document.sale_id == sale_id,
         Document.entity == entity
@@ -126,11 +125,16 @@ def download_document(
     doc = db.query(Document).filter(Document.document_id == document_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
+
     ensure_society_access(user, doc.sale.floor.plot.society_id)
-    if not os.path.exists(doc.file_path):
+
+    full_path = os.path.join(BASE_DIR, doc.file_path)
+
+    if not os.path.exists(full_path):
         raise HTTPException(status_code=404, detail="File not found on server")
+
     return FileResponse(
-        path=doc.file_path,
+        path=full_path,
         filename=doc.file_name,
         media_type=doc.file_type
     )
@@ -146,8 +150,13 @@ def delete_document(
     doc = db.query(Document).filter(Document.document_id == document_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
-    if os.path.exists(doc.file_path):
-        os.remove(doc.file_path)
+
+    full_path = os.path.join(BASE_DIR, doc.file_path)
+
+    if os.path.exists(full_path):
+        os.remove(full_path)
+
     db.delete(doc)
     db.commit()
+
     return {"message": "Document deleted"}
