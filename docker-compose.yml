@@ -63,7 +63,8 @@ services:
       - app_network
     volumes:
       - ./backend:/app
-      -  uploads_data:/app/uploads 
+      - uploads_data:/app/uploads
+      - data_files:/data 
     ports:
       - "8000:8000"
 
