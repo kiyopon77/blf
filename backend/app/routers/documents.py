@@ -13,8 +13,8 @@ from app.schemas.document import DocumentResponse
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
-# Volume is mounted at /data in Railway
-DOCS_DIR = "/data/documents"
+# Volume mounted at /data — write files directly here, NO subdirectories
+DATA_DIR = "/data"
 
 
 # ── Upload ──────────────────────────────────────────────
@@ -35,18 +35,14 @@ async def upload_document(
     plot_id = floor.plot_id
     floor_id = floor.floor_id
 
-    # Create folder structure: /data/documents/{plot_id}/{floor_id}/
-    folder_path = os.path.join(DOCS_DIR, str(plot_id), str(floor_id))
-    os.makedirs(folder_path, exist_ok=True)
-
     ext = os.path.splitext(file.filename)[1].lower()
-    unique_name = f"{uuid.uuid4()}{ext}"
+    unique_name = f"doc_{plot_id}_{floor_id}_{uuid.uuid4()}{ext}"
 
-    # Full path on server
-    full_path = os.path.join(folder_path, unique_name)
+    # Write directly to /data/ — no subdirectories
+    full_path = os.path.join(DATA_DIR, unique_name)
 
-    # Relative path stored in DB (relative to /data)
-    relative_path = f"documents/{plot_id}/{floor_id}/{unique_name}"
+    # Relative path stored in DB
+    relative_path = unique_name
 
     contents = await file.read()
     with open(full_path, "wb") as f:
@@ -117,8 +113,7 @@ def download_document(
 
     ensure_society_access(user, doc.sale.floor.plot.society_id)
 
-    # Full path = /data/ + relative_path
-    full_path = os.path.join("/data", doc.file_path)
+    full_path = os.path.join(DATA_DIR, doc.file_path)
 
     if not os.path.exists(full_path):
         raise HTTPException(status_code=404, detail="File not found on server")
@@ -141,7 +136,7 @@ def delete_document(
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    full_path = os.path.join("/data", doc.file_path)
+    full_path = os.path.join(DATA_DIR, doc.file_path)
 
     if os.path.exists(full_path):
         os.remove(full_path)

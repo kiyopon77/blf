@@ -15,19 +15,15 @@ import os
 
 router = APIRouter(prefix="/floors", tags=["Floors"])
 
-# Volume is mounted at /data in Railway
-FLOORS_DIR = "/data/floors"
+# Volume mounted at /data — write files directly here, NO subdirectories
+DATA_DIR = "/data"
 
 
 def _get_note_paths(plot_id: int, floor_id: int):
     """Returns (relative_path, full_path) for a floor note file."""
-    relative_path = f"floors/{plot_id}_{floor_id}.txt"
-    full_path = f"{FLOORS_DIR}/{plot_id}_{floor_id}.txt"
-    return relative_path, full_path
-
-
-def _ensure_floors_dir():
-    os.makedirs(FLOORS_DIR, exist_ok=True)
+    filename = f"floor_{plot_id}_{floor_id}.txt"
+    full_path = os.path.join(DATA_DIR, filename)
+    return filename, full_path
 
 
 @router.get("", response_model=List[FloorResponse])
@@ -59,7 +55,6 @@ def create_floor(data: FloorCreate, db: Session = Depends(get_db), admin=Depends
     db.commit()
     db.refresh(floor)
 
-    _ensure_floors_dir()
     relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
 
     with open(full_path, "w") as f:
@@ -136,18 +131,18 @@ def get_floor_notes(
 
     relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
 
-    # Auto-create file if missing (handles existing floors with no file yet)
-    if not floor.file_path or not os.path.exists(full_path):
-        _ensure_floors_dir()
+    # Auto-create file if missing (handles existing floors migrated from old system)
+    if not os.path.exists(full_path):
         with open(full_path, "w") as f:
             f.write(f"Floor ID: {floor.floor_id}\n")
             f.write(f"Plot ID: {floor.plot_id}\n")
             f.write(f"Floor No: {floor.floor_no}\n")
             f.write("Add your notes here...\n")
 
+    # Always keep DB in sync with correct path
+    if floor.file_path != relative_path:
         floor.file_path = relative_path
         db.commit()
-        db.refresh(floor)
 
     with open(full_path, "r") as f:
         content = f.read()
@@ -170,9 +165,8 @@ def update_floor_notes(
 
     relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
 
-    # Auto-create dir if missing
-    if not floor.file_path:
-        _ensure_floors_dir()
+    # Keep DB in sync
+    if floor.file_path != relative_path:
         floor.file_path = relative_path
         db.commit()
 
