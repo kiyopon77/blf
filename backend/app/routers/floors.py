@@ -15,7 +15,19 @@ import os
 
 router = APIRouter(prefix="/floors", tags=["Floors"])
 
-UPLOAD_BASE = "/app/uploads"
+# Volume is mounted at /data in Railway
+FLOORS_DIR = "/data/floors"
+
+
+def _get_note_paths(plot_id: int, floor_id: int):
+    """Returns (relative_path, full_path) for a floor note file."""
+    relative_path = f"floors/{plot_id}_{floor_id}.txt"
+    full_path = f"{FLOORS_DIR}/{plot_id}_{floor_id}.txt"
+    return relative_path, full_path
+
+
+def _ensure_floors_dir():
+    os.makedirs(FLOORS_DIR, exist_ok=True)
 
 
 @router.get("", response_model=List[FloorResponse])
@@ -43,25 +55,19 @@ def get_floor(floor_id: int, db: Session = Depends(get_db), user=Depends(get_cur
 @router.post("", response_model=FloorResponse, status_code=status.HTTP_201_CREATED)
 def create_floor(data: FloorCreate, db: Session = Depends(get_db), admin=Depends(require_admin)):
     floor = Floor(**data.model_dump())
-
     db.add(floor)
     db.commit()
     db.refresh(floor)
 
-    # RELATIVE path (stored in DB) — flat, no subdirectory
-    relative_path = f"uploads/{floor.plot_id}_{floor.floor_id}.txt"
+    _ensure_floors_dir()
+    relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
 
-    # FULL path (used by server)
-    full_path = os.path.join("/app", relative_path)
-
-    # Create file directly in /app/uploads/ — no makedirs needed
     with open(full_path, "w") as f:
         f.write(f"Floor ID: {floor.floor_id}\n")
         f.write(f"Plot ID: {floor.plot_id}\n")
         f.write(f"Floor No: {floor.floor_no}\n")
         f.write("Add your notes here...\n")
 
-    # Save relative path
     floor.file_path = relative_path
     db.commit()
     db.refresh(floor)
@@ -128,11 +134,11 @@ def get_floor_notes(
 
     ensure_society_access(user, floor.plot.society_id)
 
-    # Auto-create file if missing — flat path, no subdirectory
-    if not floor.file_path or not os.path.exists(os.path.join("/app", floor.file_path)):
-        relative_path = f"uploads/{floor.plot_id}_{floor.floor_id}.txt"
-        full_path = os.path.join("/app", relative_path)
+    relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
 
+    # Auto-create file if missing (handles existing floors with no file yet)
+    if not floor.file_path or not os.path.exists(full_path):
+        _ensure_floors_dir()
         with open(full_path, "w") as f:
             f.write(f"Floor ID: {floor.floor_id}\n")
             f.write(f"Plot ID: {floor.plot_id}\n")
@@ -143,7 +149,6 @@ def get_floor_notes(
         db.commit()
         db.refresh(floor)
 
-    full_path = os.path.join("/app", floor.file_path)
     with open(full_path, "r") as f:
         content = f.read()
 
@@ -163,12 +168,14 @@ def update_floor_notes(
 
     ensure_society_access(user, floor.plot.society_id)
 
-    # Auto-create file path if missing — flat path, no subdirectory
-    if not floor.file_path or not os.path.exists(os.path.join("/app", floor.file_path)):
-        floor.file_path = f"uploads/{floor.plot_id}_{floor.floor_id}.txt"
+    relative_path, full_path = _get_note_paths(floor.plot_id, floor.floor_id)
+
+    # Auto-create dir if missing
+    if not floor.file_path:
+        _ensure_floors_dir()
+        floor.file_path = relative_path
         db.commit()
 
-    full_path = os.path.join("/app", floor.file_path)
     with open(full_path, "w") as f:
         f.write(data.content)
 

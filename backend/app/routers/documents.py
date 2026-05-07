@@ -13,11 +13,8 @@ from app.schemas.document import DocumentResponse
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
-# ✅ Base directory
-UPLOAD_BASE = "/app/uploads/documents"
-BASE_DIR = "/app"
-
-
+# Volume is mounted at /data in Railway
+DOCS_DIR = "/data/documents"
 
 
 # ── Upload ──────────────────────────────────────────────
@@ -30,38 +27,31 @@ async def upload_document(
     db: Session = Depends(get_db),
     admin=Depends(require_admin)
 ):
-    # ✅ Validate sale
     sale = db.query(Sale).filter(Sale.sale_id == sale_id).first()
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
 
-    # ✅ Extract hierarchy
     floor = sale.floor
     plot_id = floor.plot_id
     floor_id = floor.floor_id
 
-    # ✅ Create folder structure
-    folder_path = os.path.join(UPLOAD_BASE, str(plot_id), str(floor_id))
+    # Create folder structure: /data/documents/{plot_id}/{floor_id}/
+    folder_path = os.path.join(DOCS_DIR, str(plot_id), str(floor_id))
     os.makedirs(folder_path, exist_ok=True)
 
-    # ✅ Get extension (supports ALL file types)
     ext = os.path.splitext(file.filename)[1].lower()
-
-    # ✅ Unique filename
     unique_name = f"{uuid.uuid4()}{ext}"
 
-    # ✅ Relative path (store in DB)
-    relative_path = f"uploads/documents/{plot_id}/{floor_id}/{unique_name}"
+    # Full path on server
+    full_path = os.path.join(folder_path, unique_name)
 
-    # ✅ Full path (server use)
-    full_path = os.path.join(BASE_DIR, relative_path)
+    # Relative path stored in DB (relative to /data)
+    relative_path = f"documents/{plot_id}/{floor_id}/{unique_name}"
 
-    # ✅ Save file
     contents = await file.read()
     with open(full_path, "wb") as f:
         f.write(contents)
 
-    # ✅ Save in DB
     doc = Document(
         label=label,
         file_name=file.filename,
@@ -127,7 +117,8 @@ def download_document(
 
     ensure_society_access(user, doc.sale.floor.plot.society_id)
 
-    full_path = os.path.join(BASE_DIR, doc.file_path)
+    # Full path = /data/ + relative_path
+    full_path = os.path.join("/data", doc.file_path)
 
     if not os.path.exists(full_path):
         raise HTTPException(status_code=404, detail="File not found on server")
@@ -150,7 +141,7 @@ def delete_document(
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    full_path = os.path.join(BASE_DIR, doc.file_path)
+    full_path = os.path.join("/data", doc.file_path)
 
     if os.path.exists(full_path):
         os.remove(full_path)
