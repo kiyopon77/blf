@@ -17,6 +17,7 @@ router = APIRouter(prefix="/floors", tags=["Floors"])
 
 UPLOAD_BASE = "/app/uploads"
 
+
 @router.get("", response_model=List[FloorResponse])
 def get_floors(
     society_id: Optional[int] = Query(default=None),
@@ -47,24 +48,20 @@ def create_floor(data: FloorCreate, db: Session = Depends(get_db), admin=Depends
     db.commit()
     db.refresh(floor)
 
-    #  Create folder: uploads/{plot_id}
-    plot_folder = os.path.join(UPLOAD_BASE, str(floor.plot_id))
-    os.makedirs(plot_folder, exist_ok=True)
+    # RELATIVE path (stored in DB) — flat, no subdirectory
+    relative_path = f"uploads/{floor.plot_id}_{floor.floor_id}.txt"
 
-    #  RELATIVE path (stored in DB)
-    relative_path = f"uploads/{floor.plot_id}/{floor.floor_id}.txt"
-
-    #  FULL path (used by server)
+    # FULL path (used by server)
     full_path = os.path.join("/app", relative_path)
 
-    #  Create file
+    # Create file directly in /app/uploads/ — no makedirs needed
     with open(full_path, "w") as f:
         f.write(f"Floor ID: {floor.floor_id}\n")
         f.write(f"Plot ID: {floor.plot_id}\n")
         f.write(f"Floor No: {floor.floor_no}\n")
         f.write("Add your notes here...\n")
 
-    #  Save relative path
+    # Save relative path
     floor.file_path = relative_path
     db.commit()
     db.refresh(floor)
@@ -105,7 +102,6 @@ def update_floor_status(
 
     old_status = floor.status
 
-    # log the change
     log = FloorStatusLog(
         floor_id=floor_id,
         changed_by=current_user.user_id,
@@ -119,6 +115,7 @@ def update_floor_status(
     db.refresh(floor)
     return floor
 
+
 @router.get("/{floor_id}/notes", response_model=FloorNoteResponse)
 def get_floor_notes(
     floor_id: int,
@@ -131,12 +128,9 @@ def get_floor_notes(
 
     ensure_society_access(user, floor.plot.society_id)
 
-    # Auto-create file if floor has no file_path or file doesn't exist
+    # Auto-create file if missing — flat path, no subdirectory
     if not floor.file_path or not os.path.exists(os.path.join("/app", floor.file_path)):
-        plot_folder = os.path.join(UPLOAD_BASE, str(floor.plot_id))
-        os.makedirs(plot_folder, exist_ok=True)
-
-        relative_path = f"uploads/{floor.plot_id}/{floor.floor_id}.txt"
+        relative_path = f"uploads/{floor.plot_id}_{floor.floor_id}.txt"
         full_path = os.path.join("/app", relative_path)
 
         with open(full_path, "w") as f:
@@ -155,6 +149,7 @@ def get_floor_notes(
 
     return FloorNoteResponse(floor_id=floor_id, content=content)
 
+
 @router.put("/{floor_id}/notes", response_model=FloorNoteResponse)
 def update_floor_notes(
     floor_id: int,
@@ -168,15 +163,9 @@ def update_floor_notes(
 
     ensure_society_access(user, floor.plot.society_id)
 
-    # Auto-create file if floor has no file_path or file doesn't exist
+    # Auto-create file path if missing — flat path, no subdirectory
     if not floor.file_path or not os.path.exists(os.path.join("/app", floor.file_path)):
-        plot_folder = os.path.join(UPLOAD_BASE, str(floor.plot_id))
-        os.makedirs(plot_folder, exist_ok=True)
-
-        relative_path = f"uploads/{floor.plot_id}/{floor.floor_id}.txt"
-        full_path = os.path.join("/app", relative_path)
-
-        floor.file_path = relative_path
+        floor.file_path = f"uploads/{floor.plot_id}_{floor.floor_id}.txt"
         db.commit()
 
     full_path = os.path.join("/app", floor.file_path)
