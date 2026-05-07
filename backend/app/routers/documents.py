@@ -17,8 +17,7 @@ router = APIRouter(prefix="/documents", tags=["Documents"])
 UPLOAD_BASE = "/app/uploads/documents"
 BASE_DIR = "/app"
 
-# Ensure base folder exists
-os.makedirs(UPLOAD_BASE, exist_ok=True)
+
 
 
 # ── Upload ──────────────────────────────────────────────
